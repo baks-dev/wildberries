@@ -1,0 +1,41 @@
+{
+  "name": "baks-dev/wildberries",
+  "description": "Модуль Wildberries Api",
+  "homepage": "https://github.com/baks-dev/wildberries",
+  "keywords": [
+    "symfony",
+    "bundle",
+    "library",
+    "module",
+    "plugin",
+    "wildberries",
+    "api",
+    "baksdev"
+  ],
+  "license": "MIT",
+  "type": "symfony-bundle",
+  "authors": [
+    {
+      "name": "Baks Development",
+      "email": "admin@baks.dev"
+    }
+  ],
+  "require": {
+    "php": ">=8.1"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest",
+    "symfony/test-pack": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "BaksDev\\Wildberries\\": ""
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "symfony/flex": true
+    }
+  }
+}
