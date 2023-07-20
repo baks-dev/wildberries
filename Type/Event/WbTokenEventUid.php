@@ -30,5 +30,5 @@ use BaksDev\Core\Type\UidType\Uid;
 
 final class WbTokenEventUid extends Uid
 {
-    public const TYPE = 'wb_token_event_uid';
+    public const TYPE = 'wb_token_event';
 }
