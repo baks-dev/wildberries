@@ -1,0 +1,27 @@
+admin:
+  page:
+    index: 'Wildberries auth tokens'
+    new: 'Add Wildberries auth tokens'
+    edit: 'Edit Wildberries auth tokens'
+    delete: 'Delete Wildberries auth tokens'
+
+  breadcrumb:
+    index: 'Authorization Tokens'
+    new: 'Add authorization tokens'
+    edit: 'Edit authorization tokens'
+    delete: 'Delete authorization tokens'
+
+  success:
+    new: 'Wildberries auth token successfully added'
+    edit: 'Wildberries auth token updated successfully'
+    delete: 'Wildberries auth token deleted successfully'
+    restore: 'Wildberries auth token successfully restored'
+
+  danger:
+    new: '%s: Error adding Wildberries auth token'
+    edit: '%s: Error refreshing Wildberries auth token'
+    delete: '%s: Error refreshing Wildberries auth token'
+    restore: '%s: Error refreshing Wildberries auth token'
+  form:
+    delete:
+      h4: 'Are you sure you want to delete the tokens?'

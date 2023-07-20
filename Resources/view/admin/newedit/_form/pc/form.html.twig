@@ -1,0 +1,172 @@
+{% trans_default_domain 'admin.wb.token' %}
+
+<ul class="nav nav-pills gap-3 mb-3" id="nav-token">
+    <li class="nav-item" role="presentation">
+        <button class="btn fw-bolder nav-link active"
+                data-bs-toggle="tab"
+                type="button"
+                role="tab"
+                aria-selected="true"
+
+                data-bs-target="#tab_token"
+                aria-controls="nav-token"
+        >
+            <small class="text-uppercase px-3">
+                {# Продукт #}
+                Токен
+            </small>
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="btn fw-bolder nav-link"
+                data-bs-toggle="tab"
+                type="button"
+                role="tab"
+                aria-selected="true"
+
+                data-bs-target="#tab_cookie"
+                aria-controls="nav-token"
+        >
+            <small class="text-uppercase px-3">
+                {# Описание #}
+                Сookie
+            </small>
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="btn fw-bolder nav-link"
+                data-bs-toggle="tab"
+                type="button"
+                role="tab"
+                aria-selected="true"
+
+                data-bs-target="#tab_profile"
+                aria-controls="nav-token"
+        >
+            <small class="text-uppercase px-3">
+                {# Описание #}
+                Профили с доступом
+            </small>
+        </button>
+    </li>
+
+</ul>
+
+<div class="tab-content" id="token_tab_content">
+
+    {# ОСНОВНЫЕ НАСТРОЙКИ #}
+    <div class="tab-pane fade show active" id="tab_token" role="tabpanel">
+
+        {{ form_row(form.profile, { label: 'Профиль пользователя', placeholder: 'Выберите профиль из списка...' }) }}
+
+        {{ form_row(form.token, { label: 'Токен авторизации' }) }}
+
+        <div class="flex-fill d-flex justify-content-around pb-3 radio-buttons gap-3" data-buttons="true">
+
+            <label class="btn p-3 border-dashed rounded-3 w-100 {{ form.active.vars.data ? 'active' }}">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                    <span class="h5">
+                        <div class="form-check d-flex align-items-center">
+                            {{ form_widget(form.active, { label: false }) }}
+                            <span>
+                                Активный токен
+                            </span>
+                        </div>
+                    </span>
+                    </div>
+                </div>
+            </label>
+        </div>
+
+    </div>
+
+    <div class="tab-pane fade" id="tab_cookie" role="tabpanel">
+
+        {{ form_row(form.cookie.identifier, { label: 'Идентификатор магазина (x-supplier-id)' }) }}
+
+        {{ form_row(form.cookie.token, { label: 'Токен авторизации (WBToken)' }) }}
+
+    </div>
+
+    <div class="tab-pane fade" id="tab_profile" role="tabpanel">
+
+        <div id="wb_token_form_access_collection">
+            {% for access in form.access %}
+
+                <div id="item_{{ access.profile.vars.id }}">
+
+                    <div class="d-flex justify-content-between align-items-end gap-3 mb-3">
+                        <button type="button"
+                                class="btn btn-outline-danger border-0 del-item"
+                                data-delete="item_{{ access.profile.vars.id }}"
+                        >
+                            <span class="svg-icon svg-icon-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25"
+                                     fill="none">
+                                    <rect opacity="0.5" x="7.05025" y="15.5356" width="12" height="2" rx="1"
+                                          transform="rotate(-45 7.05025 15.5356)"
+                                          fill="currentColor"></rect>
+                                    <rect x="8.46447" y="7.05029"
+                                          width="12" height="2" rx="1"
+                                          transform="rotate(45 8.46447 7.05029)"
+                                          fill="currentColor">
+
+                                    </rect>
+                                </svg>
+                            </span>
+                        </button>
+
+                        {# Профиль пользователя #}
+                        {{ form_widget(access.profile, { label : false, placeholder : 'Выберите профиль из списка...', attr: { class: 'mb-0' }  } ) }}
+                    </div>
+
+                </div>
+
+            {% endfor %}
+        </div>
+
+        {# {{ include(_self|replace({ "_call.html.twig": "phone/_phone.prototype.html.twig" }) )|e('html_attr') }} #}
+
+        <button type="button"
+                class="btn btn-sm btn-outline-primary border-0 mt-3"
+                id="add-collection-access"
+                data-prototype="{{ include(_self|replace({ "form.html.twig": "_profile.prototype.html.twig" }) )|e('html_attr') }}"
+
+                data-collection="{{ form.access.vars.id }}_collection"
+                data-item="item_{{ form.access.vars.prototype.vars.id }}"
+                data-index="{{ form.access.count }}"
+
+        >
+						<span class="svg-icon svg-icon-2">
+							<svg xmlns="http://www.w3.org/2000/svg"
+                                 width="24"
+                                 height="24"
+                                 viewBox="0 0 24 24"
+                                 fill="none">
+								<rect opacity="0.5"
+                                      x="11"
+                                      y="18"
+                                      width="12"
+                                      height="2"
+                                      rx="1"
+                                      transform="rotate(-90 11 18)"
+                                      fill="currentColor">
+							</rect>
+								<rect x="6" y="11" width="12" height="2" rx="1" fill="currentColor"></rect>
+							</svg>
+						</span>
+            Добавить еще профиль
+        </button>
+
+    </div>
+
+
+</div>
+
+
+
+
+

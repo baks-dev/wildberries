@@ -1,0 +1,140 @@
+<?php
+/*
+ *  Copyright 2022.  Baks.dev <admin@baks.dev>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
+namespace BaksDev\Wildberries\Api\Token\Reference\Сharacteristics;
+
+final class CharacteristicCardDTO
+{
+
+    /**
+     * Наименование подкатегории
+     */
+    private string $object;
+
+    /**
+     * Наименование характеристики
+     */
+    private string $name;
+
+    /**
+     * Характеристика обязательна к заполнению
+     */
+    private bool $required;
+
+    /**
+     * Единица измерения (см, гр и т.д.)
+     */
+    private string $unit;
+
+    /**
+     * Характеристика популярна у пользователей
+     */
+    private bool $popular;
+
+    /**
+     * Максимальное кол-во значений которое можно присвоить данной характеристике
+     */
+    private ?int $count = null;
+
+    /**
+     * Тип характеристики (1 и 0 - строка или массив строк; 4 - число или массив чисел)
+     */
+    private ?int $char = null;
+
+
+    public function __construct($data)
+    {
+        $this->object = $data['objectName'];
+        $this->name = $data['name'];
+        $this->required = $data['required'];
+        $this->popular = $data['popular'];
+        $this->count = $data['maxCount'] ?? null;
+        $this->unit = $data['unitName'];
+        $this->char = $data['charcType'];
+    }
+
+
+    /**
+     * Наименование подкатегории
+     */
+    public function getObject(): string
+    {
+        return $this->object;
+    }
+
+
+    /**
+     * Наименование подкатегории
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * Характеристика обязательна к заполнению
+     */
+    public function isRequired(): bool
+    {
+        return $this->required;
+    }
+
+
+    /**
+     * Единица измерения (см, гр и т.д.)
+     */
+    public function getUnit(): string
+    {
+        return $this->unit;
+    }
+
+
+    /**
+     * Характеристика популярна у пользователей
+     */
+    public function isPopular(): bool
+    {
+        return $this->popular;
+    }
+
+
+    /**
+     * Максимальное кол-во значений которое можно присвоить данной характеристике
+     */
+    public function getCount(): ?int
+    {
+        return $this->count;
+    }
+
+
+    /**
+     * Тип характеристики (1 и 0 - строка или массив строк; 4 - число или массив чисел)
+     */
+    public function getChar(): ?int
+    {
+        return $this->char;
+    }
+
+
+    public function isNumber(): bool
+    {
+        return $this->char === 4;
+    }
+
+}

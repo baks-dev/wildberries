@@ -1,18 +1,17 @@
 # Роль
 
-ROLE_USERPROFILE:
-  name: 'Профили пользователей'
-  desc: 'Профили пользователей'
+ROLE_WB_TOKEN:
+  name: 'Токены авторизации'
+  desc: 'Токены авторизации Wildberries'
 
 # Правила
 
-ROLE_USERPROFILE_NEW:
+ROLE_WB_TOKEN_NEW:
   name: 'Добавить'
 
-ROLE_USERPROFILE_EDIT:
+ROLE_WB_TOKEN_EDIT:
   name: 'Редактировать'
 
-ROLE_USERPROFILE_DELETE:
+ROLE_WB_TOKEN_DELETE:
   name: 'Удалить'
-
 

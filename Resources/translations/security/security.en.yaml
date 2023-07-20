@@ -1,13 +1,16 @@
-ROLE_USERPROFILE:
-  name: 'User profiles'
-  desc: 'User profiles'
+# Role
 
+ROLE_WB_TOKEN:
+  name: 'Authorization Tokens'
+  desc: 'Wildberries auth tokens'
 
-ROLE_USERPROFILE_NEW:
+# Rules
+
+ROLE_WB_TOKEN_NEW:
   name: 'Add'
 
-ROLE_USERPROFILE_EDIT:
+ROLE_WB_TOKEN_EDIT:
   name: 'Edit'
 
-ROLE_USERPROFILE_DELETE:
+ROLE_WB_TOKEN_DELETE:
   name: 'Delete'
