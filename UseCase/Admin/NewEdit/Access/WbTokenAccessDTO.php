@@ -37,7 +37,7 @@ final class WbTokenAccessDTO implements WbTokenAccessInterface
      * Профиль пользователя
      */
     #[Assert\Uuid]
-    private UserProfileUid $profile;
+    private ?UserProfileUid $profile = null;
 
     /**
      * Профиль пользователя
