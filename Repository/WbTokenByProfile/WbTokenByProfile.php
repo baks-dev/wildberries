@@ -26,6 +26,7 @@ namespace BaksDev\Wildberries\Repository\WbTokenByProfile;
 
 use BaksDev\Auth\Email\Type\Status\AccountStatus;
 use BaksDev\Auth\Email\Type\Status\AccountStatusEnum;
+use BaksDev\Core\Doctrine\ORMQueryBuilder;
 use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
@@ -37,26 +38,24 @@ use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationCookie;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
-use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 final class WbTokenByProfile implements WbTokenByProfileInterface
 {
 
-    private EntityManagerInterface $entityManager;
-
     private TokenStorageInterface $tokenStorage;
+    private ORMQueryBuilder $ORMQueryBuilder;
 
 
     public function __construct(
-        EntityManagerInterface $entityManager,
+        ORMQueryBuilder $ORMQueryBuilder,
         TokenStorageInterface $tokenStorage,
     )
     {
-        $this->entityManager = $entityManager;
+
         $this->tokenStorage = $tokenStorage;
+        $this->ORMQueryBuilder = $ORMQueryBuilder;
     }
 
 
@@ -65,7 +64,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
      */
     public function getToken(UserProfileUid $profile): ?WbAuthorizationToken
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
 
         $select = sprintf('new %s(token.id, event.token)', WbAuthorizationToken::class);
         $qb->select($select);
@@ -91,17 +90,9 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
 
         $qb->setParameter('status', new UserProfileStatus(UserProfileStatusEnum::ACTIVE), UserProfileUid::TYPE);
 
-        // Кешируем результат ORM
-        $cacheQueries = new ApcuAdapter('Wildberries');
 
-        $query = $this->entityManager->createQuery($qb->getDQL());
-        $query->setQueryCache($cacheQueries);
-        $query->setResultCache($cacheQueries);
-        $query->enableResultCache();
-        $query->setLifetime(60 * 60 * 24);
-        $query->setParameters($qb->getParameters());
-
-        return $query->getOneOrNullResult();
+        /* Кешируем результат ORM */
+        return $qb->enableCache('UserGroup', 86400)->getOneOrNullResult();
 
     }
 
@@ -111,7 +102,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
      */
     public function getTokenCookie(UserProfileUid $profile): ?WbAuthorizationCookie
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
 
         $select = sprintf('new %s(token.id, cookie.identifier, cookie.token)', WbAuthorizationCookie::class);
         $qb->select($select);
@@ -146,17 +137,10 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
 
         $qb->setParameter('status', new UserProfileStatus(UserProfileStatusEnum::ACTIVE), UserProfileUid::TYPE);
 
-        // Кешируем результат ORM
-        $cacheQueries = new ApcuAdapter('Wildberries');
 
-        $query = $this->entityManager->createQuery($qb->getDQL());
-        $query->setQueryCache($cacheQueries);
-        $query->setResultCache($cacheQueries);
-        $query->enableResultCache();
-        $query->setLifetime(60 * 60 * 24);
-        $query->setParameters($qb->getParameters());
+        /* Кешируем результат ORM */
+        return $qb->enableCache('Wildberries', 86400)->getOneOrNullResult();
 
-        return $query->getOneOrNullResult();
     }
 
 
@@ -165,6 +149,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
      */
     public function getCurrentUserProfile(): ?UserProfileUid
     {
+        /** @var UserUid $user */
         $user = $this->tokenStorage->getToken()
             ?->getUser()
             ?->getId();
@@ -174,7 +159,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
             throw new InvalidArgumentException('Невозможно определить авторизованного пользователя');
         }
 
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
 
         $select = sprintf('new %s(profile.id)', UserProfileUid::class);
         $qb->select($select);
@@ -195,19 +180,8 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
             'profile.id = profile_info.profile',
         );
 
-
-        // Кешируем результат ORM
-        $cacheQueries = new ApcuAdapter('Wildberries');
-
-        $query = $this->entityManager->createQuery($qb->getDQL());
-        $query->setQueryCache($cacheQueries);
-        $query->setResultCache($cacheQueries);
-        $query->enableResultCache();
-        $query->setLifetime(60 * 60 * 24);
-        $query->setParameters($qb->getParameters());
-        
-        return $query->getOneOrNullResult();
-        //return $query->getSingleResult();
+        /* Кешируем результат ORM */
+        return $qb->enableCache('Wildberries', 86400)->getOneOrNullResult();
 
     }
 

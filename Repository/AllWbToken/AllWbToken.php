@@ -28,10 +28,9 @@ namespace BaksDev\Wildberries\Repository\AllWbToken;
 use BaksDev\Auth\Email\Entity\Account;
 use BaksDev\Auth\Email\Entity\Event\AccountEvent;
 use BaksDev\Auth\Email\Entity\Status\AccountStatus;
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
-use BaksDev\Core\Services\Switcher\SwitcherInterface;
-use BaksDev\Core\Type\Locale\Locale;
 use BaksDev\Users\Groups\Group\Entity\Group;
 use BaksDev\Users\Groups\Group\Entity\Trans\GroupTrans;
 use BaksDev\Users\Groups\Users\Entity\CheckUsers;
@@ -43,32 +42,21 @@ use BaksDev\Users\Profile\UserProfile\Entity\Personal\UserProfilePersonal;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
-use Doctrine\DBAL\Connection;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AllWbToken implements AllWbTokenInterface
 {
-
-    private Connection $connection;
-
     private PaginatorInterface $paginator;
-
-    private SwitcherInterface $switcher;
-
-    private TranslatorInterface $translator;
+    private DBALQueryBuilder $DBALQueryBuilder;
 
 
     public function __construct(
-        Connection $connection,
+        DBALQueryBuilder $DBALQueryBuilder,
         PaginatorInterface $paginator,
-        SwitcherInterface $switcher,
-        TranslatorInterface $translator
     )
     {
-        $this->connection = $connection;
+
         $this->paginator = $paginator;
-        $this->switcher = $switcher;
-        $this->translator = $translator;
+        $this->DBALQueryBuilder = $DBALQueryBuilder;
     }
 
 
@@ -77,10 +65,10 @@ final class AllWbToken implements AllWbTokenInterface
      */
     public function fetchAllWbTokenAssociative(SearchDTO $search): PaginatorInterface
     {
-        $qb = $this->connection->createQueryBuilder();
-
-        $local = new Locale($this->translator->getLocale());
-
+        $qb = $this->DBALQueryBuilder
+            ->createQueryBuilder(self::class)
+            ->bindLocal()
+        ;
 
         $qb->select('token.id');
         $qb->addSelect('token.event');
@@ -117,7 +105,6 @@ final class AllWbToken implements AllWbTokenInterface
             'users_profile_event',
             'users_profile_event.id = users_profile.event'
         );
-
 
 
         // Personal
@@ -175,10 +162,6 @@ final class AllWbToken implements AllWbTokenInterface
             'groups_trans.event = groups.event AND groups_trans.local = :local'
         );
 
-        $qb->setParameter('local', $local, Locale::TYPE);
-
-
-
         /** ACCOUNT */
 
         $qb->join(
@@ -205,33 +188,20 @@ final class AllWbToken implements AllWbTokenInterface
         );
 
         /* Поиск */
-        if($search->query)
+        if($search->getQuery())
         {
-            $search->query = mb_strtolower($search->query);
-            $searcher = $this->connection->createQueryBuilder();
+            $qb
+                ->createSearchQueryBuilder($search)
 
-            if($search->isUid())
-            {
+                ->addSearchEqualUid('token.id')
+                ->addSearchEqualUid('token.event')
 
-
-                $searcher->orWhere('token.id = :query');
-                $searcher->orWhere('token.event = :query');
-
-                $qb->setParameter('query', $search->query);
-            }
-            else
-            {
-                $searcher->orWhere('LOWER(account_event.email) LIKE :query');
-                $searcher->orWhere('LOWER(account_event.email) LIKE :switcher');
-
-                $searcher->orWhere('LOWER(users_profile_personal.username) LIKE :query');
-                $searcher->orWhere('LOWER(users_profile_personal.username) LIKE :switcher');
-
-                $qb->setParameter('query', '%'.$this->switcher->toRus($search->query).'%');
-                $qb->setParameter('switcher', '%'.$this->switcher->toEng($search->query).'%');
-            }
+                ->addSearchLike('account_event.email')
+                ->addSearchLike('users_profile_personal.username')
+            ;
         }
 
         return $this->paginator->fetchAllAssociative($qb);
+
     }
 }

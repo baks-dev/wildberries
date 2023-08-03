@@ -33,8 +33,10 @@ use BaksDev\Wildberries\UseCase\Admin\NewEdit\WbTokenForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\WbTokenHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[AsController]
 #[RoleSecurity('ROLE_WB_TOKEN_NEW')]
 final class NewController extends AbstractController
 {

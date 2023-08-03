@@ -61,7 +61,7 @@ final class AllProfileToken implements AllProfileTokenInterface
             WbTokenEvent::class,
             'event',
             'WITH',
-            'event.id = token.event AND event.profile = token.id',
+            'event.id = token.event AND event.profile = token.id AND event.active = true',
         );
 
         $qb->join(

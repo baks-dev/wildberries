@@ -20,10 +20,10 @@ namespace BaksDev\Wildberries\Controller\Admin\Tests;
 
 use BaksDev\Users\User\Tests\TestUserAccount;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group wildberries
- */
+/** @group wildberries */
+#[When(env: 'test')]
 final class IndexControllerTest extends WebTestCase
 {
     private const URL = '/admin/wb/tokens';

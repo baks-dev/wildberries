@@ -31,14 +31,14 @@ return static function(DoctrineConfig $doctrine, ContainerConfigurator $configur
 
     $doctrine->dbal()->type(WbTokenEventUid::TYPE)->class(WbTokenEventType::class);
 
-    $emDefault = $doctrine->orm()->entityManager('default');
+    $emDefault = $doctrine->orm()->entityManager('default')->autoMapping(true);
 
-    $emDefault->autoMapping(true);
+    $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
 
     $emDefault
         ->mapping('Wildberries')
         ->type('attribute')
-        ->dir(__DIR__ . '/../../Entity')
+        ->dir($MODULE . 'Entity')
         ->isBundle(false)
         ->prefix('BaksDev\Wildberries\Entity')
         ->alias('Wildberries');

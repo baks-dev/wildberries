@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Repository\WbTokenChoice;
 
+use BaksDev\Core\Doctrine\ORMQueryBuilder;
 use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use BaksDev\Users\Profile\UserProfile\Entity\Personal\UserProfilePersonal;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
@@ -36,7 +37,6 @@ use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class WbTokenChoice implements WbTokenChoiceInterface
@@ -44,17 +44,20 @@ final class WbTokenChoice implements WbTokenChoiceInterface
     private EntityManagerInterface $entityManager;
     private TranslatorInterface $translator;
     private WbTokenByProfileInterface $wbTokenByProfile;
+    private ORMQueryBuilder $ORMQueryBuilder;
 
 
     public function __construct(
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
-        WbTokenByProfileInterface $wbTokenByProfile
+        WbTokenByProfileInterface $wbTokenByProfile,
+        ORMQueryBuilder $ORMQueryBuilder
     )
     {
         $this->entityManager = $entityManager;
         $this->translator = $translator;
         $this->wbTokenByProfile = $wbTokenByProfile;
+        $this->ORMQueryBuilder = $ORMQueryBuilder;
     }
 
     /**
@@ -62,7 +65,7 @@ final class WbTokenChoice implements WbTokenChoiceInterface
      */
     public function getTokenCollection(): ?array
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
 
         $select = sprintf('new %s(token.id, users_profile_personal.username)', UserProfileUid::class);
         $qb->select($select);
@@ -99,19 +102,9 @@ final class WbTokenChoice implements WbTokenChoiceInterface
 
 
         $qb->setParameter('status', new UserProfileStatus(UserProfileStatusEnum::ACTIVE), UserProfileStatus::TYPE);
-
-
-        // Кешируем результат ORM
-        $cacheQueries = new ApcuAdapter('Wildberries');
-
-        $query = $this->entityManager->createQuery($qb->getDQL());
-        $query->setQueryCache($cacheQueries);
-        $query->setResultCache($cacheQueries);
-        $query->enableResultCache();
-        $query->setLifetime(60 * 60 * 24);
-        $query->setParameters($qb->getParameters());
-
-        return $query->getResult();
+        
+        /* Кешируем результат ORM */
+        return $qb->enableCache('Wildberries', 86400)->getResult();
     }
 
     /**
@@ -126,7 +119,7 @@ final class WbTokenChoice implements WbTokenChoiceInterface
             return [];
         }
 
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
 
         $select = sprintf('new %s(token.id, users_profile_personal.username)', UserProfileUid::class);
         $qb->select($select);
@@ -175,22 +168,8 @@ final class WbTokenChoice implements WbTokenChoiceInterface
         );
 
 
-        //        $local = new Locale($this->translator->getLocale());
-        //
-        //        $qb->setParameter('local', $local, Locale::TYPE);
-
-
-        // Кешируем результат ORM
-        $cacheQueries = new ApcuAdapter('Wildberries');
-
-        $query = $this->entityManager->createQuery($qb->getDQL());
-        $query->setQueryCache($cacheQueries);
-        $query->setResultCache($cacheQueries);
-        $query->enableResultCache();
-        $query->setLifetime(60 * 60 * 24);
-        $query->setParameters($qb->getParameters());
-
-        return $query->getResult();
+        /* Кешируем результат ORM */
+        return $qb->enableCache('Wildberries', 86400)->getResult();
 
     }
 }

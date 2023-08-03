@@ -35,8 +35,10 @@ use BaksDev\Wildberries\UseCase\Admin\Delete\WbTokenDeleteHandler;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[AsController]
 #[RoleSecurity('ROLE_WB_TOKEN_DELETE')]
 final class DeleteController extends AbstractController
 {

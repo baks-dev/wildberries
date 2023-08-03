@@ -23,10 +23,10 @@ use BaksDev\Wildberries\Entity\WbToken;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group wildberries
- */
+/** @group wildberries */
+#[When(env: 'test')]
 final class DeleteControllerTest extends WebTestCase
 {
     private const URL = '/admin/wb/token/delete/%s';

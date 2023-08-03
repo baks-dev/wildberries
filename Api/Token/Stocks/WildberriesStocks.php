@@ -109,7 +109,7 @@ final class WildberriesStocks extends Wildberries
         {
             $content = $response->toArray(false);
 
-            dump($data);
+            //dump($data);
 
             //$this->logger->critical('curl -X POST "' . $url . '" ' . $curlHeader . ' -d "' . $data . '"');
             throw new DomainException(
