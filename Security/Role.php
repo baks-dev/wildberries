@@ -27,12 +27,13 @@ namespace BaksDev\Wildberries\Security;
 
 use BaksDev\Menu\Admin\Command\Upgrade\MenuAdminInterface;
 use BaksDev\Menu\Admin\Type\SectionGroup\Group\Collection\MenuAdminSectionGroupCollectionInterface;
-use BaksDev\Users\Groups\Group\DataFixtures\Security\RoleFixturesInterface;
+use BaksDev\Menu\Admin\Type\SectionGroup\Group\MenuGroupSettings;
+use BaksDev\Users\Profile\Group\Security\RoleInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.security.role')]
 #[AutoconfigureTag('baks.menu.admin')]
-final class Role implements RoleFixturesInterface, MenuAdminInterface
+final class Role implements RoleInterface, MenuAdminInterface
 {
     /** Транспорт доставки заказов */
     public const ROLE = 'ROLE_WB_TOKEN';
@@ -57,7 +58,7 @@ final class Role implements RoleFixturesInterface, MenuAdminInterface
      */
     public function getGroupMenu(): MenuAdminSectionGroupCollectionInterface|bool
     {
-        return new MenuGroupWildberries();
+        return new MenuGroupSettings();
     }
 
     /**

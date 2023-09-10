@@ -31,15 +31,12 @@ use BaksDev\Auth\Email\Entity\Status\AccountStatus;
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
-use BaksDev\Users\Groups\Group\Entity\Group;
-use BaksDev\Users\Groups\Group\Entity\Trans\GroupTrans;
-use BaksDev\Users\Groups\Users\Entity\CheckUsers;
-use BaksDev\Users\Groups\Users\Entity\Event\CheckUsersEvent;
 use BaksDev\Users\Profile\UserProfile\Entity\Avatar\UserProfileAvatar;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\UserProfileEvent;
 use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use BaksDev\Users\Profile\UserProfile\Entity\Personal\UserProfilePersonal;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 
@@ -63,7 +60,7 @@ final class AllWbToken implements AllWbTokenInterface
     /**
      * Метод возвращает пагинатор WbToken
      */
-    public function fetchAllWbTokenAssociative(SearchDTO $search): PaginatorInterface
+    public function fetchAllWbTokenAssociative(SearchDTO $search, ?UserProfileUid $profile): PaginatorInterface
     {
         $qb = $this->DBALQueryBuilder
             ->createQueryBuilder(self::class)
@@ -74,24 +71,38 @@ final class AllWbToken implements AllWbTokenInterface
         $qb->addSelect('token.event');
         $qb->from(WbToken::TABLE, 'token');
 
+        /** сли не админ - только токен профиля */
+        if($profile)
+        {
+            $qb->where('token.id = :profile')
+                ->setParameter('profile', $profile, UserProfileUid::TYPE)
+            ;
+        }
+
+
         $qb->addSelect('event.active');
         $qb->join('token', WbTokenEvent::TABLE, 'event', 'event.id = token.event AND event.profile = token.id');
+
+
 
 
         // ОТВЕТСТВЕННЫЙ
 
         // UserProfile
         $qb->addSelect('users_profile.event as users_profile_event');
-        $qb->join(
+        $qb->leftJoin(
             'token',
             UserProfile::TABLE,
             'users_profile',
             'users_profile.id = token.id'
         );
 
+        //dd($qb->fetchAllAssociative());
+
+
         // Info
         $qb->addSelect('users_profile_info.status as users_profile_status');
-        $qb->join(
+        $qb->leftJoin(
             'token',
             UserProfileInfo::TABLE,
             'users_profile_info',
@@ -99,7 +110,7 @@ final class AllWbToken implements AllWbTokenInterface
         );
 
         // Event
-        $qb->join(
+        $qb->leftJoin(
             'users_profile',
             UserProfileEvent::TABLE,
             'users_profile_event',
@@ -110,7 +121,7 @@ final class AllWbToken implements AllWbTokenInterface
         // Personal
         $qb->addSelect('users_profile_personal.username AS users_profile_username');
 
-        $qb->join(
+        $qb->leftJoin(
             'users_profile_event',
             UserProfilePersonal::TABLE,
             'users_profile_personal',
@@ -119,8 +130,8 @@ final class AllWbToken implements AllWbTokenInterface
 
         // Avatar
 
-        $qb->addSelect("CONCAT ( '/upload/".UserProfileAvatar::TABLE."' , '/', users_profile_avatar.dir, '/', users_profile_avatar.name, '.') AS users_profile_avatar");
-        $qb->addSelect("CASE WHEN users_profile_avatar.cdn THEN  CONCAT ( 'small.', users_profile_avatar.ext) ELSE users_profile_avatar.ext END AS users_profile_avatar_ext");
+        $qb->addSelect("CASE WHEN users_profile_avatar.name IS NOT NULL THEN CONCAT ( '/upload/".UserProfileAvatar::TABLE."' , '/', users_profile_avatar.dir, '/', users_profile_avatar.name, '.') ELSE NULL END AS users_profile_avatar");
+        $qb->addSelect("CASE WHEN users_profile_avatar.cdn THEN CONCAT ( 'small.', users_profile_avatar.ext) ELSE users_profile_avatar.ext END AS users_profile_avatar_ext");
         $qb->addSelect('users_profile_avatar.cdn AS users_profile_avatar_cdn');
 
         $qb->leftJoin(
@@ -130,49 +141,49 @@ final class AllWbToken implements AllWbTokenInterface
             'users_profile_avatar.event = users_profile_event.id'
         );
 
-        // Группа
-
-        $qb->join(
-            'users_profile_info',
-            CheckUsers::TABLE,
-            'check_user',
-            'check_user.user_id = users_profile_info.user_id'
-        );
-
-        $qb->join(
-            'check_user',
-            CheckUsersEvent::TABLE,
-            'check_user_event',
-            'check_user_event.id = check_user.event'
-        );
-
-        $qb->leftJoin(
-            'check_user_event',
-            Group::TABLE,
-            'groups',
-            'groups.id = check_user_event.group_id'
-        );
-
-        $qb->addSelect('groups_trans.name AS group_name'); // Название группы
-
-        $qb->leftJoin(
-            'groups',
-            GroupTrans::TABLE,
-            'groups_trans',
-            'groups_trans.event = groups.event AND groups_trans.local = :local'
-        );
+//        // Группа
+//
+//        $qb->join(
+//            'users_profile_info',
+//            CheckUsers::TABLE,
+//            'check_user',
+//            'check_user.usr = users_profile_info.usr'
+//        );
+//
+//        $qb->join(
+//            'check_user',
+//            CheckUsersEvent::TABLE,
+//            'check_user_event',
+//            'check_user_event.id = check_user.event'
+//        );
+//
+//        $qb->leftJoin(
+//            'check_user_event',
+//            Group::TABLE,
+//            'groups',
+//            'groups.id = check_user_event.group_id'
+//        );
+//
+//        $qb->addSelect('groups_trans.name AS group_name'); // Название группы
+//
+//        $qb->leftJoin(
+//            'groups',
+//            GroupTrans::TABLE,
+//            'groups_trans',
+//            'groups_trans.event = groups.event AND groups_trans.local = :local'
+//        );
 
         /** ACCOUNT */
 
-        $qb->join(
+        $qb->leftJoin(
             'users_profile_info',
             Account::TABLE,
             'account',
-            'account.id = users_profile_info.user_id'
+            'account.id = users_profile_info.usr'
         );
 
         $qb->addSelect('account_event.email AS account_email');
-        $qb->join(
+        $qb->leftJoin(
             'account',
             AccountEvent::TABLE,
             'account_event',
@@ -180,7 +191,7 @@ final class AllWbToken implements AllWbTokenInterface
         );
 
         $qb->addSelect('account_status.status as account_status');
-        $qb->join(
+        $qb->leftJoin(
             'account_event',
             AccountStatus::TABLE,
             'account_status',

@@ -52,7 +52,7 @@ final class WbTokenModifyListener
 
         if ($token)
         {
-            $data->setUser($token->getUser());
+            $data->setUsr($token->getUser());
         }
 
         /* Если пользователь не из консоли */

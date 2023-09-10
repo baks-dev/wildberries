@@ -29,6 +29,7 @@ use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
+use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\WbTokenDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\WbTokenForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\WbTokenHandler;
@@ -51,16 +52,29 @@ final class EditController extends AbstractController
     ): Response
     {
         $WbTokenDTO = new WbTokenDTO();
-        $WbTokenEvent->getDto($WbTokenDTO);
+
+        /** Запрещаем редактировать чужой токен */
+        if($this->getFilterProfile() || $this->getFilterProfile()?->equals($WbTokenDTO->getProfile()) === true)
+        {
+            $WbTokenEvent->getDto($WbTokenDTO);
+        }
 
         // Форма
         $form = $this->createForm(WbTokenForm::class, $WbTokenDTO, [
-            'action' => $this->generateUrl('Wildberries:admin.newedit.edit', ['id' => $WbTokenDTO->getEvent()]),
+            'action' => $this->generateUrl('Wildberries:admin.newedit.edit', ['id' => $WbTokenDTO->getEvent() ?: new WbTokenEventUid() ]),
         ]);
+
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid() && $form->has('wb_token'))
         {
+            /** Запрещаем редактировать чужой токен */
+            if($this->getFilterProfile() && $this->getFilterProfile()->equals($WbTokenDTO->getProfile()) === false)
+            {
+                $this->addFlash('admin.breadcrumb.edit', 'admin.danger.edit', 'admin.wb.token', '404');
+                return $this->redirectToReferer();
+            }
+
             $WbToken = $WbTokenHandler->handle($WbTokenDTO);
 
             if($WbToken instanceof WbToken)

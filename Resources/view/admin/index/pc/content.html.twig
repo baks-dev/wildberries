@@ -20,14 +20,16 @@
 
                 {# Добавить #}
                 {% if is_granted(ROLE~'_NEW') or is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('Wildberries:admin.newedit.new') }}"
-                       class="btn btn-primary fw-bolder modal-link"
-                       data-bs-toggle="modal"
-                       data-bs-target="#modal"
-                       title='Добавить табель сотруднику'
-                    >
-                        {{ 'btn.new'|trans({}, 'core.btn') }}
-                    </a>
+                    {% if not is_granted('ROLE_ADMIN') and query.counter < 1 or is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('Wildberries:admin.newedit.new') }}"
+                           class="btn btn-primary fw-bolder modal-link"
+                           data-bs-toggle="modal"
+                           data-bs-target="#modal"
+                           title='Добавить табель сотруднику'
+                        >
+                            {{ 'btn.new'|trans({}, 'core.btn') }}
+                        </a>
+                    {% endif %}
                 {% endif %}
             </div>
 
@@ -44,17 +46,21 @@
                 <thead>
 
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col" class='w-100'> Профиль пользователя</th>
-                    <th scope="col" class='text-nowrap'>Статус профиля</th>
-                    <th scope="col" class='text-nowrap'>Статус токена</th>
+                    <th>#</th>
+                    <th class='w-100'> Профиль пользователя</th>
+                    <th class='text-nowrap'>Статус токена</th>
+                    <th class='text-nowrap'>Статус профиля</th>
+
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <th class='text-nowrap'>&nbsp;</th>
+                    {% endif %}
+
                 </tr>
 
                 </thead>
                 <tbody>
 
                 {% for item in query.data %}
-
                     {{ include(_self|replace({ "content.html.twig": "card.html.twig" })) }}
                 {% endfor %}
 

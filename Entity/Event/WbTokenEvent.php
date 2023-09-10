@@ -30,7 +30,6 @@ use BaksDev\Wildberries\Entity\Access\WbTokenAccess;
 use BaksDev\Wildberries\Entity\Cookie\WbTokenCookie;
 use BaksDev\Wildberries\Entity\Modify\WbTokenModify;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
@@ -63,12 +62,6 @@ class WbTokenEvent extends EntityEvent
     private UserProfileUid $profile;
 
 
-    /**
-     * Доступ профилей к токену
-     */
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: WbTokenAccess::class, cascade: ['all'])]
-    private Collection $access;
-    
     /**
      * Токен
      */

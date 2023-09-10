@@ -25,6 +25,7 @@ namespace BaksDev\Wildberries\Repository\AllWbToken;
 
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 
 interface AllWbTokenInterface
 {
@@ -32,6 +33,6 @@ interface AllWbTokenInterface
     /**
      * Метод возвращает пагинатор WbToken
      */
-    public function fetchAllWbTokenAssociative(SearchDTO $search): PaginatorInterface;
+    public function fetchAllWbTokenAssociative(SearchDTO $search, ?UserProfileUid $profile): PaginatorInterface;
     
 }

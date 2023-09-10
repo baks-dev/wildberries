@@ -28,12 +28,14 @@ namespace BaksDev\Wildberries\Security;
 use BaksDev\Menu\Admin\Type\SectionGroup\Group\Collection\MenuAdminSectionGroupCollectionInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+/**
+ * Секция меню Wildberries
+ */
 #[AutoconfigureTag('baks.menu.admin.group')]
 final class MenuGroupWildberries implements MenuAdminSectionGroupCollectionInterface
 {
 
     public const GROUP = 'wildberries';
-
 
     /**
      * Возвращает значение (value)

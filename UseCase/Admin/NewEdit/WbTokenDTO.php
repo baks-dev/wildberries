@@ -28,7 +28,6 @@ namespace BaksDev\Wildberries\UseCase\Admin\NewEdit;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEventInterface;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see WbTokenEvent */
@@ -46,13 +45,7 @@ final class WbTokenDTO implements WbTokenEventInterface
      */
     #[Assert\NotBlank]
     #[Assert\Uuid]
-    private UserProfileUid $profile;
-
-    /**
-     * Доступ профилей к токену
-     */
-    #[Assert\Valid]
-    private ArrayCollection $access;
+    private ?UserProfileUid $profile = null;
 
 
     /**
@@ -73,7 +66,6 @@ final class WbTokenDTO implements WbTokenEventInterface
     public function __construct()
     {
         $this->cookie = new Cookie\WbTokenCookieDTO();
-        $this->access = new ArrayCollection();
     }
 
 
@@ -92,7 +84,7 @@ final class WbTokenDTO implements WbTokenEventInterface
     /**
      * Profile
      */
-    public function getProfile(): UserProfileUid
+    public function getProfile(): ?UserProfileUid
     {
         return $this->profile;
     }
@@ -102,7 +94,6 @@ final class WbTokenDTO implements WbTokenEventInterface
     {
         $this->profile = $profile;
     }
-
 
     /**
      * Token
@@ -146,39 +137,6 @@ final class WbTokenDTO implements WbTokenEventInterface
     public function setCookie(Cookie\WbTokenCookieDTO $cookie): void
     {
         $this->cookie = $cookie;
-    }
-
-    /**
-     * Доступ профилей к токену
-     */
-    public function getAccess(): ArrayCollection
-    {
-        !$this->access->isEmpty() ?: $this->access->add(new Access\WbTokenAccessDTO());
-
-        return $this->access;
-    }
-
-    public function setAccess(ArrayCollection $access): void
-    {
-        $this->access = $access;
-    }
-
-
-    public function addAccess(Access\WbTokenAccessDTO $access): void
-    {
-        $filter = $this->access->filter(function(Access\WbTokenAccessDTO $element) use ($access) {
-            return $access->getProfile()?->equals($element->getProfile());
-        });
-
-        if($filter->isEmpty())
-        {
-            $this->access->add($access);
-        }
-    }
-
-    public function removeAccess(ArrayCollection $access): void
-    {
-        $this->access->removeElement($access);
     }
 
 }

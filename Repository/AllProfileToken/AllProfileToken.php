@@ -26,6 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Repository\AllProfileToken;
 
 use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
+use BaksDev\Users\Profile\UserProfile\Entity\Personal\UserProfilePersonal;
+use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\Type\Status\UserProfileStatus;
 use BaksDev\Users\Profile\UserProfile\Type\Status\UserProfileStatusEnum;
@@ -52,7 +54,7 @@ final class AllProfileToken implements AllProfileTokenInterface
     {
         $qb = $this->entityManager->createQueryBuilder();
 
-        $select = sprintf('new %s(token.id)', UserProfileUid::class);
+        $select = sprintf('new %s(token.id, personal.username)', UserProfileUid::class);
         $qb->select($select);
 
         $qb->from(WbToken::class, 'token');
@@ -70,6 +72,23 @@ final class AllProfileToken implements AllProfileTokenInterface
             'WITH',
             'users_profile_info.profile = token.id AND users_profile_info.status = :status',
         );
+
+        $qb->join(
+            UserProfile::class,
+            'users_profile',
+            'WITH',
+            'users_profile.id = token.id',
+        );
+
+
+        $qb->leftJoin(
+            UserProfilePersonal::class,
+            'personal',
+            'WITH',
+            'personal.event = users_profile.event',
+        );
+
+
 
         $qb->setParameter('status', new UserProfileStatus(UserProfileStatusEnum::ACTIVE), UserProfileStatus::TYPE);
 

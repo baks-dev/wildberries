@@ -35,7 +35,7 @@
         </button>
     </li>
 
-    <li class="nav-item">
+   {# <li class="nav-item">
         <button class="btn fw-bolder nav-link"
                 data-bs-toggle="tab"
                 type="button"
@@ -46,11 +46,11 @@
                 aria-controls="nav-token"
         >
             <small class="text-uppercase px-3">
-                {# Описание #}
+                #}{# Описание #}{#
                 Профили с доступом
             </small>
         </button>
-    </li>
+    </li>#}
 
 </ul>
 
@@ -59,7 +59,10 @@
     {# ОСНОВНЫЕ НАСТРОЙКИ #}
     <div class="tab-pane fade show active" id="tab_token" role="tabpanel">
 
-        {{ form_row(form.profile, { label: 'Профиль пользователя', placeholder: 'Выберите профиль из списка...' }) }}
+        {# Если администратор ресурса  #}
+        {% if is_granted('ROLE_ADMIN') and form.profile is defined  %}
+            {{ form_row(form.profile, { label: 'Профиль пользователя', placeholder: 'Выберите профиль из списка...' }) }}
+        {% endif %}
 
         {{ form_row(form.token, { label: 'Токен авторизации' }) }}
 
@@ -91,7 +94,7 @@
 
     </div>
 
-    <div class="tab-pane fade" id="tab_profile" role="tabpanel">
+    {#<div class="tab-pane fade" id="tab_profile" role="tabpanel">
 
         <div id="wb_token_form_access_collection">
             {% for access in form.access %}
@@ -119,7 +122,7 @@
                             </span>
                         </button>
 
-                        {# Профиль пользователя #}
+                        #}{# Профиль пользователя #}{#
                         {{ form_widget(access.profile, { label : false, placeholder : 'Выберите профиль из списка...', attr: { class: 'mb-0' }  } ) }}
                     </div>
 
@@ -128,7 +131,7 @@
             {% endfor %}
         </div>
 
-        {# {{ include(_self|replace({ "_call.html.twig": "phone/_phone.prototype.html.twig" }) )|e('html_attr') }} #}
+        #}{# {{ include(_self|replace({ "_call.html.twig": "phone/_phone.prototype.html.twig" }) )|e('html_attr') }} #}{#
 
         <button type="button"
                 class="btn btn-sm btn-outline-primary border-0 mt-3"
@@ -161,7 +164,7 @@
             Добавить еще профиль
         </button>
 
-    </div>
+    </div>#}
 
 
 </div>

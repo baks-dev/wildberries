@@ -14,23 +14,25 @@
             {% set img_path = item.users_profile_avatar_cdn == true ? CDN_HOST : '' %}
 
             <div>
-                <a href="{# {{ is_granted('ROLE_ADMIN') ? path('UserProfile:admin.newedit.edit', { id: item.users_profile_event }) : '#' }} #}"
-                   class="icon rounded-circle bg-contain lazy p-1"
-                   data-bg="{{ item.users_profile_avatar ? img_path ~ item.users_profile_avatar ~ item.users_profile_avatar_ext : '/img/blank.svg' }}"
-                > </a>
+                <span
+                   class="icon rounded-circle bg-cover lazy p-1"
+                   data-bg="{{ item.users_profile_avatar ? img_path ~ item.users_profile_avatar ~ item.users_profile_avatar_ext : '/assets/img/blank.svg' }}"
+                > </span>
             </div>
 
             <div class="ms-0 text-start">
 
-                <a href="{{ is_granted('ROLE_ADMIN') ? path('UserProfile:admin.newedit.edit', { id: item.users_profile_event }) : '#' }}"
-                   class="fw-bolder text-decoration-none text-dark"
+                <a href="{{ path('Wildberries:admin.newedit.edit', {id: item.event }) }}"
+                   class="fw-bolder text-decoration-none text-dark modal-link"
+                   data-bs-toggle="modal"
+                   data-bs-target="#modal"
                 >
                     {{ item.users_profile_username }}
                 </a>
 
                 <div class="text-muted fs-7 fw-bolder d-flex gap-3">
 
-                    <span class="me-1 text-muted">
+                    {#<span class="me-1 text-muted">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
                              viewBox="0 0 24 24" fill="none"
                         >
@@ -42,8 +44,8 @@
                                   fill="currentColor"
                             ></path>
                         </svg>
-                        {{ item.group_name }}
-                    </span>
+                       #}{# {{ item.group_name }}#}{#
+                    </span>#}
 
                     <span class="me-1 text-muted">
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
@@ -61,10 +63,6 @@
     </td>
 
     <td class="text-center">
-        {{ user_profile_status(item.users_profile_status) }}
-    </td>
-
-    <td class="text-center">
         {% if item.active %}
             <div class="badge bg-success">
                 Активный
@@ -76,4 +74,17 @@
         {% endif %}
     </td>
 
+    <td class="text-center">
+        {{ user_profile_status(item.users_profile_status) }}
+    </td>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <td class="text-center">
+            <a href='{{ path(app.current_route, {'authority' :  item.id  }) }}'
+               class="badge text-bg-light text-decoration-none"
+            >
+                Авторизоваться
+            </a>
+        </td>
+    {% endif %}
 </tr>

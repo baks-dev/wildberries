@@ -25,5 +25,5 @@ interface WbTokenEventInterface
 {
     public function getEvent(): ?WbTokenEventUid;
 
-    public function getProfile(): UserProfileUid;
+    public function getProfile(): ?UserProfileUid;
 }

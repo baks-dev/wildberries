@@ -149,12 +149,12 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
      */
     public function getCurrentUserProfile(): ?UserProfileUid
     {
-        /** @var UserUid $user */
-        $user = $this->tokenStorage->getToken()
+        /** @var UserUid $usr */
+        $usr = $this->tokenStorage->getToken()
             ?->getUser()
             ?->getId();
 
-        if(!$user)
+        if(!$usr)
         {
             throw new InvalidArgumentException('Невозможно определить авторизованного пользователя');
         }
@@ -165,12 +165,12 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
         $qb->select($select);
 
         $qb->from(UserProfileInfo::class, 'profile_info');
-        $qb->where('profile_info.user = :user');
+        $qb->where('profile_info.usr = :user');
 
         $qb->andWhere('profile_info.active = true');
         $qb->andWhere('profile_info.status = :status');
 
-        $qb->setParameter('user', $user, UserUid::TYPE);
+        $qb->setParameter('user', $usr, UserUid::TYPE);
         $qb->setParameter('status', new AccountStatus(AccountStatusEnum::ACTIVE), UserUid::TYPE);
 
         $qb->join(

@@ -51,13 +51,17 @@ final class IndexController extends AbstractController
         $searchForm = $this->createForm(SearchForm::class, $search);
         $searchForm->handleRequest($request);
 
+
+        //$ADMIN =  $this->getFilterProfile();
+
+
         // Фильтр
         // $filter = new ProductsStocksFilterDTO($request, $ROLE_ADMIN ? null : $this->getProfileUid());
         // $filterForm = $this->createForm(ProductsStocksFilterForm::class, $filter);
         // $filterForm->handleRequest($request);
 
         // Получаем список
-        $WbToken = $allWbToken->fetchAllWbTokenAssociative($search);
+        $WbToken = $allWbToken->fetchAllWbTokenAssociative($search, $this->getFilterProfile());
 
         return $this->render(
             [
