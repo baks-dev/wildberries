@@ -141,38 +141,6 @@ final class AllWbToken implements AllWbTokenInterface
             'users_profile_avatar.event = users_profile_event.id'
         );
 
-//        // Группа
-//
-//        $qb->join(
-//            'users_profile_info',
-//            CheckUsers::TABLE,
-//            'check_user',
-//            'check_user.usr = users_profile_info.usr'
-//        );
-//
-//        $qb->join(
-//            'check_user',
-//            CheckUsersEvent::TABLE,
-//            'check_user_event',
-//            'check_user_event.id = check_user.event'
-//        );
-//
-//        $qb->leftJoin(
-//            'check_user_event',
-//            Group::TABLE,
-//            'groups',
-//            'groups.id = check_user_event.group_id'
-//        );
-//
-//        $qb->addSelect('groups_trans.name AS group_name'); // Название группы
-//
-//        $qb->leftJoin(
-//            'groups',
-//            GroupTrans::TABLE,
-//            'groups_trans',
-//            'groups_trans.event = groups.event AND groups_trans.local = :local'
-//        );
-
         /** ACCOUNT */
 
         $qb->leftJoin(

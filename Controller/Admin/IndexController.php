@@ -61,7 +61,7 @@ final class IndexController extends AbstractController
         // $filterForm->handleRequest($request);
 
         // Получаем список
-        $WbToken = $allWbToken->fetchAllWbTokenAssociative($search, $this->getFilterProfile());
+        $WbToken = $allWbToken->fetchAllWbTokenAssociative($search, $this->getAdminFilterProfile());
 
         return $this->render(
             [

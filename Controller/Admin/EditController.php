@@ -54,7 +54,7 @@ final class EditController extends AbstractController
         $WbTokenDTO = new WbTokenDTO();
 
         /** Запрещаем редактировать чужой токен */
-        if($this->getFilterProfile() || $this->getFilterProfile()?->equals($WbTokenDTO->getProfile()) === true)
+        if($this->getAdminFilterProfile() || $this->getAdminFilterProfile()?->equals($WbTokenDTO->getProfile()) === true)
         {
             $WbTokenEvent->getDto($WbTokenDTO);
         }
@@ -69,7 +69,7 @@ final class EditController extends AbstractController
         if($form->isSubmitted() && $form->isValid() && $form->has('wb_token'))
         {
             /** Запрещаем редактировать чужой токен */
-            if($this->getFilterProfile() && $this->getFilterProfile()->equals($WbTokenDTO->getProfile()) === false)
+            if($this->getAdminFilterProfile() && $this->getAdminFilterProfile()->equals($WbTokenDTO->getProfile()) === false)
             {
                 $this->addFlash('admin.breadcrumb.edit', 'admin.danger.edit', 'admin.wb.token', '404');
                 return $this->redirectToReferer();

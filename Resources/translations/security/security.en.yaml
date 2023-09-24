@@ -5,12 +5,18 @@ ROLE_WB_TOKEN:
   desc: 'Wildberries auth tokens'
 
 # Rules
+ROLE_WB_TOKEN_INDEX:
+  name: 'View'
+  desc: ''
 
 ROLE_WB_TOKEN_NEW:
   name: 'Add'
+  desc: ''
 
 ROLE_WB_TOKEN_EDIT:
   name: 'Edit'
+  desc: ''
 
 ROLE_WB_TOKEN_DELETE:
   name: 'Delete'
+  desc: ''

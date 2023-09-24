@@ -54,9 +54,9 @@ final class NewController extends AbstractController
 
         $WbTokenDTO = new WbTokenDTO();
 
-        if($this->getFilterProfile())
+        if($this->getAdminFilterProfile())
         {
-            $WbTokenDTO->setProfile($this->getFilterProfile());
+            $WbTokenDTO->setProfile($this->getAdminFilterProfile());
         }
 
 

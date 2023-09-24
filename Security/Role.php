@@ -43,6 +43,7 @@ final class Role implements RoleInterface, MenuAdminInterface
         return self::ROLE;
     }
 
+
     /**
      * Добавляем раздел в меню администрирования.
      */
@@ -84,4 +85,5 @@ final class Role implements RoleInterface, MenuAdminInterface
     {
         return false;
     }
+    
 }

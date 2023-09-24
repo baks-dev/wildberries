@@ -23,16 +23,22 @@
 
         <div class="modal-footer">
 
-            {# Отмена #}
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                {{ 'btn.cancel'|trans({}, 'core.btn') }}
-            </button>
+            <div class="flex-grow-1">
+                &nbsp;
+            </div>
 
-            {# Удалить #}
-            {{ form_widget(form.wb_token, { label: '
+            <div class="d-flex gap-3">
+                {# Отмена #}
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    {{ 'btn.cancel'|trans({}, 'core.btn') }}
+                </button>
+
+                {# Удалить #}
+                {{ form_widget(form.wb_token, { label: '
 				<span>'~ 'btn.new'|trans({}, 'core.btn') ~'</span>
 				<span class="spinner-border spinner-border-sm vertical-middle d-none"></span>
 			'}) }}
+            </div>
 
         </div>
     </div>

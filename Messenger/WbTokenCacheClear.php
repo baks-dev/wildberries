@@ -25,22 +25,32 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Messenger;
 
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use BaksDev\Core\Cache\AppCacheInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(fromTransport: 'sync')]
 final class WbTokenCacheClear
 {
 
+    private AppCacheInterface $cache;
+    private LoggerInterface $messageDispatchLogger;
+
+    public function __construct(
+        AppCacheInterface $cache,
+        LoggerInterface $messageDispatchLogger,
+    ) {
+        $this->cache = $cache;
+        $this->messageDispatchLogger = $messageDispatchLogger;
+    }
+
     public function __invoke(WbTokenMessage $message)
     {
         /* Чистим кеш модуля */
-        $cache = new FilesystemAdapter('Wildberries');
+        $cache = $this->cache->init('Wildberries');
         $cache->clear();
 
-        $cache = new ApcuAdapter('Wildberries');
-        $cache->clear();
+        $this->messageDispatchLogger->info('Очистили кеш Wildberries', [__LINE__ => __FILE__]);
 
     }
 }
