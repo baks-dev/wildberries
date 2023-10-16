@@ -30,6 +30,7 @@ use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
 use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 
@@ -42,12 +43,15 @@ abstract class Wildberries
 
     protected ?UserProfileUid $profile = null;
 
+    protected bool $test;
 
     public function __construct(
+        #[Autowire(env: 'APP_ENV')] string $environment,
         WbTokenByProfileInterface $TokenByProfile,
         LoggerInterface $logger,
     )
     {
+        $this->test = ($environment === 'test' || $environment === 'api');
         $this->TokenByProfile = $TokenByProfile;
         $this->logger = $logger;
     }

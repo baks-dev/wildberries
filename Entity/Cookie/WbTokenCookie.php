@@ -68,9 +68,15 @@ class WbTokenCookie extends EntityEvent
         $this->event = $event;
     }
 
+    public function __toString(): string
+    {
+        return (string) $this->event;
+    }
 
     public function getDto($dto): mixed
     {
+        $dto = is_string($dto) && class_exists($dto) ? new $dto() : $dto;
+
         if($dto instanceof WbTokenCookieInterface)
         {
             return parent::getDto($dto);
@@ -82,7 +88,7 @@ class WbTokenCookie extends EntityEvent
 
     public function setEntity($dto): mixed
     {
-        if($dto instanceof WbTokenCookieInterface)
+        if($dto instanceof WbTokenCookieInterface || $dto instanceof self)
         {
             if(empty($dto->getToken()) || empty($dto->getIdentifier()))
             {

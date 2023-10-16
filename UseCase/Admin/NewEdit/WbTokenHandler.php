@@ -63,11 +63,10 @@ final class WbTokenHandler
     /** @see WbToken */
     public function handle(
         WbTokenDTO $command,
-        //?UploadedFile $cover = null
     ): string|WbToken
     {
         /**
-         *  Валидация WbTokenDTO
+         *  Валидация DTO
          */
         $errors = $this->validator->validate($command);
 
@@ -75,7 +74,7 @@ final class WbTokenHandler
         {
             /** Ошибка валидации */
             $uniqid = uniqid('', false);
-            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [__LINE__ => __FILE__]);
+            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [__FILE__.':'.__LINE__]);
 
             return $uniqid;
         }
@@ -100,19 +99,22 @@ final class WbTokenHandler
                 return $uniqid;
             }
 
+            $EventRepo->setEntity($command);
+            $EventRepo->setEntityManager($this->entityManager);
             $Event = $EventRepo->cloneEntity();
-
         }
         else
         {
             $Event = new WbTokenEvent();
+            $Event->setEntity($command);
             $this->entityManager->persist($Event);
         }
 
-        $this->entityManager->clear();
+//        $this->entityManager->clear();
+//        $this->entityManager->persist($Event);
+
 
         /** @var WbToken $Main */
-
         $Main = $this->entityManager->getRepository(WbToken::class)
             ->find($command->getProfile());
 
@@ -122,25 +124,25 @@ final class WbTokenHandler
             $this->entityManager->persist($Main);
         }
 
-        $Event->setEntity($command);
-        $this->entityManager->persist($Event);
+        /* присваиваем событие корню */
+        $Main->setEvent($Event);
+
+
 
         /**
          * Валидация Event
          */
+
         $errors = $this->validator->validate($Event);
 
         if(count($errors) > 0)
         {
             /** Ошибка валидации */
             $uniqid = uniqid('', false);
-            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [__LINE__ => __FILE__]);
+            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [__FILE__.':'.__LINE__]);
 
             return $uniqid;
         }
-
-        /* присваиваем событие корню */
-        $Main->setEvent($Event);
 
         /**
          * Валидация Main
@@ -151,10 +153,11 @@ final class WbTokenHandler
         {
             /** Ошибка валидации */
             $uniqid = uniqid('', false);
-            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [__LINE__ => __FILE__]);
+            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [__FILE__.':'.__LINE__]);
 
             return $uniqid;
         }
+
 
         $this->entityManager->flush();
 
@@ -164,7 +167,6 @@ final class WbTokenHandler
             transport: 'wildberries',
         );
 
-        // 'wb_token_high'
         return $Main;
     }
 }

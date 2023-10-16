@@ -96,29 +96,18 @@ class WbTokenEvent extends EntityEvent
 
     public function __clone(): void
     {
-        $this->id = new WbTokenEventUid();
+        $this->id = clone $this->id;
     }
 
-    /**
-     * Id
-     */
-    public function getId(): WbTokenEventUid
+    public function __toString(): string
     {
-        return $this->id;
+        return (string) $this->id;
     }
-
-
-    /**
-     * Profile
-     */
-    public function getProfile(): UserProfileUid
-    {
-        return $this->profile;
-    }
-
 
     public function getDto($dto): mixed
     {
+        $dto = is_string($dto) && class_exists($dto) ? new $dto() : $dto;
+
         if($dto instanceof WbTokenEventInterface)
         {
             return parent::getDto($dto);
@@ -129,7 +118,7 @@ class WbTokenEvent extends EntityEvent
 
     public function setEntity($dto): mixed
     {
-        if($dto instanceof WbTokenEventInterface)
+        if($dto instanceof WbTokenEventInterface || $dto instanceof self)
         {
             return parent::setEntity($dto);
         }
@@ -137,4 +126,13 @@ class WbTokenEvent extends EntityEvent
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
 
+    public function getId(): WbTokenEventUid
+    {
+        return $this->id;
+    }
+
+    public function getProfile(): UserProfileUid
+    {
+        return $this->profile;
+    }
 }

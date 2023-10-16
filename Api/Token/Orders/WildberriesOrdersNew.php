@@ -64,7 +64,9 @@ final class WildberriesOrdersNew extends Wildberries
         return $this;
     }
 
-
+    /**
+     * Получить список новых сборочных заданий.
+     */
     public function getContent(): array
     {
         return $this->content;

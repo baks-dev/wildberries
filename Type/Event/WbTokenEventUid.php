@@ -25,10 +25,15 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Type\Event;
 
+use App\Kernel;
 use BaksDev\Core\Type\UidType\Uid;
+use Symfony\Component\Uid\AbstractUid;
 
 
 final class WbTokenEventUid extends Uid
 {
+    public const TEST = '018ad880-b597-72c1-9391-f18f129381b7';
+
     public const TYPE = 'wb_token_event';
+
 }

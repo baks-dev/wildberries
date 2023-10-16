@@ -54,17 +54,21 @@ final class WildberriesSupplyClosed extends Wildberries
      * После закрытия поставки новые сборочные задания к ней добавить будет невозможно.
      * Передать поставку в доставку можно только при наличии в ней хотя бы одного сборочного задания.
      *
-     * @see https://openapi.wildberries.ru/#tag/Marketplace-Sborochnye-zadaniya/paths/~1api~1v3~1supplies~1{supplyId}~1deliver/patch
+     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Postavki/paths/~1api~1v3~1supplies~1{supplyId}~1deliver/patch
      *
      */
     public function close(): void
     {
-
         if($this->supply === null)
         {
             throw new InvalidArgumentException(
                 'Не указан идентификатор поставки через вызов метода withSupply: ->withSupply("WB-GI-1234567")'
             );
+        }
+
+        if($this->test)
+        {
+            return;
         }
 
         $response = $this->TokenHttpClient()->request(

@@ -72,7 +72,7 @@ final class ConfigCardDTO
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -80,7 +80,7 @@ final class ConfigCardDTO
     /**
      * @return string
      */
-    public function getParent() : string
+    public function getParent(): string
     {
         return $this->parent;
     }

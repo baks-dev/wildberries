@@ -70,11 +70,10 @@ final class WildberriesAddOrderToSupply extends Wildberries
     /**
      * Добавляет к поставке заказ и переводит в статус 1 ("В сборке").
      *
-     * @see https://openapi.wildberries.ru/#tag/Marketplace-Sborochnye-zadaniya/paths/~1api~1v3~1supplies~1{supplyId}~1orders~1{orderId}/patch
+     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Postavki/paths/~1api~1v3~1supplies~1{supplyId}~1orders~1{orderId}/patch
      */
     public function add(): self
     {
-
         if($this->supply === null)
         {
             throw new InvalidArgumentException(
@@ -82,11 +81,16 @@ final class WildberriesAddOrderToSupply extends Wildberries
             );
         }
 
-        if(empty($this->orders))
+        if(empty($this->order))
         {
             throw new InvalidArgumentException(
-                'Не указан cписок идентификаторов сборочных заданий через вызов метода addOrder: ->addOrder(5632423)'
+                'Не указан cписок идентификаторов сборочных заданий через вызов метода addOrder: ->withOrder(5632423)'
             );
+        }
+
+        if($this->test)
+        {
+            return $this;
         }
 
         $response = $this->TokenHttpClient()->request(
@@ -95,13 +99,13 @@ final class WildberriesAddOrderToSupply extends Wildberries
         );
 
 
-
         if($response->getStatusCode() !== 204)
         {
             $content = $response->toArray(false);
-            //$this->logger->critical('curl -X POST "' . $url . '" ' . $curlHeader . ' -d "' . $data . '"');
+
             throw new DomainException(
-                message: $response->getStatusCode().': '.$content['message'] ?? self::class, code: $response->getStatusCode()
+                message: $response->getStatusCode().': '.$content['message'] ?? self::class,
+                code: $response->getStatusCode()
             );
         }
 

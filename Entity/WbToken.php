@@ -53,6 +53,11 @@ class WbToken
     {
         $this->id = $profile instanceof UserProfile ? $profile->getId() : $profile;
     }
+
+    public function __toString(): string
+    {
+        return (string) $this->id;
+    }
     
     public function getId(): UserProfileUid
     {

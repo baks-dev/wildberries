@@ -50,7 +50,7 @@ final class WildberriesSupplyDelete extends Wildberries
     /**
      * Удаляет поставку, если она активна и за ней не закреплено ни одно сборочное задание.
      *
-     * @see https://openapi.wildberries.ru/#tag/Marketplace-Sborochnye-zadaniya/paths/~1api~1v3~1supplies~1{supplyId}/delete
+     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Postavki/paths/~1api~1v3~1supplies~1{supplyId}/delete
      *
      */
     public function delete(): void
@@ -61,6 +61,11 @@ final class WildberriesSupplyDelete extends Wildberries
             throw new InvalidArgumentException(
                 'Не указан идентификатор поставки через вызов метода withSupply: ->withSupply("WB-GI-1234567")'
             );
+        }
+
+        if($this->test)
+        {
+            return;
         }
 
         $response = $this->TokenHttpClient()->request(
