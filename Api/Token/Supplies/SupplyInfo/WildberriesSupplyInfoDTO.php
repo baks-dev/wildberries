@@ -48,12 +48,12 @@ final class WildberriesSupplyInfoDTO
     /**
      * Дата закрытия поставки
      */
-    private DateTimeImmutable $closed;
+    private ?DateTimeImmutable $closed;
 
     /**
      * Дата скана поставки
      */
-    private DateTimeImmutable $scan;
+    private ?DateTimeImmutable $scan;
 
     /**
      * Наименование поставки
@@ -94,10 +94,10 @@ final class WildberriesSupplyInfoDTO
         $this->created = new DateTimeImmutable($content['createdAt']);
 
         /*Дата закрытия поставки (RFC3339)*/
-        $this->closed = new DateTimeImmutable($content['closedAt']);
+        $this->closed = $content['closedAt'] ? new DateTimeImmutable($content['closedAt']) : null;
 
         /*Дата скана поставки (RFC3339)*/
-        $this->scan = new DateTimeImmutable($content['scanDt']);
+        $this->scan = $content['scanDt'] ? new DateTimeImmutable($content['scanDt']) : null;
 
         /*сКГТ-признак поставки*/
         $this->cargo = $content['isLargeCargo'] ?: false;
@@ -130,7 +130,7 @@ final class WildberriesSupplyInfoDTO
     /**
      * Closed
      */
-    public function getClosed(): DateTimeImmutable
+    public function getClosed(): ?DateTimeImmutable
     {
         return $this->closed;
     }
@@ -138,7 +138,7 @@ final class WildberriesSupplyInfoDTO
     /**
      * Scan
      */
-    public function getScan(): DateTimeImmutable
+    public function getScan(): ?DateTimeImmutable
     {
         return $this->scan;
     }

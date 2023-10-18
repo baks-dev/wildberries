@@ -55,7 +55,7 @@ final class WildberriesWarehouses extends Wildberries
 
         /** Кешируем результат запроса */
 
-        $cache = new FilesystemAdapter('Wildberries');
+        $cache = new FilesystemAdapter('wildberries');
 
         $response = $cache->get('warehouses-'.$this->profile->getValue(), function(ItemInterface $item)
             {

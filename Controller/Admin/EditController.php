@@ -61,7 +61,7 @@ final class EditController extends AbstractController
 
         // Форма
         $form = $this->createForm(WbTokenForm::class, $WbTokenDTO, [
-            'action' => $this->generateUrl('Wildberries:admin.newedit.edit', ['id' => $WbTokenDTO->getEvent() ?: new WbTokenEventUid() ]),
+            'action' => $this->generateUrl('wildberries:admin.newedit.edit', ['id' => $WbTokenDTO->getEvent() ?: new WbTokenEventUid() ]),
         ]);
 
         $form->handleRequest($request);
@@ -81,7 +81,7 @@ final class EditController extends AbstractController
             {
                 $this->addFlash('admin.breadcrumb.edit', 'admin.success.edit', 'admin.wb.token');
 
-                return $this->redirectToRoute('Wildberries:admin.index');
+                return $this->redirectToRoute('wildberries:admin.index');
             }
 
             $this->addFlash('admin.breadcrumb.edit', 'admin.danger.edit', 'admin.wb.token', $WbToken);

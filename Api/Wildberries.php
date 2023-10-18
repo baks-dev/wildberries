@@ -27,6 +27,7 @@ namespace BaksDev\Wildberries\Api;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
+use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -44,6 +45,8 @@ abstract class Wildberries
     protected ?UserProfileUid $profile = null;
 
     protected bool $test;
+
+    private array $headers;
 
     public function __construct(
         #[Autowire(env: 'APP_ENV')] string $environment,
@@ -74,15 +77,17 @@ abstract class Wildberries
             );
         }
 
-        $WbAuthorizationToken = $this->TokenByProfile->getToken($this->profile);
+        $WbAuthorizationToken = $this->test ? new WbAuthorizationToken($this->profile, 'string-authorization_token') : $this->TokenByProfile->getToken($this->profile);
 
         if(!$WbAuthorizationToken)
         {
             throw new DomainException(sprintf('Токен авторизации Wildberries не найден: %s', $this->profile));
         }
 
+        $this->headers = ['Authorization' => $WbAuthorizationToken->getToken()];
+
         return new RetryableHttpClient(
-            HttpClient::create(['headers' => ['Authorization' => $WbAuthorizationToken->getToken()]])
+            HttpClient::create(['headers' => $this->headers])
                 ->withOptions([
                     'base_uri' => 'https://suppliers-api.wildberries.ru',
                     'verify_host' => false
@@ -107,18 +112,32 @@ abstract class Wildberries
             throw new DomainException(sprintf('Cookie авторизации Wildberries не найдены: %s', $this->profile));
         }
 
+        $this->headers = [
+            'Content-Type' => 'application/json',
+            'Cookie'       => 'WBToken='.$WbAuthorizationCookie->getToken().'; x-supplier-id='.
+                $WbAuthorizationCookie->getIdentifier().';',
+        ];
+
         return new RetryableHttpClient(
-            HttpClient::create([
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Cookie'       => 'WBToken='.$WbAuthorizationCookie->getToken().'; x-supplier-id='.
-                        $WbAuthorizationCookie->getIdentifier().';',
-                ],
-            ])
+            HttpClient::create([ 'headers' => $this->headers ])
                 ->withOptions([
                     'base_uri' => 'https://seller.wildberries.ru/',
                 ])
         );
+    }
+
+    protected function getCurlHeader(): string
+    {
+        $this->headers['accept'] = 'application/json';
+        $this->headers['Content-Type'] = 'application/json';
+
+        return '-H "'.implode('" -H "', array_map(
+                function ($key, $value) {
+                    return "$key: $value";
+                },
+                array_keys($this->headers),
+                $this->headers
+            )).'"';
     }
 
 }

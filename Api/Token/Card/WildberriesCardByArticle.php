@@ -101,7 +101,7 @@ final class WildberriesCardByArticle extends Wildberries
         $key = md5(json_encode($this->article));
 
         /** Кешируем результат запроса */
-        $cache = new FilesystemAdapter('Wildberries');
+        $cache = new FilesystemAdapter('wildberries');
 
         $response = $cache->get($key, function(ItemInterface $item)
             {

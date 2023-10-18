@@ -36,7 +36,7 @@ final class WildberriesOrdersSticker extends Wildberries
     /**
      * Список идентификаторов сборочных заданий
      */
-    private array $orders = [];
+    private ?int $orders = null;
 
     /**
      * Ширина этикетки
@@ -77,7 +77,8 @@ final class WildberriesOrdersSticker extends Wildberries
             return new WildberriesOrdersStickerDTO($this->dataTest());
         }
 
-        $data = ["orders" => $this->orders];
+        $data = ["orders" => [$this->orders]];
+
 
         $response = $this->TokenHttpClient()->request(
             'POST',
@@ -85,9 +86,13 @@ final class WildberriesOrdersSticker extends Wildberries
             ['json' => $data],
         );
 
+
         if($response->getStatusCode() !== 200)
         {
             $content = $response->toArray(false);
+
+            $curlData = str_replace('"', '\\"', json_encode($data, JSON_THROW_ON_ERROR));
+            $this->logger->critical('curl -X POST "'.$response->getInfo()["url"].'" -d "'.$curlData.'" '.$this->getCurlHeader());
             
             throw new DomainException(
                 message: $response->getStatusCode().': '.$content['message'] ?? self::class,
@@ -105,7 +110,7 @@ final class WildberriesOrdersSticker extends Wildberries
         return [
             "stickers" => [
                 [
-                    "orderId" => current($this->orders),
+                    "orderId" => $this->orders,
                     "partA" => 231648,
                     "partB" => 9753,
                     "barcode" => "!uKEtQZVx",
@@ -120,7 +125,7 @@ final class WildberriesOrdersSticker extends Wildberries
      */
     public function addOrder(int|string $order): self
     {
-        $this->orders[] = (int) $order;
+        $this->orders = (int) $order;
         return $this;
     }
 

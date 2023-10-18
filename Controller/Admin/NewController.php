@@ -63,7 +63,7 @@ final class NewController extends AbstractController
 
         // Форма
         $form = $this->createForm(WbTokenForm::class, $WbTokenDTO, [
-            'action' => $this->generateUrl('Wildberries:admin.newedit.new'),
+            'action' => $this->generateUrl('wildberries:admin.newedit.new'),
         ]);
         $form->handleRequest($request);
 
@@ -75,7 +75,7 @@ final class NewController extends AbstractController
             {
                 $this->addFlash('admin.breadcrumb.new', 'admin.success.new', 'admin.wb.token');
 
-                return $this->redirectToRoute('Wildberries:admin.index');
+                return $this->redirectToRoute('wildberries:admin.index');
             }
 
             $this->addFlash('admin.breadcrumb.new', 'admin.danger.new', 'admin.wb.token', $WbToken);

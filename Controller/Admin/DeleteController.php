@@ -54,7 +54,7 @@ final class DeleteController extends AbstractController
         $WbTokenDeleteDTO = new WbTokenDeleteDTO();
         $WbTokenEvent->getDto($WbTokenDeleteDTO);
         $form = $this->createForm(WbTokenDeleteForm::class, $WbTokenDeleteDTO, [
-            'action' => $this->generateUrl('Wildberries:admin.delete', ['id' => $WbTokenDeleteDTO->getEvent()]),
+            'action' => $this->generateUrl('wildberries:admin.delete', ['id' => $WbTokenDeleteDTO->getEvent()]),
         ]);
         $form->handleRequest($request);
 
@@ -66,7 +66,7 @@ final class DeleteController extends AbstractController
             {
                 $this->addFlash('admin.breadcrumb.delete', 'admin.success.delete', 'admin.wb.token');
 
-                return $this->redirectToRoute('Wildberries:admin.index');
+                return $this->redirectToRoute('wildberries:admin.index');
             }
 
             $this->addFlash(
@@ -76,7 +76,7 @@ final class DeleteController extends AbstractController
                 $WbToken,
             );
 
-            return $this->redirectToRoute('Wildberries:admin.index', status: 400);
+            return $this->redirectToRoute('wildberries:admin.index', status: 400);
         }
 
         return $this->render([

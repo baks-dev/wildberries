@@ -21,7 +21,7 @@
                 {# Добавить #}
                 {% if is_granted(ROLE~'_NEW') or is_granted('ROLE_ADMIN') %}
                     {% if not is_granted('ROLE_ADMIN') and query.counter < 1 or is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('Wildberries:admin.newedit.new') }}"
+                        <a href="{{ path('wildberries:admin.newedit.new') }}"
                            class="btn btn-primary fw-bolder modal-link"
                            data-bs-toggle="modal"
                            data-bs-target="#modal"

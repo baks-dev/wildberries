@@ -24,14 +24,14 @@
 namespace BaksDev\Wildberries\Repository\WbTokenByProfile;
 
 
-use BaksDev\Auth\Email\Type\Status\AccountStatus;
-use BaksDev\Auth\Email\Type\Status\AccountStatusEnum;
+use BaksDev\Auth\Email\Type\EmailStatus\EmailStatus;
+use BaksDev\Auth\Email\Type\EmailStatus\Status\EmailStatusActive;
 use BaksDev\Core\Doctrine\ORMQueryBuilder;
 use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Users\Profile\UserProfile\Type\Status\UserProfileStatus;
-use BaksDev\Users\Profile\UserProfile\Type\Status\UserProfileStatusEnum;
+use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\Status\UserProfileStatusActive;
+use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
 use BaksDev\Users\User\Type\Id\UserUid;
 use BaksDev\Wildberries\Entity\Cookie\WbTokenCookie;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
@@ -88,7 +88,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
             'info.profile = token.id AND info.status = :status',
         );
 
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusEnum::ACTIVE), UserProfileUid::TYPE);
+        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileUid::TYPE);
 
 
         /* Кешируем результат ORM */
@@ -135,11 +135,11 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
             'cookie.event = token.event',
         );
 
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusEnum::ACTIVE), UserProfileUid::TYPE);
+        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileUid::TYPE);
 
 
         /* Кешируем результат ORM */
-        return $qb->enableCache('Wildberries', 86400)->getOneOrNullResult();
+        return $qb->enableCache('wildberries', 86400)->getOneOrNullResult();
 
     }
 
@@ -171,7 +171,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
         $qb->andWhere('profile_info.status = :status');
 
         $qb->setParameter('user', $usr, UserUid::TYPE);
-        $qb->setParameter('status', new AccountStatus(AccountStatusEnum::ACTIVE), UserUid::TYPE);
+        $qb->setParameter('status', new EmailStatus(EmailStatusActive::class), UserUid::TYPE);
 
         $qb->join(
             UserProfile::class,
@@ -181,7 +181,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
         );
 
         /* Кешируем результат ORM */
-        return $qb->enableCache('Wildberries', 86400)->getOneOrNullResult();
+        return $qb->enableCache('wildberries', 86400)->getOneOrNullResult();
 
     }
 

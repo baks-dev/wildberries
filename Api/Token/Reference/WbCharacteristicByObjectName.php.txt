@@ -34,17 +34,6 @@ final class WbCharacteristicByObjectName extends Wildberries
 {
 
     /**
-     * "objectName": "Косухи", - Наименование подкатегории
-     * "name": "Особенности модели", - Наименование характеристики
-     * "required": false, - Характеристика обязательна к заполенению
-     * "unitName": "", - Единица имерения (см, гр и т.д.)
-     * "maxCount": 1, - Максимальное кол-во значений которое можно присвоить данной характеристике
-     * "popular": false, - Характеристика популярна у пользователей
-     * "charcType": 1 - Тип характеристики (1 и 0 - строка или массив строк; 4 - число или массив чисел)
-     */
-    private array $content;
-
-    /**
      * Поиск по родительской категории.
      */
     private ?string $name = null;
@@ -61,7 +50,7 @@ final class WbCharacteristicByObjectName extends Wildberries
     /**
      * Характеристики для создания КТ по всем подкатегориям
      *
-     * @see https://openapi.wildberries.ru/#tag/Kontent-Konfigurator/paths/~1content~1v1~1object~1characteristics~1list~1filter/get
+     * @see https://openapi.wildberries.ru/content/api/ru/#tag/Konfigurator/paths/~1content~1v1~1object~1characteristics~1list~1filter/get
      *
      * С помощью данного метода можно получить список характеристик, которые можно или нужно заполнить при создании КТ
      *     в подкатегории определенной родительской категории.
@@ -112,19 +101,24 @@ final class WbCharacteristicByObjectName extends Wildberries
 
     }
 
-
-    /**
-     * "objectName": "Косухи", - Наименование подкатегории
-     * "name": "Особенности модели", - Наименование характеристики
-     * "required": false, - Характеристика обязательна к заполенению
-     * "unitName": "", - Единица имерения (см, гр и т.д.)
-     * "maxCount": 1, - Максимальное кол-во значений которое можно присвоить данной характеристике
-     * "popular": false, - Характеристика популярна у пользователей
-     * "charcType": 1 - Тип характеристики (1 и 0 - строка или массив строк; 4 - число или массив чисел)
-     */
-    public function getContent(): array
+    public function dataTest(): array
     {
-        return $this->content;
+        // TODO: Implement __clone() method.
     }
+
+
+    //    /**
+//     * "objectName": "Косухи", - Наименование подкатегории
+//     * "name": "Особенности модели", - Наименование характеристики
+//     * "required": false, - Характеристика обязательна к заполенению
+//     * "unitName": "", - Единица имерения (см, гр и т.д.)
+//     * "maxCount": 1, - Максимальное кол-во значений которое можно присвоить данной характеристике
+//     * "popular": false, - Характеристика популярна у пользователей
+//     * "charcType": 1 - Тип характеристики (1 и 0 - строка или массив строк; 4 - число или массив чисел)
+//     */
+//    public function getContent(): array
+//    {
+//        return $this->content;
+//    }
 
 }

@@ -36,10 +36,10 @@ return static function(DoctrineConfig $doctrine, ContainerConfigurator $configur
     $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
 
     $emDefault
-        ->mapping('Wildberries')
+        ->mapping('wildberries')
         ->type('attribute')
         ->dir($MODULE . 'Entity')
         ->isBundle(false)
         ->prefix('BaksDev\Wildberries\Entity')
-        ->alias('Wildberries');
+        ->alias('wildberries');
 };
