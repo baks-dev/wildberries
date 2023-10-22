@@ -63,43 +63,10 @@ final class WildberriesCardImage
 
         /** Вычисляем хеш ссылки и присваиваем его к названию файла */
         $originalFilename = pathinfo($url);
-        $name = md5($url);
-        $newFilename = $name.'.'.$originalFilename['extension'];
+        $newFilename = 'image.'.$originalFilename['extension'];
 
-//        00000000-0000
-//        01894539-9078
-        // 01893515-f761
+        $dir = md5($url);
 
-        //dd($url);
-
-        /** Преобразуем название в UID */
-        //$stringDir = '01893515-f761-7654-ac3f-'.substr($name, 20);
-        $stringDir = substr($name, 0, 8).'-f761-7654-ac3f-'.substr($name, 20);
-
-        // 0189453f-77e7-7876-941d-098241dd2129
-        // 01893515-f761-75ba-41c4-c4e93f541380
-        // 01893515-f761-79b3-8be4-70a9f6781512
-
-        //dd($stringDir);
-
-//        $stringDir =
-//            substr($name, 0, 8).'-'.
-//            substr($name, 8, 4).'00c5be4b-dc80-7'.
-//            substr($name, 12, 3).'-'.
-//            substr($name, 16, 4).'-'.
-//            substr($name, 20);
-
-
-        /**
-         * Определяем тип параметра метода для инициализации названия директории
-         * @var ReflectionParameter $ReflectionParameter
-         */
-        $reflex = new ReflectionClass($Image);
-        $setDir = $reflex->getMethod('setDir');
-
-        $ReflectionParameter = current($setDir->getParameters());
-        $dirClass = $ReflectionParameter->getType()?->getName();
-        $dir = class_exists($dirClass) ? new $dirClass($stringDir) : $stringDir;
 
         /** Полный путь к директории загрузки */
         $uploadDir = $this->kernel->getProjectDir().'/public/upload/'.$nameDir.'/'.$dir;
@@ -156,8 +123,8 @@ final class WildberriesCardImage
         /* Размер файла */
         $fileSize = filesize($path);
 
-        $Image->setName($name);
-        $Image->setDir($dir);
+        $Image->setName($dir);
+        //$Image->setDir($dir);
         $Image->setExt($originalFilename['extension']);
         $Image->setSize($fileSize);
 

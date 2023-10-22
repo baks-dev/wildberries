@@ -67,6 +67,14 @@ abstract class Wildberries
         return $this;
     }
 
+    /**
+     * Profile
+     */
+    public function getProfile(): ?UserProfileUid
+    {
+        return $this->profile;
+    }
+
 
     protected function TokenHttpClient(): RetryableHttpClient
     {
