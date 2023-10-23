@@ -114,37 +114,9 @@ final class Card
     {
         $this->profile = $profile;
 
-        $client = HttpClient::create();
-        $store = new Store(sys_get_temp_dir());
-        $client = new CachingHttpClient($client, $store, ['default_ttl' => 86400]);
-
-
-        $parseDomainCard = current($data['mediaFiles']);
-        $DomainCard = substr($parseDomainCard, 0, strpos($parseDomainCard, '/images/')).'/info/ru/card.json';
-        $response = $client->request('GET', $DomainCard);
-
-        if($response->getStatusCode() !== 200)
-        {
-            throw new InvalidArgumentException(sprintf('Невозможно получить файл card.json ( url: %s ) ', $DomainCard));
-        }
-
-        $card = $response->toArray(false);
-
-        $this->characteristics = new ArrayObject();
-
-        foreach($card['options'] as $characteristic)
-        {
-            $this->characteristics->offsetSet($characteristic['name'], $characteristic['value']);
-        }
-
-
-
         $this->id = $data['imtID'];
         $this->nomenclature = $data['nmID'];
-        $this->root = $card['subj_root_name'];
         $this->category = $data['object'];
-        $this->name = $card['imt_name'];
-        $this->description = $card['description'] ?? '';
         $this->article = $data['vendorCode'];
         $this->update = new DateTimeImmutable($data['updateAt']);
         $this->media = $data['mediaFiles'];
@@ -163,6 +135,45 @@ final class Card
             $this->offers->offsetSet($barcode, $size['techSize']);
         }
 
+    }
+
+    public function getCardDetail(): self
+    {
+        if(!$this->media)
+        {
+            throw new InvalidArgumentException(sprintf('В карточке отсутствуют медиа-файлы ( nomenclature: %s )', $this->nomenclature));
+        }
+
+        $client = HttpClient::create();
+        $store = new Store(sys_get_temp_dir());
+        $client = new CachingHttpClient($client, $store, ['default_ttl' => 86400]);
+
+
+        $parseDomainCard = current($this->media);
+        $DomainCard = substr($parseDomainCard, 0, strpos($parseDomainCard, '/images/')).'/info/ru/card.json';
+        $response = $client->request('GET', $DomainCard);
+
+        if($response->getStatusCode() !== 200)
+        {
+            throw new InvalidArgumentException(sprintf('Невозможно получить файл card.json ( url: %s ) ', $DomainCard));
+        }
+
+        $card = $response->toArray(false);
+
+
+        $this->name = $card['imt_name'];
+        $this->root = $card['subj_root_name'];
+        $this->description = $card['description'] ?? '';
+
+
+        $this->characteristics = new ArrayObject();
+
+        foreach($card['options'] as $characteristic)
+        {
+            $this->characteristics->offsetSet($characteristic['name'], $characteristic['value']);
+        }
+
+        return $this;
     }
 
     /**
