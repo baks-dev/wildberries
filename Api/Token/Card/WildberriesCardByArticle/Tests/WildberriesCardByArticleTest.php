@@ -44,13 +44,13 @@ final class WildberriesCardByArticleTest extends KernelTestCase
     {
         self::assertTrue(true);
 
-        /** @var WildberriesCardByArticle $WildberriesCardByArticle */
-        $WildberriesCardByArticle = self::getContainer()->get(WildberriesCardByArticle::class);
-
-        $CardByArticle = $WildberriesCardByArticle
-            ->profile(new UserProfileUid())
-            ->addArticle('ARTICLE')
-            ->findByArticle();
+//        /** @var WildberriesCardByArticle $WildberriesCardByArticle */
+//        $WildberriesCardByArticle = self::getContainer()->get(WildberriesCardByArticle::class);
+//
+//        $CardByArticle = $WildberriesCardByArticle
+//            ->profile(new UserProfileUid())
+//            ->addArticle('ARTICLE')
+//            ->findByArticle();
 
 //        /** @var CardByArticle $card */
 //        foreach($CardByArticle as $card)

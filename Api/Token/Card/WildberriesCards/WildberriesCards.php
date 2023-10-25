@@ -167,8 +167,8 @@ final class WildberriesCards extends Wildberries
 
         /** Сохраняем курсоры для следующей итерации */
         $this->count = count($content["data"]["cards"]);
-        $this->updated = $content['data']['cursor']['updatedAt'];
-        $this->nomenclature = $content['data']['cursor']['nmID'];
+        $this->updated = $content['data']['cursor']['updatedAt'] ?? null;
+        $this->nomenclature = $content['data']['cursor']['nmID'] ?? null;
 
 
         foreach($content['data']['cards'] as $data)
