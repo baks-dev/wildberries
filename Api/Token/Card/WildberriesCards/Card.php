@@ -112,6 +112,13 @@ final class Card
 
     public function __construct(UserProfileUid $profile, array $data)
     {
+        if(empty($data['colors']))
+        {
+            throw new \Doctrine\Instantiator\Exception\InvalidArgumentException(
+                sprintf('Не указан цвет для товара с номенклатурой %s', $data['nmID'])
+            );
+        }
+
         $this->profile = $profile;
 
         $this->id = $data['imtID'];
