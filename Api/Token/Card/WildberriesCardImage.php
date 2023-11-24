@@ -144,68 +144,68 @@ final class WildberriesCardImage
     }
 
 
-
-    private static string $time = '';
-    private static array $rand = [];
-    private static string $seed;
-    private static array $seedParts;
-    private static int $seedIndex = 0;
-
-    public static function generate(DateTimeInterface $time = null): string
-    {
-        if (0 > $time = $time->format('Uv')) {
-            throw new InvalidArgumentException('The timestamp must be positive.');
-        }
-
-        if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {
-            randomize:
-            self::$rand = unpack('n*', isset(self::$seed) ? random_bytes(10) : self::$seed = random_bytes(16));
-            self::$rand[1] &= 0x03FF;
-            self::$time = $time;
-        } else {
-            if (!self::$seedIndex) {
-                $s = unpack('l*', self::$seed = hash('sha512', self::$seed, true));
-                $s[] = ($s[1] >> 8 & 0xFF0000) | ($s[2] >> 16 & 0xFF00) | ($s[3] >> 24 & 0xFF);
-                $s[] = ($s[4] >> 8 & 0xFF0000) | ($s[5] >> 16 & 0xFF00) | ($s[6] >> 24 & 0xFF);
-                $s[] = ($s[7] >> 8 & 0xFF0000) | ($s[8] >> 16 & 0xFF00) | ($s[9] >> 24 & 0xFF);
-                $s[] = ($s[10] >> 8 & 0xFF0000) | ($s[11] >> 16 & 0xFF00) | ($s[12] >> 24 & 0xFF);
-                $s[] = ($s[13] >> 8 & 0xFF0000) | ($s[14] >> 16 & 0xFF00) | ($s[15] >> 24 & 0xFF);
-                self::$seedParts = $s;
-                self::$seedIndex = 21;
-            }
-
-            self::$rand[5] = 0xFFFF & $carry = self::$rand[5] + (self::$seedParts[self::$seedIndex--] & 0xFFFFFF);
-            self::$rand[4] = 0xFFFF & $carry = self::$rand[4] + ($carry >> 16);
-            self::$rand[3] = 0xFFFF & $carry = self::$rand[3] + ($carry >> 16);
-            self::$rand[2] = 0xFFFF & $carry = self::$rand[2] + ($carry >> 16);
-            self::$rand[1] += $carry >> 16;
-
-            if (0xFC00 & self::$rand[1]) {
-                if (PHP_INT_SIZE >= 8 || 10 > strlen($time = self::$time)) {
-                    $time = (string) (1 + $time);
-                } elseif ('999999999' === $mtime = substr($time, -9)) {
-                    $time = (1 + substr($time, 0, -9)).'000000000';
-                } else {
-                    $time = substr_replace($time, str_pad(++$mtime, 9, '0', STR_PAD_LEFT), -9);
-                }
-
-                goto randomize;
-            }
-
-            $time = self::$time;
-        }
-
-        $time = dechex($time * 1);
-
-
-        return substr_replace(sprintf('%012s-%04x-%04x-%04x%04x%04x',
-            $time,
-            0x7000 | (self::$rand[1] << 2) | (self::$rand[2] >> 14),
-            0x8000 | (self::$rand[2] & 0x3FFF),
-            self::$rand[3],
-            self::$rand[4],
-            self::$rand[5],
-        ), '-', 8, 0);
-    }
+//
+//    private static string $time = '';
+//    private static array $rand = [];
+//    private static string $seed;
+//    private static array $seedParts;
+//    private static int $seedIndex = 0;
+//
+//    public static function generate(DateTimeInterface $time = null): string
+//    {
+//        if (0 > $time = $time->format('Uv')) {
+//            throw new InvalidArgumentException('The timestamp must be positive.');
+//        }
+//
+//        if ($time > self::$time || (null !== $mtime && $time !== self::$time)) {
+//            randomize:
+//            self::$rand = unpack('n*', isset(self::$seed) ? random_bytes(10) : self::$seed = random_bytes(16));
+//            self::$rand[1] &= 0x03FF;
+//            self::$time = $time;
+//        } else {
+//            if (!self::$seedIndex) {
+//                $s = unpack('l*', self::$seed = hash('sha512', self::$seed, true));
+//                $s[] = ($s[1] >> 8 & 0xFF0000) | ($s[2] >> 16 & 0xFF00) | ($s[3] >> 24 & 0xFF);
+//                $s[] = ($s[4] >> 8 & 0xFF0000) | ($s[5] >> 16 & 0xFF00) | ($s[6] >> 24 & 0xFF);
+//                $s[] = ($s[7] >> 8 & 0xFF0000) | ($s[8] >> 16 & 0xFF00) | ($s[9] >> 24 & 0xFF);
+//                $s[] = ($s[10] >> 8 & 0xFF0000) | ($s[11] >> 16 & 0xFF00) | ($s[12] >> 24 & 0xFF);
+//                $s[] = ($s[13] >> 8 & 0xFF0000) | ($s[14] >> 16 & 0xFF00) | ($s[15] >> 24 & 0xFF);
+//                self::$seedParts = $s;
+//                self::$seedIndex = 21;
+//            }
+//
+//            self::$rand[5] = 0xFFFF & $carry = self::$rand[5] + (self::$seedParts[self::$seedIndex--] & 0xFFFFFF);
+//            self::$rand[4] = 0xFFFF & $carry = self::$rand[4] + ($carry >> 16);
+//            self::$rand[3] = 0xFFFF & $carry = self::$rand[3] + ($carry >> 16);
+//            self::$rand[2] = 0xFFFF & $carry = self::$rand[2] + ($carry >> 16);
+//            self::$rand[1] += $carry >> 16;
+//
+//            if (0xFC00 & self::$rand[1]) {
+//                if (PHP_INT_SIZE >= 8 || 10 > strlen($time = self::$time)) {
+//                    $time = (string) (1 + $time);
+//                } elseif ('999999999' === $mtime = substr($time, -9)) {
+//                    $time = (1 + substr($time, 0, -9)).'000000000';
+//                } else {
+//                    $time = substr_replace($time, str_pad(++$mtime, 9, '0', STR_PAD_LEFT), -9);
+//                }
+//
+//                goto randomize;
+//            }
+//
+//            $time = self::$time;
+//        }
+//
+//        $time = dechex($time * 1);
+//
+//
+//        return substr_replace(sprintf('%012s-%04x-%04x-%04x%04x%04x',
+//            $time,
+//            0x7000 | (self::$rand[1] << 2) | (self::$rand[2] >> 14),
+//            0x8000 | (self::$rand[2] & 0x3FFF),
+//            self::$rand[3],
+//            self::$rand[4],
+//            self::$rand[5],
+//        ), '-', 8, 0);
+//    }
 
 }

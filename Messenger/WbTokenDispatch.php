@@ -29,7 +29,7 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(priority: 100)]
 final class WbTokenDispatch
 {
     public function __invoke(WbTokenMessage $message): void {}
