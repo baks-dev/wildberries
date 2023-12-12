@@ -145,7 +145,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
 
 
     /**
-     * Текущий Активный профиль пользователя
+     * Текущий Активный профиль пользователя любой
      */
     public function getCurrentUserProfile(): ?UserProfileUid
     {
