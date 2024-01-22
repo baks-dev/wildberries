@@ -34,7 +34,7 @@ final class DeleteControllerTest extends WebTestCase
     private const ROLE = 'ROLE_WB_TOKEN_DELETE';
 
 
-    private static ?WbTokenEventUid $identifier;
+    private static ?WbTokenEventUid $identifier = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -67,10 +67,9 @@ final class DeleteControllerTest extends WebTestCase
 
                 self::assertResponseIsSuccessful();
             }
-        } else
-        {
-            self::assertTrue(true);
         }
+
+        self::assertTrue(true);
     }
 
     // доступ по роли ROLE_ADMIN
@@ -95,10 +94,9 @@ final class DeleteControllerTest extends WebTestCase
 
                 self::assertResponseIsSuccessful();
             }
-        } else
-        {
-            self::assertTrue(true);
         }
+
+        self::assertTrue(true);
     }
 
     // доступ по роли ROLE_USER
@@ -122,10 +120,9 @@ final class DeleteControllerTest extends WebTestCase
 
                 self::assertResponseStatusCodeSame(403);
             }
-        } else
-        {
-            self::assertTrue(true);
         }
+
+        self::assertTrue(true);
     }
 
     /** Доступ по без роли */
@@ -148,9 +145,8 @@ final class DeleteControllerTest extends WebTestCase
                 // Full authentication is required to access this resource
                 self::assertResponseStatusCodeSame(401);
             }
-        } else
-        {
-            self::assertTrue(true);
         }
+
+        self::assertTrue(true);
     }
 }
