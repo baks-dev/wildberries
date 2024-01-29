@@ -34,7 +34,13 @@ return static function(ContainerConfigurator $configurator) {
 
     $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
 
-    $services->load($NAMESPACE, $MODULE)
-        ->exclude($MODULE.'{Entity,Resources,Type,*DTO.php,*Message.php}');
+    $services
+        ->load($NAMESPACE, $MODULE)
+        ->exclude([
+            $MODULE.'{Entity,Resources,Type}',
+            $MODULE.'**/*Message.php',
+            $MODULE.'**/*DTO.php',
+        ])
+    ;
 
 };
