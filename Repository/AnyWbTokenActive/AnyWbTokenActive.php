@@ -67,15 +67,13 @@ final class AnyWbTokenActive implements AnyWbTokenActiveInterface
             'event.id = token.event AND event.active = true',
         );
 
-        $dbal->exists(
-            'token',
+        $dbal->andWhereExists(
             UserProfile::class,
             'profile',
             'profile.id = token.id'
         );
 
-        $dbal->exists(
-            'token',
+        $dbal->andWhereExists(
             UserProfileInfo::class,
             'info',
             'info.profile = token.id AND info.status = :status',
