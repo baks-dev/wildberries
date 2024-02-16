@@ -59,8 +59,6 @@ final class WildberriesCardImage
     public function get(string $url, object $Image, string $nameDir, $reload = false,): mixed
     {
 
-        //dd(self::generate(new \DateTimeImmutable('1996-11-30 00:00:00')));
-
         /** Вычисляем хеш ссылки и присваиваем его к названию файла */
         $originalFilename = pathinfo($url);
         $newFilename = 'image.'.$originalFilename['extension'];

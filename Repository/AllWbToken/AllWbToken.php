@@ -97,8 +97,6 @@ final class AllWbToken implements AllWbTokenInterface
             'users_profile.id = token.id'
         );
 
-        //dd($qb->fetchAllAssociative());
-
 
         // Info
         $qb->addSelect('users_profile_info.status as users_profile_status');

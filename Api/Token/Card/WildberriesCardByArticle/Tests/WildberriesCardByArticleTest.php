@@ -25,11 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Api\Token\Card\WildberriesCardByArticle\Tests;
 
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Api\Token\Card\WildberriesCardByArticle\CardByArticle;
-use BaksDev\Wildberries\Api\Token\Card\WildberriesCardByArticle\WildberriesCardByArticle;
-use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersSticker\WildberriesOrdersSticker;
-use BaksDev\Wildberries\Api\Token\Supplies\SupplyInfo\WildberriesSupplyInfo;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -43,31 +38,5 @@ final class WildberriesCardByArticleTest extends KernelTestCase
     public function testUseCase(): void
     {
         self::assertTrue(true);
-
-//        /** @var WildberriesCardByArticle $WildberriesCardByArticle */
-//        $WildberriesCardByArticle = self::getContainer()->get(WildberriesCardByArticle::class);
-//
-//        $CardByArticle = $WildberriesCardByArticle
-//            ->profile(new UserProfileUid())
-//            ->addArticle('ARTICLE')
-//            ->findByArticle();
-
-//        /** @var CardByArticle $card */
-//        foreach($CardByArticle as $card)
-//        {
-//            dd($card);
-//        }
-
-//
-//        self::assertEquals('WB-GI-7654321', $WildberriesSupplyInfoDTO->getIdentifier());
-//        self::assertEquals('Тестовая поставка', $WildberriesSupplyInfoDTO->getName());
-//        self::assertTrue($WildberriesSupplyInfoDTO->isCargo());
-//        self::assertFalse($WildberriesSupplyInfoDTO->isDone());
-//
-//        $date = new \DateTimeImmutable('2022-05-04T07:56:29Z');
-//        self::assertEquals($date, $WildberriesSupplyInfoDTO->getScan());
-//        self::assertEquals($date, $WildberriesSupplyInfoDTO->getCreated());
-//        self::assertEquals($date, $WildberriesSupplyInfoDTO->getClosed());
-
     }
 }
