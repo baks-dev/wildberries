@@ -79,7 +79,7 @@ final class AnyWbTokenActive implements AnyWbTokenActiveInterface
             'info.profile = token.id AND info.status = :status',
         );
 
-        $dbal->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileUid::TYPE);
+        $dbal->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
 
 
         //$dbal->analyze();
