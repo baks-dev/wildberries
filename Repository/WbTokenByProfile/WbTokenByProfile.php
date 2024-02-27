@@ -45,15 +45,14 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
 {
 
     private TokenStorageInterface $tokenStorage;
-    private ORMQueryBuilder $ORMQueryBuilder;
 
+    private ORMQueryBuilder $ORMQueryBuilder;
 
     public function __construct(
         ORMQueryBuilder $ORMQueryBuilder,
         TokenStorageInterface $tokenStorage,
     )
     {
-
         $this->tokenStorage = $tokenStorage;
         $this->ORMQueryBuilder = $ORMQueryBuilder;
     }
@@ -88,7 +87,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
             'info.profile = token.id AND info.status = :status',
         );
 
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileUid::TYPE);
+        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
 
 
         /* Кешируем результат ORM */
@@ -135,7 +134,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
             'cookie.event = token.event',
         );
 
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileUid::TYPE);
+        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
 
 
         /* Кешируем результат ORM */
@@ -171,7 +170,7 @@ final class WbTokenByProfile implements WbTokenByProfileInterface
         $qb->andWhere('profile_info.status = :status');
 
         $qb->setParameter('user', $usr, UserUid::TYPE);
-        $qb->setParameter('status', new EmailStatus(EmailStatusActive::class), UserUid::TYPE);
+        $qb->setParameter('status', new EmailStatus(EmailStatusActive::class), EmailStatus::TYPE);
 
         $qb->join(
             UserProfile::class,
