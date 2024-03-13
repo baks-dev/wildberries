@@ -8,6 +8,6 @@
 
 
 {% block javascript %}
-<script async data-src="/assets/js/radio.input.min.js?v={{ version }}" class="lazy"></script>
-<script async data-src="/assets/wildberries/script.min.js?v={{ version }}" class="lazy"></script>
+<script nonce='{{ csp_nonce() }}' async  data-src="/assets/js/radio.input.min.js?v={{ version }}" class="lazy"></script>
+<script nonce='{{ csp_nonce() }}' async  data-src="/assets/wildberries/script.min.js?v={{ version }}" class="lazy"></script>
 {% endblock %}
