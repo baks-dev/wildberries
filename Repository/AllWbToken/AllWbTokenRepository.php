@@ -40,7 +40,7 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 
-final class AllWbToken implements AllWbTokenInterface
+final class AllWbTokenRepository implements AllWbTokenInterface
 {
     private PaginatorInterface $paginator;
     private DBALQueryBuilder $DBALQueryBuilder;

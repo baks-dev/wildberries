@@ -37,7 +37,7 @@ use BaksDev\Users\User\Type\Id\UserUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 
-final class AnyWbTokenActive implements AnyWbTokenActiveInterface
+final class AnyWbTokenActiveRepository implements AnyWbTokenActiveInterface
 {
     private DBALQueryBuilder $DBALQueryBuilder;
 

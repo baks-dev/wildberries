@@ -38,7 +38,7 @@ use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class WbTokenChoice implements WbTokenChoiceInterface
+final class WbTokenChoiceRepository implements WbTokenChoiceInterface
 {
     private EntityManagerInterface $entityManager;
     private TranslatorInterface $translator;

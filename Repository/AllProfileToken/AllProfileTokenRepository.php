@@ -35,7 +35,7 @@ use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class AllProfileToken implements AllProfileTokenInterface
+final class AllProfileTokenRepository implements AllProfileTokenInterface
 {
 
     private EntityManagerInterface $entityManager;

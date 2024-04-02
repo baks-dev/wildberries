@@ -41,7 +41,7 @@ use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use InvalidArgumentException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-final class WbTokenByProfile implements WbTokenByProfileInterface
+final class WbTokenByProfileRepository implements WbTokenByProfileInterface
 {
 
     private TokenStorageInterface $tokenStorage;
