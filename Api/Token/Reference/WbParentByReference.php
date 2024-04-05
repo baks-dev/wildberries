@@ -49,7 +49,7 @@ final class WbParentByReference extends Wildberries
      */
     public function findParent(): self
     {
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemAdapter('wildberries');
 
         /**
          * Кешируем результат запроса

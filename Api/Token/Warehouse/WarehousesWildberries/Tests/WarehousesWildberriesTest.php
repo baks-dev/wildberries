@@ -23,13 +23,13 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Supplies\SupplyInfo\Tests;
+namespace BaksDev\Wildberries\Api\Token\Warehouse\WarehousesWildberries\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersSticker\WildberriesOrdersSticker;
-use BaksDev\Wildberries\Api\Token\Supplies\SupplyAll\WildberriesSupplyAll;
-use BaksDev\Wildberries\Api\Token\Supplies\SupplyAll\WildberriesSupplyAllDTO;
 use BaksDev\Wildberries\Api\Token\Supplies\SupplyInfo\WildberriesSupplyInfo;
+use BaksDev\Wildberries\Api\Token\Warehouse\WarehousesWildberries\WildberriesWarehousesClient;
+use BaksDev\Wildberries\Api\Token\Warehouse\WarehousesWildberries\WildberriesWarehouseDTO;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -37,10 +37,10 @@ use Symfony\Component\DependencyInjection\Attribute\When;
 
 /**
  * @group wildberries
- * @group wildberries-supply-info
+ * @group wildberries-warehouses
  */
 #[When(env: 'test')]
-final class WildberriesSupplyInfoTest extends KernelTestCase
+final class WarehousesWildberriesTest extends KernelTestCase
 {
     private static $tocken;
 
@@ -51,38 +51,35 @@ final class WildberriesSupplyInfoTest extends KernelTestCase
 
     public function testUseCase(): void
     {
-        /** @var WildberriesSupplyAll $WildberriesSupplyAll */
-        $WildberriesSupplyAll = self::getContainer()->get(WildberriesSupplyAll::class);
-        $WildberriesSupplyAll->TokenHttpClient(new WbAuthorizationToken(new UserProfileUid(), self::$tocken));
+        /** @var WildberriesWarehousesClient $PartnerWarehouses */
+        $WildberriesWarehousesClient = self::getContainer()->get(WildberriesWarehousesClient::class);
 
-        /** @var WildberriesSupplyAllDTO $WildberriesSupply */
-        $WildberriesSupply = ($WildberriesSupplyAll->all())->current();
+        $WildberriesWarehousesClient->TokenHttpClient(new WbAuthorizationToken(new UserProfileUid(), self::$tocken));
 
 
-        /** @var WildberriesSupplyInfo $WildberriesSupplyInfo */
-        $WildberriesSupplyInfo = self::getContainer()->get(WildberriesSupplyInfo::class);
-        $WildberriesSupplyInfo->TokenHttpClient(new WbAuthorizationToken(new UserProfileUid(), self::$tocken));
+        $WildberriesWarehouse = $WildberriesWarehousesClient
+            ->profile(new UserProfileUid())
+            ->warehouses();
+
+        /** @var WildberriesWarehouseDTO $WildberriesWarehouseDTO */
+        $WildberriesWarehouseDTO = $WildberriesWarehouse->current();
 
 
-        $WildberriesSupplyInfoDTO = $WildberriesSupplyInfo
-            ->withSupply($WildberriesSupply->getIdentifier())
-            ->getInfo();
+        self::assertNotNull($WildberriesWarehouseDTO->getId());
+        self::assertIsInt($WildberriesWarehouseDTO->getId());
+
+        self::assertNotNull($WildberriesWarehouseDTO->getName());
+        self::assertIsString($WildberriesWarehouseDTO->getName());
+
+        self::assertNotNull($WildberriesWarehouseDTO->getCity());
+        self::assertIsString($WildberriesWarehouseDTO->getCity());
 
 
-        self::assertNotNull($WildberriesSupplyInfoDTO->getIdentifier());
-        self::assertIsString($WildberriesSupplyInfoDTO->getIdentifier());
+        self::assertNotNull($WildberriesWarehouseDTO->getCargo());
+        self::assertContains($WildberriesWarehouseDTO->getCargo(), [1, 2, 3]);
 
-        self::assertNotNull($WildberriesSupplyInfoDTO->getName());
-        self::assertIsString($WildberriesSupplyInfoDTO->getName());
-
-        self::assertNotNull($WildberriesSupplyInfoDTO->isDone());
-        self::assertIsBool($WildberriesSupplyInfoDTO->isDone());
-
-        self::assertNotNull($WildberriesSupplyInfoDTO->getCreated());
-
-        self::assertNotNull($WildberriesSupplyInfoDTO->getCargo());
-        self::assertIsInt($WildberriesSupplyInfoDTO->getCargo());
-        self::assertContains($WildberriesSupplyInfoDTO->getCargo(), [0, 1, 2, 3]);
+        self::assertNotNull($WildberriesWarehouseDTO->getDelivery());
+        self::assertContains($WildberriesWarehouseDTO->getDelivery(), [1, 2, 3]);
 
     }
 }

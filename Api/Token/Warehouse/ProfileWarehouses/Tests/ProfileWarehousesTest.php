@@ -23,28 +23,56 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Warehouse\WildberriesWarehouses\Tests;
+namespace BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersSticker\WildberriesOrdersSticker;
 use BaksDev\Wildberries\Api\Token\Supplies\SupplyInfo\WildberriesSupplyInfo;
-use BaksDev\Wildberries\Api\Token\Warehouse\WildberriesWarehouses\WildberriesWarehouses;
+use BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses\ProfileWarehouseDTO;
+use BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses\ProfileWarehousesClient;
+use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
 /**
  * @group wildberries
- * @group wildberries-api
+ * @group wildberries-profile-warehouses
  */
 #[When(env: 'test')]
-final class WarehousesWildberriesTest extends KernelTestCase
+final class ProfileWarehousesTest extends KernelTestCase
 {
+    private static $tocken;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$tocken = $_SERVER['TEST_WB_TOCKEN'];
+    }
+
     public function testUseCase(): void
     {
-        /** @var WildberriesSupplyInfo $WildberriesSupplyInfo */
-        //$WildberriesSupplyInfo = self::getContainer()->get(WildberriesWarehouses::class);
+        /** @var ProfileWarehousesClient $WildberriesWarehouses */
+        $WildberriesWarehouses = self::getContainer()->get(ProfileWarehousesClient::class);
 
-        self::assertTrue(true);
+        $WildberriesWarehouses->TokenHttpClient(new WbAuthorizationToken(new UserProfileUid(), self::$tocken));
+
+        /** @var ProfileWarehouseDTO $Warehouse */
+        $Warehouse = $WildberriesWarehouses->warehouses()->current();
+
+        self::assertNotNull($Warehouse->getId());
+        self::assertIsInt($Warehouse->getId());
+
+        self::assertNotNull($Warehouse->getOffice());
+        self::assertIsInt($Warehouse->getOffice());
+
+        self::assertNotNull($Warehouse->getName());
+        self::assertIsString($Warehouse->getName());
+
+        self::assertNotNull($Warehouse->getCategory());
+        self::assertContains($Warehouse->getCategory(), [1, 2, 3]);
+
+        self::assertNotNull($Warehouse->getDelivery());
+        self::assertContains($Warehouse->getDelivery(), [1, 2, 3]);
+
     }
 }

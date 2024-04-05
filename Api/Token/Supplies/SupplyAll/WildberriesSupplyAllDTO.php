@@ -23,42 +23,34 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Supplies\SupplyInfo;
+namespace BaksDev\Wildberries\Api\Token\Supplies\SupplyAll;
 
 use DateTimeImmutable;
+use Symfony\Component\Validator\Constraints as Assert;
 
-final class WildberriesSupplyInfoDTO
+
+final class WildberriesSupplyAllDTO
 {
-
     /**
      * Идентификатор поставки
+     * @example "WB-GI-1234567"
      */
     private string $identifier;
 
-    /**
-     * Флаг закрытия поставки
-     */
+    /** Наименование поставки */
+    private string $name;
+
+    /** Флаг закрытия поставки */
     private bool $done;
 
-    /**
-     * Дата создания поставки
-     */
+    /** Дата создания поставки */
     private DateTimeImmutable $created;
 
-    /**
-     * Дата закрытия поставки
-     */
+    /** Дата закрытия поставки */
     private ?DateTimeImmutable $closed;
 
-    /**
-     * Дата скана поставки
-     */
+    /** Дата скана поставки */
     private ?DateTimeImmutable $scan;
-
-    /**
-     * Наименование поставки
-     */
-    private string $name;
 
     /**
      * Тип поставки:
@@ -70,28 +62,14 @@ final class WildberriesSupplyInfoDTO
      */
     private int $cargo;
 
+    public function __construct(array $content) {
 
-    public function __construct(array $content)
-    {
-        /*Идентификатор поставки*/
         $this->identifier = $content['id'];
-
-        /*Наименование поставки*/
         $this->name = $content['name'];
-
-        /*Флаг закрытия поставки*/
         $this->done = $content['done'];
-
-        /*Дата создания поставки (RFC3339)*/
         $this->created = new DateTimeImmutable($content['createdAt']);
-
-        /*Дата закрытия поставки (RFC3339)*/
         $this->closed = $content['closedAt'] ? new DateTimeImmutable($content['closedAt']) : null;
-
-        /*Дата скана поставки (RFC3339)*/
         $this->scan = $content['scanDt'] ? new DateTimeImmutable($content['scanDt']) : null;
-
-        /*сКГТ-признак поставки*/
         $this->cargo = $content['cargoType'];
     }
 
@@ -101,6 +79,14 @@ final class WildberriesSupplyInfoDTO
     public function getIdentifier(): string
     {
         return $this->identifier;
+    }
+
+    /**
+     * Name
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
@@ -122,7 +108,7 @@ final class WildberriesSupplyInfoDTO
     /**
      * Closed
      */
-    public function getClosed(): ?DateTimeImmutable
+    public function getClosed(): DateTimeImmutable
     {
         return $this->closed;
     }
@@ -130,17 +116,9 @@ final class WildberriesSupplyInfoDTO
     /**
      * Scan
      */
-    public function getScan(): ?DateTimeImmutable
+    public function getScan(): DateTimeImmutable
     {
         return $this->scan;
-    }
-
-    /**
-     * Name
-     */
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     /**
@@ -150,6 +128,7 @@ final class WildberriesSupplyInfoDTO
     {
         return $this->cargo;
     }
+
 
 
 }

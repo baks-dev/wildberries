@@ -23,25 +23,47 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries;
+namespace BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses;
 
-final class Warehouse
+final class ProfileWarehouseDTO
 {
-    /**  ID склада продавца */
+
+    /** ID склада продавца */
     private int $id;
+
+    /** ID склада WB */
+    private int $office;
 
     /** Название склада продавца */
     private string $name;
 
-    /** ID склада WB */
-    private int $wildberries;
+    /** Тип товара, который принимает склад:
+     *
+     * 1 - обычный
+     * 2 - СГТ (Сверхгабаритный товар)
+     * 3 - КГТ (Крупногабаритный товар). Не используется на данный момент.
+     */
+    private int $category;
+
+    /** Тип доставки, который принимает склад:
+     *
+     * 1 - доставка на склад Wildberries
+     * 2 - доставка силами продавца
+     * 3 - доставка курьером WB
+     */
+    private int $delivery;
+
 
 
     public function __construct(array $content)
     {
         $this->id = $content['id'];
+        $this->office = $content['officeId'];
         $this->name = $content['name'];
-        $this->wildberries = $content['officeId'];
+
+        $this->category = $content['cargoType'];
+        $this->delivery = $content['deliveryType'];
+
     }
 
     /**
@@ -53,6 +75,14 @@ final class Warehouse
     }
 
     /**
+     * Office
+     */
+    public function getOffice(): int
+    {
+        return $this->office;
+    }
+
+    /**
      * Name
      */
     public function getName(): string
@@ -61,11 +91,18 @@ final class Warehouse
     }
 
     /**
-     * Wildberries
+     * Category
      */
-    public function getWildberries(): int
+    public function getCategory(): int
     {
-        return $this->wildberries;
+        return $this->category;
     }
 
+    /**
+     * Delivery
+     */
+    public function getDelivery(): int
+    {
+        return $this->delivery;
+    }
 }

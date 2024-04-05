@@ -63,11 +63,6 @@ final class WildberriesSupplyInfo extends Wildberries
             );
         }
 
-        if($this->test)
-        {
-            return new WildberriesSupplyInfoDTO($this->dataTest());
-        }
-
         $response = $this->TokenHttpClient()->request(
             'GET',
             '/api/v3/supplies/'.$this->supply,
@@ -86,20 +81,6 @@ final class WildberriesSupplyInfo extends Wildberries
         $content = $response->toArray(false);
 
         return new WildberriesSupplyInfoDTO($content);
-    }
-
-
-    public function dataTest(): array
-    {
-        return  [
-            "id" => $this->supply,
-            "done" => false,
-            "createdAt" => "2022-05-04T07:56:29Z",
-            "closedAt" => "2022-05-04T07:56:29Z",
-            "scanDt" => "2022-05-04T07:56:29Z",
-            "name" => "Тестовая поставка",
-            "isLargeCargo" => true
-        ];
     }
 
 }

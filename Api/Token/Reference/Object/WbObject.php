@@ -56,7 +56,7 @@ final class WbObject extends Wildberries
             return;
         }
 
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemAdapter('wildberries');
 
         /**
          * Кешируем результат запроса

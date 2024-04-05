@@ -45,7 +45,7 @@ final class ConfigCard implements ConfigCardInterface
     
     public function get(string $name)
     {
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemAdapter('wildberries');
     
         /* Кешируем результат запроса */
         $response = $cache->get('wb_config_card_'.md5($name), function (ItemInterface $item) use ($name)

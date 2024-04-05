@@ -31,9 +31,6 @@ use DomainException;
 final class WildberriesOrdersNew extends Wildberries
 {
 
-    /**
-     * Список карточек товаров
-     */
     private array $content = [];
 
 

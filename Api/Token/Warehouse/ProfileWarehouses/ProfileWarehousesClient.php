@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Warehouse\WildberriesWarehouses;
+namespace BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses;
 
 use BaksDev\Wildberries\Api\Wildberries;
 use DomainException;
@@ -32,18 +32,17 @@ use InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class WildberriesWarehouses extends Wildberries
+final class ProfileWarehousesClient extends Wildberries
 {
 
     /**
-     * Получить список складов WB
+     * Получить список складов продавца
      *
-     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Sklady/paths/~1api~1v3~1offices/get
+     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Sklady/paths/~1api~1v3~1warehouses/get
      *
      */
     public function warehouses(): Generator
     {
-
         if(!$this->profile)
         {
             throw new InvalidArgumentException(
@@ -51,30 +50,17 @@ final class WildberriesWarehouses extends Wildberries
             );
         }
 
-
-        if($this->test)
-        {
-            $content = $this->dataTest();
-
-            foreach($content as $data)
-            {
-                yield new Warehouse($data);
-            }
-
-            return;
-        }
-
-
         /** Кешируем результат запроса */
 
-        $cache = new FilesystemAdapter('Wildberries');
+        $cache = new FilesystemAdapter('wildberries');
 
-        $content = $cache->get('warehouses-wildberries-'.$this->profile->getValue(), function(ItemInterface $item) {
+        $content = $cache->get('warehouses-'.$this->profile->getValue(), function(ItemInterface $item) {
+
             $item->expiresAfter(60 * 60);
 
             $response = $this->TokenHttpClient()->request(
                 'GET',
-                '/api/v3/offices',
+                '/api/v3/warehouses',
             );
 
             if($response->getStatusCode() !== 200)
@@ -92,33 +78,9 @@ final class WildberriesWarehouses extends Wildberries
 
         foreach($content as $data)
         {
-            yield new Warehouse($data);
+            yield new ProfileWarehouseDTO($data);
         }
     }
 
-    public function dataTest(): array
-    {
-        return [
-            [
-                "address" => "ул. Троицкая, Подольск, Московская обл.",
-                "name" => "Москва (Подольск)",
-                "city" => "Москва",
-                "id" => 15,
-                "longitude" => 55.386871,
-                "latitude" => 37.588898,
-                "selected" => true
-            ],
-
-            [
-                "address" => "ул. Троицкая, Химки, Московская обл.",
-                "name" => "Москва (Химки)",
-                "city" => "Москва",
-                "id" => 18,
-                "longitude" => 55.386872,
-                "latitude" => 37.588899,
-                "selected" => true
-            ]
-        ];
-    }
 
 }

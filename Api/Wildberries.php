@@ -38,25 +38,23 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 abstract class Wildberries
 {
 
+    private ?WbAuthorizationToken $wbAuthorizationToken = null;
+
     private WbTokenByProfileInterface $TokenByProfile;
 
     protected LoggerInterface $logger;
 
     protected ?UserProfileUid $profile = null;
 
-    protected bool $test;
-
     private array $headers;
 
     public function __construct(
-        #[Autowire(env: 'APP_ENV')] string $environment,
         WbTokenByProfileInterface $TokenByProfile,
-        LoggerInterface $logger,
+        LoggerInterface $WildberriesLogger,
     )
     {
-        $this->test = ($environment === 'test' || $environment === 'api');
         $this->TokenByProfile = $TokenByProfile;
-        $this->logger = $logger;
+        $this->logger = $WildberriesLogger;
     }
 
 
@@ -76,23 +74,34 @@ abstract class Wildberries
     }
 
 
-    protected function TokenHttpClient(): RetryableHttpClient
+    public function TokenHttpClient(WbAuthorizationToken $WbAuthorizationToken = null): RetryableHttpClient
     {
-        if(!$this->profile)
+        if($WbAuthorizationToken !== null)
         {
-            throw new InvalidArgumentException(
-                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)'
-            );
+            $this->wbAuthorizationToken = $WbAuthorizationToken;
+            $this->profile = $WbAuthorizationToken->getProfile();
         }
 
-        $WbAuthorizationToken = $this->test ? new WbAuthorizationToken($this->profile, 'string-authorization_token') : $this->TokenByProfile->getToken($this->profile);
-
-        if(!$WbAuthorizationToken)
+        if($this->wbAuthorizationToken === null)
         {
-            throw new DomainException(sprintf('Токен авторизации Wildberries не найден: %s', $this->profile));
+            if(!$this->profile)
+            {
+                $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [__FILE__.':'.__LINE__]);
+
+                throw new InvalidArgumentException(
+                    'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)'
+                );
+            }
+
+            $this->wbAuthorizationToken = $this->TokenByProfile->getToken($this->profile);
+
+            if(!$this->wbAuthorizationToken)
+            {
+                throw new DomainException(sprintf('Токен авторизации Wildberries не найден: %s', $this->profile));
+            }
         }
 
-        $this->headers = ['Authorization' => $WbAuthorizationToken->getToken()];
+        $this->headers = ['Authorization' => $this->wbAuthorizationToken->getToken()];
 
         return new RetryableHttpClient(
             HttpClient::create(['headers' => $this->headers])

@@ -30,6 +30,7 @@ use BaksDev\Reference\Money\Type\Money;
 
 final class Price
 {
+
     /**
      * Цена
      */
@@ -40,16 +41,11 @@ final class Price
      */
     private int $discount;
 
-    /**
-     * Промокод
-     */
-    private int $promoCode;
+
 
     public function __construct(array $content) {
-
         $this->price = $content['price'];
-        $this->discount = $content['discount'];
-        $this->promoCode = $content['promoCode'];
+        $this->discount = $content['discountedPrice'];
     }
 
     /**
@@ -66,14 +62,6 @@ final class Price
     public function getDiscount(): int
     {
         return $this->discount;
-    }
-
-    /**
-     * PromoCode
-     */
-    public function getPromoCode(): int
-    {
-        return $this->promoCode;
     }
 
 }

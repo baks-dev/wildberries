@@ -26,37 +26,50 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Api\Token\Stocks\GetStocks\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\Api\Token\Card\WildberriesCards\WildberriesCards;
 use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersSticker\WildberriesOrdersSticker;
 use BaksDev\Wildberries\Api\Token\Stocks\GetStocks\WildberriesStocks;
 use BaksDev\Wildberries\Api\Token\Supplies\SupplyInfo\WildberriesSupplyInfo;
-use BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\PartnerWarehouses;
-use BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\Warehouse;
+use BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\SellerWarehouses;
+use BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\SellerWarehouse;
+use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
 /**
  * @group wildberries
- * @group wildberries-api
+ * @group wildberries-stocks
  */
 #[When(env: 'test')]
 final class WarehousesStocksTest extends KernelTestCase
 {
+    private static $tocken;
+    private static $warehouse;
+    private static $barcode;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$tocken = $_SERVER['TEST_WB_TOCKEN'];
+        self::$warehouse = (int) $_SERVER['TEST_WB_WAREHOUSE'];
+        self::$barcode = $_SERVER['TEST_WB_BARCODE'];
+    }
+
     public function testUseCase(): void
     {
         /** @var WildberriesStocks $WildberriesStocks */
         $WildberriesStocks = self::getContainer()->get(WildberriesStocks::class);
 
+        $WildberriesStocks->TokenHttpClient(new WbAuthorizationToken(new UserProfileUid(), self::$tocken));
+
         $Warehouses =  $WildberriesStocks
-            ->profile(new UserProfileUid())
-            ->warehouse(1234567890)
-            ->addBarcode('BarcodeTest123')
-            ->addBarcode('BarcodeTest456')
+            ->warehouse(self::$warehouse)
+            ->addBarcode(self::$barcode)
             ->stocks()
         ;
 
-        self::assertEquals(5, $Warehouses->getAmount('BarcodeTest123'));
-        self::assertEquals(10, $Warehouses->getAmount('BarcodeTest456'));
+        self::assertNotNull($Warehouses->getAmount(self::$barcode));
+        self::assertIsInt($Warehouses->getAmount(self::$barcode));
 
     }
 }

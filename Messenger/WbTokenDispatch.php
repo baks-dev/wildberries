@@ -26,11 +26,20 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Messenger;
 
 use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Wildberries\Api\Token\Supplies\SupplyAll\WildberriesSupplyAll;
+use BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses\ProfileWarehousesClient;
+use BaksDev\Wildberries\Api\Token\Warehouse\WarehousesWildberries\WildberriesWarehousesClient;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 100)]
 final class WbTokenDispatch
 {
+    public function __construct(
+        ProfileWarehousesClient $wildberriesWarehouses,
+        WildberriesWarehousesClient $wildberriesWarehousesClient,
+        WildberriesSupplyAll $wildberriesSupplyAll
+    ) {}
+
     public function __invoke(WbTokenMessage $message): void {}
 }

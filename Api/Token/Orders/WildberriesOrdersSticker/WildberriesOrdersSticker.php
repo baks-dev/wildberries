@@ -72,10 +72,10 @@ final class WildberriesOrdersSticker extends Wildberries
             );
         }
 
-        if($this->test)
-        {
-            return new WildberriesOrdersStickerDTO($this->dataTest());
-        }
+
+
+
+
 
         $data = ["orders" => [$this->orders]];
 

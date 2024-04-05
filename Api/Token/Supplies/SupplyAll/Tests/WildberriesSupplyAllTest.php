@@ -23,46 +23,60 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\Tests;
+namespace BaksDev\Wildberries\Api\Token\Supplies\SupplyAll\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\Api\Token\Card\WildberriesCards\WildberriesCards;
 use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersSticker\WildberriesOrdersSticker;
+use BaksDev\Wildberries\Api\Token\Supplies\SupplyAll\WildberriesSupplyAll;
+use BaksDev\Wildberries\Api\Token\Supplies\SupplyAll\WildberriesSupplyAllDTO;
 use BaksDev\Wildberries\Api\Token\Supplies\SupplyInfo\WildberriesSupplyInfo;
-use BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\PartnerWarehouses;
-use BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\Warehouse;
+use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
 /**
  * @group wildberries
- * @group wildberries-api
+ * @group wildberries-supply-all
  */
 #[When(env: 'test')]
-final class WarehousesPartnerTest extends KernelTestCase
+final class WildberriesSupplyAllTest extends KernelTestCase
 {
+
+    private static $tocken;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$tocken = $_SERVER['TEST_WB_TOCKEN'];
+    }
+
+
     public function testUseCase(): void
     {
-        /** @var PartnerWarehouses $PartnerWarehouses */
-        $PartnerWarehouses = self::getContainer()->get(PartnerWarehouses::class);
+        /** @var WildberriesSupplyAll $WildberriesSupplyAll */
+        $WildberriesSupplyAll = self::getContainer()->get(WildberriesSupplyAll::class);
 
-        $Warehouses = $PartnerWarehouses
-            ->profile(new UserProfileUid())
-            ->warehouses();
+        $WildberriesSupplyAll->TokenHttpClient(new WbAuthorizationToken(new UserProfileUid(), self::$tocken));
 
-        $Warehouse = $Warehouses->current();
-
-       self::assertEquals(1, $Warehouse->getId());
-       self::assertEquals("ул. Троицкая, Подольск, Московская обл.", $Warehouse->getName());
-       self::assertEquals(15, $Warehouse->getWildberries());
+        /** @var WildberriesSupplyAllDTO $WildberriesSupply */
+        $WildberriesSupply = ($WildberriesSupplyAll->all())->current();
 
 
-        $Warehouses->next();
-        $Warehouse = $Warehouses->current();
+        self::assertNotNull($WildberriesSupply->getIdentifier());
+        self::assertIsString($WildberriesSupply->getIdentifier());
 
-        self::assertEquals(2, $Warehouse->getId());
-        self::assertEquals("ул. Троицкая, Химки, Московская обл.", $Warehouse->getName());
-        self::assertEquals(16, $Warehouse->getWildberries());
+        self::assertNotNull($WildberriesSupply->getName());
+        self::assertIsString($WildberriesSupply->getName());
+
+        self::assertNotNull($WildberriesSupply->isDone());
+        self::assertIsBool($WildberriesSupply->isDone());
+
+        self::assertNotNull($WildberriesSupply->getCreated());
+
+        self::assertNotNull($WildberriesSupply->getCargo());
+        self::assertIsInt($WildberriesSupply->getCargo());
+        self::assertContains($WildberriesSupply->getCargo(), [0, 1, 2, 3]);
 
     }
 }

@@ -43,7 +43,6 @@ final class Card
     private UserProfileUid $profile;
 
 
-
     /**
      * Идентификатор карточки товара
      */
@@ -72,7 +71,7 @@ final class Card
     /**
      * Описание товар
      */
-    private string $description;
+    private ?string $description;
 
     /**
      * Артикул продавца
@@ -89,12 +88,13 @@ final class Card
      */
     private string $color;
 
+
+    private DateTimeImmutable $update;
+
     /**
      * Медиафайлы номенклатуры.
      */
-    private array $media;
-
-    private DateTimeImmutable $update;
+    private ArrayObject $media;
 
     /**
      * Характеристики товара
@@ -112,39 +112,69 @@ final class Card
 
     public function __construct(UserProfileUid $profile, array $data)
     {
-        if(empty($data['colors']))
-        {
-            throw new \Doctrine\Instantiator\Exception\InvalidArgumentException(
-                sprintf('Не указан цвет для товара с номенклатурой %s', $data['nmID'])
-            );
-        }
+        //dd($data);
+
+        //       if(empty($data['colors']))
+        //       {
+        //           throw new \Doctrine\Instantiator\Exception\InvalidArgumentException(
+        //               sprintf('Не указан цвет для товара с номенклатурой %s', $data['nmID'])
+        //           );
+        //       }
 
         $this->profile = $profile;
 
         $this->id = $data['imtID'];
         $this->nomenclature = $data['nmID'];
-        $this->category = $data['object'];
+
+        $this->name = $data['title'];
+        $this->description = $data['description'] ?? null;
+        $this->brand = $data['brand'];
+
+        $this->category = $data['subjectName'];
         $this->article = $data['vendorCode'];
-        $this->update = new DateTimeImmutable($data['updateAt']);
-        $this->media = $data['mediaFiles'];
-        $this->color = current($data['colors']);
+        $this->update = new DateTimeImmutable($data['updatedAt']);
+        //$this->media = $data['photos'];
+
+        //        foreach($data['characteristics'] as $characteristic) {
+        //
+        //        }
+
+        //$this->color = current($data['colors']);
+
+        $this->media = new ArrayObject();
+
+        foreach($data['photos'] as $key => $photos) {
+            $this->media->offsetSet($key, $photos['big'] ?? $photos['small']);
+        }
+
+
+        $this->characteristics = new ArrayObject();
+
+        foreach($data['characteristics'] as $characteristic) {
+
+            $key = mb_strtolower($characteristic['name']);
+
+            $values = $characteristic['value'];
+            $value = is_array($values) ? implode(', ', $values) : $values;
+
+            $this->characteristics->offsetSet($key, $value);
+        }
+
 
         $this->offers = new ArrayObject();
 
-        foreach($data['sizes'] as $size)
-        {
-            if(empty($size['techSize']))
-            {
+        foreach($data['sizes'] as $size) {
+
+            if(empty($size['techSize'])) {
                 $this->offer = false;
             }
 
             $barcode = current($size['skus']);
             $this->offers->offsetSet($barcode, $size['techSize']);
         }
-
     }
 
-    public function getCardDetail(): self
+    /*public function getCardDetail(): self
     {
         if(!$this->media)
         {
@@ -156,8 +186,9 @@ final class Card
         $client = new CachingHttpClient($client, $store, ['default_ttl' => 86400]);
 
 
-        $parseDomainCard = current($this->media);
+        $parseDomainCard = current($this->media)['big'];
         $DomainCard = substr($parseDomainCard, 0, strpos($parseDomainCard, '/images/')).'/info/ru/card.json';
+
         $response = $client->request('GET', $DomainCard);
 
         if($response->getStatusCode() !== 200)
@@ -181,7 +212,7 @@ final class Card
         }
 
         return $this;
-    }
+    }*/
 
     /**
      * Id
@@ -263,7 +294,7 @@ final class Card
     /**
      * Media
      */
-    public function getMedia(): array
+    public function getMedia(): ArrayObject
     {
         return $this->media;
     }
@@ -292,9 +323,8 @@ final class Card
 
     public function getCharacteristic($name): ?string
     {
-        if($this->characteristics->offsetExists($name))
-        {
-            return $this->characteristics->offsetGet($name);
+        if($this->characteristics->offsetExists($name)) {
+            return (string) $this->characteristics->offsetGet($name);
         }
 
         return null;
@@ -319,18 +349,16 @@ final class Card
         $iterator = $this->offers->getIterator();
         $iterator->rewind();
 
-        return (string) $iterator->key();
+        return (string)$iterator->key();
     }
 
-     public function getCurrentValue(): mixed
+    public function getCurrentValue(): mixed
     {
         $iterator = $this->offers->getIterator();
         $iterator->rewind();
 
         return $iterator->current();
     }
-
-
 
 
     public function getOffer($barcode): string

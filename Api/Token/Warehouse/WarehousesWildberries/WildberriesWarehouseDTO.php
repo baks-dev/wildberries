@@ -23,11 +23,10 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Warehouse\WildberriesWarehouses;
+namespace BaksDev\Wildberries\Api\Token\Warehouse\WarehousesWildberries;
 
-final class Warehouse
+final class WildberriesWarehouseDTO
 {
-
 
     /** ID*/
     private int $id;
@@ -57,6 +56,26 @@ final class Warehouse
     private bool $selected;
 
 
+    /**
+     * Тип товара, который принимает склад:
+     *
+     * 1 - обычный
+     * 2 - СГТ (Сверхгабаритный товар)
+     * 3 - КГТ (Крупногабаритный товар). Не используется на данный момент.
+     */
+    private int $cargo;
+
+    /**
+     *
+     * Тип доставки, который принимает склад:
+     *
+     * 1 - доставка на склад Wildberries
+     * 2 - доставка силами продавца
+     * 3 - доставка курьером WB
+     */
+    private int $delivery;
+
+
     public function __construct(array $content)
     {
         $this->id = $content['id'];
@@ -66,6 +85,8 @@ final class Warehouse
         $this->longitude = $content['longitude'];
         $this->latitude = $content['latitude'];
         $this->selected = $content['selected'];
+        $this->cargo = $content['cargoType'];
+        $this->delivery = $content['deliveryType'];
     }
 
     /**
@@ -124,5 +145,19 @@ final class Warehouse
         return $this->selected;
     }
 
+    /**
+     * Cargo
+     */
+    public function getCargo(): int
+    {
+        return $this->cargo;
+    }
 
+    /**
+     * Delivery
+     */
+    public function getDelivery(): int
+    {
+        return $this->delivery;
+    }
 }

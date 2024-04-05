@@ -23,13 +23,16 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Supplies\SupplyOpen;
+namespace BaksDev\Wildberries\Api\Token\Supplies\SupplyAll;
 
 use BaksDev\Wildberries\Api\Wildberries;
 use DomainException;
+use Generator;
 
-final class WildberriesSupplyOpen extends Wildberries
+final class WildberriesSupplyAll extends Wildberries
 {
+    private int $next = 0;
+
     /**
      * Наименование поставки
      */
@@ -43,36 +46,49 @@ final class WildberriesSupplyOpen extends Wildberries
     }
 
     /**
-     * Создать новую поставку
+     * Получить список поставок (LIMIT 100)
      *
-     * Возвращает идентификатор созданной поставки в формате "WB-GI-1234567".
-     *
-     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Postavki/paths/~1api~1v3~1supplies/post
+     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Postavki/paths/~1api~1v3~1supplies/get
      *
      */
-    public function open(): WildberriesSupplyOpenDTO
+    public function all(int $next = 0): Generator
     {
-        $data = ["name" => $this->name];
+        $data = [
+            "limit" => 100,
+            "next" => $next
+        ];
 
         $response = $this->TokenHttpClient()->request(
-            'POST',
+            'GET',
             '/api/v3/supplies',
-            ['json' => $data],
+            ['query' => $data],
         );
 
-        if($response->getStatusCode() !== 201)
+        $content = $response->toArray(false);
+
+        if($response->getStatusCode() !== 200)
         {
-            $content = $response->toArray(false);
-            //$this->logger->critical('curl -X POST "' . $url . '" ' . $curlHeader . ' -d "' . $data . '"');
             throw new DomainException(
                 message: $response->getStatusCode().': '.$content['message'] ?? self::class,
                 code: $response->getStatusCode()
             );
         }
 
-        return new WildberriesSupplyOpenDTO($response->toArray(false));
+        $this->next += 100;
+
+        $response->toArray(false);
+
+        foreach($content['supplies'] as $data) {
+            yield new WildberriesSupplyAllDTO($data);
+        }
     }
 
-
+    /**
+     * Next
+     */
+    public function getNext(): int
+    {
+        return $this->next;
+    }
 
 }

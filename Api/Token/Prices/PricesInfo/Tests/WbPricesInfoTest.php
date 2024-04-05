@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,33 +23,52 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Supplies\SupplyOpen\Tests;
+namespace BaksDev\Wildberries\Api\Token\Prices\PricesInfo\Tests;
 
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
+use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersSticker\WildberriesOrdersSticker;
-use BaksDev\Wildberries\Api\Token\Supplies\SupplyInfo\WildberriesSupplyInfo;
-use BaksDev\Wildberries\Api\Token\Supplies\SupplyOpen\WildberriesSupplyOpen;
+use BaksDev\Wildberries\Api\Token\Card\WildberriesCards\WildberriesCards;
+use BaksDev\Wildberries\Api\Token\Prices\PricesInfo\PricesInfo;
+use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
+
 /**
  * @group wildberries
- * @group wildberries-api
+ * @group wildberries-prices
  */
 #[When(env: 'test')]
-final class WildberriesSupplyOpenTest extends KernelTestCase
+class WbPricesInfoTest extends KernelTestCase
 {
+    private static string $tocken;
+    private static int $nomenclature;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$tocken = $_SERVER['TEST_WB_TOCKEN'];
+        self::$nomenclature = (int) $_SERVER['TEST_WB_NOMENCLATURE'];
+    }
+
     public function testUseCase(): void
     {
-        /** @var WildberriesSupplyOpen $WildberriesSupplyOpen */
-        $WildberriesSupplyOpen = self::getContainer()->get(WildberriesSupplyOpen::class);
+        /** @var PricesInfo $PricesInfo */
+        $PricesInfo = self::getContainer()->get(PricesInfo::class);
 
-        $WildberriesSupplyOpenDTO = $WildberriesSupplyOpen
-            ->profile(new UserProfileUid())
-            ->setName('Тестовая поставка')
-            ->open();
+        $PricesInfo->TokenHttpClient(new WbAuthorizationToken(new UserProfileUid(), self::$tocken));
 
-        self::assertEquals('WB-GI-1234567', $WildberriesSupplyOpenDTO->getIdentifier());
+        $PricesInfo->prices(self::$nomenclature);
+        $Price = $PricesInfo->getPriceByNomenclature(self::$nomenclature);
+
+        self::assertNotNull($Price->getPrice());
+        self::assertInstanceOf(Money::class, $Price->getPrice());
+        self::assertIsFloat($Price->getPrice()->getValue());
+
+        self::assertNotNull($Price->getDiscount());
+        self::assertIsInt($Price->getDiscount());
 
     }
+
 }

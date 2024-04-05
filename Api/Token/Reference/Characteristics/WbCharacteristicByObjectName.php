@@ -65,19 +65,19 @@ final class WbCharacteristicByObjectName extends Wildberries
             );
         }
 
-        if($this->test)
-        {
-            $content = $this->dataTest();
+//        if($this->test)
+//        {
+//            $content = $this->dataTest();
+//
+//            foreach($content['data'] as $data)
+//            {
+//                yield new WbCharacteristicByObjectNameDTO($data);
+//            }
+//
+//            return;
+//        }
 
-            foreach($content['data'] as $data)
-            {
-                yield new WbCharacteristicByObjectNameDTO($data);
-            }
-
-            return;
-        }
-
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemAdapter('wildberries');
 
         /**
          * Кешируем результат запроса
@@ -108,46 +108,17 @@ final class WbCharacteristicByObjectName extends Wildberries
 
         $content = $response->toArray(false);
 
+        if(empty($content['data']))
+        {
+            $cache->delete('wb_config_card_'.md5($this->name));
+        }
+
+
         foreach($content['data'] as $data)
         {
             yield new WbCharacteristicByObjectNameDTO($data);
         }
 
     }
-
-    public function dataTest(): array
-    {
-        return [
-            "data" => [
-                [
-                    "objectName" => "Косухи",
-                    "name" => "Особенности модели",
-                    "required" => false,
-                    "unitName" => "",
-                    "maxCount" => 1,
-                    "popular" => false,
-                    "charcType" => 1
-                ]
-            ],
-            "error" => false,
-            "errorText" => "",
-            "additionalErrors" => ""
-        ];
-    }
-
-
-    //    /**
-    //     * "objectName": "Косухи", - Наименование подкатегории
-    //     * "name": "Особенности модели", - Наименование характеристики
-    //     * "required": false, - Характеристика обязательна к заполенению
-    //     * "unitName": "", - Единица имерения (см, гр и т.д.)
-    //     * "maxCount": 1, - Максимальное кол-во значений которое можно присвоить данной характеристике
-    //     * "popular": false, - Характеристика популярна у пользователей
-    //     * "charcType": 1 - Тип характеристики (1 и 0 - строка или массив строк; 4 - число или массив чисел)
-    //     */
-    //    public function getContent(): array
-    //    {
-    //        return $this->content;
-    //    }
 
 }

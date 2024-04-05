@@ -76,7 +76,7 @@ final class WildberriesStocks extends Wildberries
     /**
      * Получить остатки товаров
      *
-     * @see https://openapi.wildberries.ru/#tag/Marketplace-Sborochnye-zadaniya/paths/~1api~1v3~1supplies~1{supplyId}~1barcode/get
+     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Ostatki/paths/~1api~1v3~1stocks~1{warehouseId}/post
      *
      */
     public function stocks(): Stocks
@@ -95,12 +95,7 @@ final class WildberriesStocks extends Wildberries
             );
         }
 
-        if($this->test)
-        {
-            return new Stocks($this->dataTest());
-        }
-
-        $cache = new FilesystemAdapter('Wildberries');
+        $cache = new FilesystemAdapter('wildberries');
 
         $response = $cache->get('stocks-'.$this->profile->getValue().'-'.implode('.', $this->barcode), function(
             ItemInterface $item

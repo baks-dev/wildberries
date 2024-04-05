@@ -44,7 +44,7 @@ final class PricesInfo extends Wildberries
      * @see https://openapi.wildberries.ru/prices/api/ru/#tag/Ceny/paths/~1public~1api~1v1~1info/get
      *
      */
-    public function prices(): self
+    public function prices(int $nomenclature): self
     {
 
         if(!$this->profile)
@@ -55,31 +55,40 @@ final class PricesInfo extends Wildberries
         }
 
 
-//        if($this->test)
-//        {
-//            $content = $this->dataTest();
-//
-//            foreach($content as $data)
-//            {
-//                yield new Price($data);
-//            }
-//
-//            return;
-//        }
+
+
+        //        if($this->test)
+        //        {
+        //            $content = $this->dataTest();
+        //
+        //            foreach($content as $data)
+        //            {
+        //                yield new Price($data);
+        //            }
+        //
+        //            return;
+        //        }
 
 
         /** Кешируем результат запроса */
 
-        $cache = new FilesystemAdapter('Wildberries');
+        $cache = new FilesystemAdapter('wildberries');
+        //$cache->delete('prices-'.$nomenclature);
 
-        $content = $cache->get('prices-'.$this->profile->getValue(), function(ItemInterface $item) {
+        $content = $cache->get('prices-'.$nomenclature, function(ItemInterface $item) use ($nomenclature)
+        {
 
             $item->expiresAfter(60 * 60 * 24);
 
             $response = $this->TokenHttpClient()->request(
                 'GET',
-                '/public/api/v1/info',
+                'https://discounts-prices-api.wb.ru/api/v2/list/goods/filter',
+                [ 'query' => [
+                    'limit' => 100,
+                    'filterNmID' => $nomenclature
+                ], ]
             );
+
 
             if($response->getStatusCode() !== 200)
             {
@@ -90,16 +99,39 @@ final class PricesInfo extends Wildberries
                 );
             }
 
-            return $response->toArray(false);
+            $content = $response->toArray(false);
+
+            if(count($content['data']['listGoods']) > 1 || empty(current($content['data']['listGoods'])['sizes']))
+            {
+                throw new DomainException(
+                    message: 'Не найдена стоимость товара по номенклатуре '.$nomenclature, code: 404
+                );
+            }
+
+            $list = current($content['data']['listGoods']);
+
+            if($list['nmID'] !== $nomenclature)
+            {
+                throw new DomainException(
+                    message: 'Найденная номенклатура не совпадает с искомой: '.$list['nmID'].' != '.$nomenclature, code: 404
+                );
+            }
+
+            return current($content['data']['listGoods'])['sizes']; //$response->toArray(false);
 
         });
 
         $this->prices = new ArrayObject();
 
-        foreach($content as $data)
+        $data = current($content);
+
+        if(empty($data['price']))
         {
-            $this->prices->offsetSet($data['nmId'], new Price($data));
+            $cache->delete('prices-'.$nomenclature);
         }
+
+
+        $this->prices->offsetSet($nomenclature, new Price($data));
 
         return $this;
     }

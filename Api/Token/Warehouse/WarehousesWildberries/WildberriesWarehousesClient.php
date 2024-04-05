@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries;
+namespace BaksDev\Wildberries\Api\Token\Warehouse\WarehousesWildberries;
 
 use BaksDev\Wildberries\Api\Wildberries;
 use DomainException;
@@ -32,11 +32,11 @@ use InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class PartnerWarehouses extends Wildberries
+final class WildberriesWarehousesClient extends Wildberries
 {
 
     /**
-     * Получить список складов продавца
+     * Получить список складов Wildberries
      *
      * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Sklady/paths/~1api~1v3~1warehouses/get
      *
@@ -52,30 +52,30 @@ final class PartnerWarehouses extends Wildberries
         }
 
 
-        if($this->test)
-        {
-            $content = $this->dataTest();
-
-            foreach($content as $data)
-            {
-                yield new Warehouse($data);
-            }
-
-            return;
-        }
+//        if($this->test)
+//        {
+//            $content = $this->dataTest();
+//
+//            foreach($content as $data)
+//            {
+//                yield new SellerWarehouse($data);
+//            }
+//
+//            return;
+//        }
 
 
         /** Кешируем результат запроса */
 
-        $cache = new FilesystemAdapter('Wildberries');
+        $cache = new FilesystemAdapter('wildberries');
 
-        $content = $cache->get('warehouses-partner-'.$this->profile->getValue(), function(ItemInterface $item) {
+        $content = $cache->get('warehouses-wildberries-'.$this->profile->getValue(), function(ItemInterface $item) {
 
             $item->expiresAfter(60 * 60 * 24);
 
             $response = $this->TokenHttpClient()->request(
                 'GET',
-                '/api/v3/warehouses',
+                '/api/v3/offices',
             );
 
             if($response->getStatusCode() !== 200)
@@ -93,7 +93,7 @@ final class PartnerWarehouses extends Wildberries
 
         foreach($content as $data)
         {
-            yield new Warehouse($data);
+            yield new WildberriesWarehouseDTO($data);
         }
     }
 
