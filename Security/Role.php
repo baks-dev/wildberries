@@ -59,7 +59,7 @@ final class Role implements RoleInterface, MenuAdminInterface
      */
     public function getGroupMenu(): MenuAdminSectionGroupCollectionInterface|bool
     {
-        return new MenuGroupSettings();
+        return new MenuGroupWildberries();
     }
 
     /**

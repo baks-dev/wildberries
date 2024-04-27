@@ -91,7 +91,7 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
 
 
         /* Кешируем результат ORM */
-        return $qb->enableCache('UserGroup', 86400)->getOneOrNullResult();
+        return $qb->enableCache('users-profile-group', 86400)->getOneOrNullResult();
 
     }
 
