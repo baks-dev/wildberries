@@ -65,11 +65,7 @@ final class WildberriesCards extends Wildberries
      */
     public function limit(int $limit): self
     {
-        if($limit > 1000) {
-            throw new InvalidArgumentException(message: 'В параметр limit не должно присваиваться больше 100');
-        }
-
-        $this->limit = $limit;
+        $this->limit = $limit > 100 ? 100 : $limit;
 
         return $this;
     }

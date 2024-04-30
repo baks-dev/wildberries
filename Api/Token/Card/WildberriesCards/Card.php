@@ -144,7 +144,7 @@ final class Card
         $this->media = new ArrayObject();
 
         foreach($data['photos'] as $key => $photos) {
-            $this->media->offsetSet($key, $photos['big'] ?? $photos['small']);
+            $this->media->offsetSet($key, $photos['big'] ?: current($photos));
         }
 
 
