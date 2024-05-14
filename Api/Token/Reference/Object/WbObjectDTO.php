@@ -29,11 +29,16 @@ namespace BaksDev\Wildberries\Api\Token\Reference\Object;
 final class WbObjectDTO
 {
 
-
     /**
-     * Идентификатор предмета
+     * Идентификатор категории
      */
     private int $id;
+
+    /**
+     * Название категории
+     */
+    private string $name;
+
 
     /**
      * Идентификатор родительской категории
@@ -45,24 +50,17 @@ final class WbObjectDTO
      */
     private string $category;
 
-    /**
-     * Название категории
-     */
-    private string $name;
 
-    /**
-     * Виден на сайте
-     */
-    private bool $public;
 
     public function __construct(array $content)
     {
 
-        $this->id = $content["objectID"]; // => 2560,
+        $this->id = $content["subjectID"]; // => 2560,
+        $this->name = $content["subjectName"]; // => "3D очки",
+
         $this->parent = $content["parentID"]; // => 479,
-        $this->name = $content["objectName"]; // => "3D очки",
         $this->category = $content["parentName"]; // => "Электроника",
-        $this->public = $content["isVisible"]; // => true
+
     }
 
     /**
@@ -97,11 +95,4 @@ final class WbObjectDTO
         return $this->name;
     }
 
-    /**
-     * Public
-     */
-    public function isPublic(): bool
-    {
-        return $this->public;
-    }
 }

@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Api\Token\Reference\Object;
 
 use BaksDev\Wildberries\Api\Wildberries;
+use DateInterval;
 use DomainException;
 use Generator;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -44,18 +45,6 @@ final class WbObject extends Wildberries
     public function findObject(): Generator
     {
 
-        if($this->test)
-        {
-            $content = $this->dataTest();
-
-            foreach($content['data'] as $data)
-            {
-                yield new WbObjectDTO($data);
-            }
-
-            return;
-        }
-
         $cache = new FilesystemAdapter('wildberries');
 
         /**
@@ -64,13 +53,17 @@ final class WbObject extends Wildberries
          * @var  ResponseInterface $response
          */
         $response = $cache->get('wb_object_reference', function(ItemInterface $item) {
-            $item->expiresAfter(60 * 60 * 24);
+
+            $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
             return $this->TokenHttpClient()
                 ->request(
                     'GET',
-                    '/content/v1/object/all',
-                    ['query' => ['top' => 8000]],
+                    '/content/v2/object/all',
+                    ['query' => [
+                        'limit' => 1000,
+                        'locale' => 'ru'
+                    ]],
                 );
         });
 
@@ -91,23 +84,4 @@ final class WbObject extends Wildberries
             yield new WbObjectDTO($data);
         }
     }
-
-    public function dataTest(): array
-    {
-        return [
-            "data" => [
-                [
-                    "objectID" => 2560,
-                    "parentID" => 479,
-                    "objectName" => "3D очки",
-                    "parentName" => "Электроника",
-                    "isVisible" => true
-                ]
-            ],
-            "error" => false,
-            "errorText" => "",
-            "additionalErrors" => ""
-        ];
-    }
-
 }

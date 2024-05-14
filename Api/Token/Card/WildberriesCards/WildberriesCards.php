@@ -27,6 +27,7 @@ namespace BaksDev\Wildberries\Api\Token\Card\WildberriesCards;
 
 use BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\SellerWarehouse;
 use BaksDev\Wildberries\Api\Wildberries;
+use DateInterval;
 use DomainException;
 use Generator;
 use InvalidArgumentException;
@@ -103,7 +104,7 @@ final class WildberriesCards extends Wildberries
 
         $content = $cache->get('cards-' . $this->profile->getValue() . $this->limit . ($this->nomenclature ?: '') . ($this->updated ?: ''), function(ItemInterface $item) {
 
-            $item->expiresAfter(60 * 60);
+            $item->expiresAfter(DateInterval::createFromDateString('1 hours'));
 
             $data = [
                 "settings" => [
@@ -133,6 +134,9 @@ final class WildberriesCards extends Wildberries
                 );
 
             if($response->getStatusCode() !== 200) {
+
+                $item->expiresAfter(DateInterval::createFromDateString('1 seconds'));
+
                 $content = $response->toArray(false);
 
                 throw new DomainException(
