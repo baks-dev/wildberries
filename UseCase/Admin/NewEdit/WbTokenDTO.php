@@ -30,7 +30,7 @@ use BaksDev\Wildberries\Entity\Event\WbTokenEventInterface;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/** @see YaMarketTokenEvent */
+/** @see MegamarketTokenEvent */
 final class WbTokenDTO implements WbTokenEventInterface
 {
 

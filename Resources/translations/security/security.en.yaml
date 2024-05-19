@@ -1,6 +1,7 @@
 # Role
 
 ROLE_WB_TOKEN:
+  header: 'Wildberries'
   name: 'Authorization Tokens'
   desc: 'Wildberries auth tokens'
 

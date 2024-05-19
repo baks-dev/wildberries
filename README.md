@@ -1,6 +1,6 @@
 # BaksDev Api Wildberries 
 
-[![Version](https://img.shields.io/badge/version-7.0.25-blue)](https://github.com/baks-dev/wildberries/releases)
+[![Version](https://img.shields.io/badge/version-7.0.26-blue)](https://github.com/baks-dev/wildberries/releases)
 ![php 8.2+](https://img.shields.io/badge/php-min%208.1-red.svg)
 
 Модуль Wildberries Api

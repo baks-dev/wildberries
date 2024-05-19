@@ -1,6 +1,7 @@
 # Роль
 
 ROLE_WB_TOKEN:
+  header: 'Wildberries'
   name: 'Токены авторизации Wildberries'
   desc: 'Токены авторизации Wildberries'
 

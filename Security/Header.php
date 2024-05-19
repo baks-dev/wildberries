@@ -25,41 +25,63 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Security;
 
+use BaksDev\Menu\Admin\Command\Upgrade\MenuAdminInterface;
 use BaksDev\Menu\Admin\Type\SectionGroup\Group\Collection\MenuAdminSectionGroupCollectionInterface;
+use BaksDev\Menu\Admin\Type\SectionGroup\Group\MenuGroupSettings;
+use BaksDev\Menu\Admin\Type\SectionGroup\Group\MenuGroupUser;
+use BaksDev\Orders\Order\Security\MenuGroupMarketplace;
+use BaksDev\Users\Profile\Group\Security\RoleInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-/**
- * Секция меню Wildberries
- */
-#[AutoconfigureTag('baks.menu.admin.group')]
-final class MenuGroupWildberries implements MenuAdminSectionGroupCollectionInterface
+#[AutoconfigureTag('baks.menu.admin')]
+final class Header implements MenuAdminInterface
 {
 
-    public const GROUP = 'wildberries';
+    public function getRole(): string
+    {
+        return Role::ROLE;
+    }
 
     /**
-     * Возвращает значение (value)
+     * Добавляем заголовок в меню администрирования.
      */
-    public function getValue(): string
+
+    public function getPath(): ?string
     {
-        return self::GROUP;
+        return null;
+    }
+
+    /**
+     * Метод возвращает секцию, в которую помещается ссылка на раздел
+     */
+    public function getGroupMenu(): MenuAdminSectionGroupCollectionInterface|bool
+    {
+        return new MenuGroupSettings();
+    }
+
+    /**
+     * Метод возвращает позицию, в которую располагается ссылка в секции меню
+     */
+    public function getSortMenu(): int
+    {
+        return 300;
+    }
+
+    /**
+     * Метод возвращает флаг "Показать в выпадающем меню"
+     */
+    public function getDropdownMenu(): bool
+    {
+        return true;
     }
 
 
     /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     * Метод возвращает флаг "Модальное окно".
      */
-    public static function sort(): int
+    public function getModal(): bool
     {
-        return 99;
+        return false;
     }
 
-
-    /**
-     * Проверяет, относится ли секция к данному объекту
-     */
-    public static function equals(string $group): bool
-    {
-        return self::GROUP === mb_strtolower($group);
-    }
 }
