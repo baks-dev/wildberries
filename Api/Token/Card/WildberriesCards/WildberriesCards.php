@@ -98,11 +98,15 @@ final class WildberriesCards extends Wildberries
      */
     public function findAll(): Generator
     {
+
+
+
         /** Кешируем результат запроса */
 
         $cache = new FilesystemAdapter('wildberries');
 
-        $content = $cache->get('cards-' . $this->profile->getValue() . $this->limit . ($this->nomenclature ?: '') . ($this->updated ?: ''), function(ItemInterface $item) {
+        $content = $cache->get('cards-' . $this->profile->getValue() . $this->limit . ($this->nomenclature ?: '') . ($this->updated ?: ''), function(ItemInterface $item)
+        {
 
             $item->expiresAfter(DateInterval::createFromDateString('1 hours'));
 
@@ -132,6 +136,9 @@ final class WildberriesCards extends Wildberries
                     '/content/v2/get/cards/list',
                     ['json' => $data],
                 );
+
+
+
 
             if($response->getStatusCode() !== 200) {
 

@@ -40,11 +40,10 @@ final class WbObject extends Wildberries
      *
      * С помощью данного метода можно получить список категорий товаров по текстовому фильтру (названию категории).
      *
-     * @see https://openapi.wildberries.ru/content/api/ru/#tag/Konfigurator/paths/~1content~1v1~1object~1all/get
+     * @see https://openapi.wildberries.ru/content/api/ru/#tag/Konfigurator/paths/~1content~1v2~1object~1all/get
      */
     public function findObject(): Generator
     {
-
         $cache = new FilesystemAdapter('wildberries');
 
         /**
@@ -66,6 +65,8 @@ final class WbObject extends Wildberries
                     ]],
                 );
         });
+
+
 
         if($response->getStatusCode() !== 200)
         {

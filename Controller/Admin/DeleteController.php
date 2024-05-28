@@ -60,6 +60,8 @@ final class DeleteController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid() && $form->has('wb_token_delete'))
         {
+            $this->refreshTokenForm($form);
+
             $WbToken = $WbTokenDeleteHandler->handle($WbTokenDeleteDTO);
 
             if($WbToken instanceof WbToken)

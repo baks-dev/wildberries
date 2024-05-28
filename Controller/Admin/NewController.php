@@ -69,6 +69,8 @@ final class NewController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid() && $form->has('wb_token'))
         {
+            $this->refreshTokenForm($form);
+
             $WbToken = $WbTokenHandler->handle($WbTokenDTO);
 
             if($WbToken instanceof WbToken)
