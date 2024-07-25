@@ -43,8 +43,7 @@ final class AnyWbTokenActiveRepository implements AnyWbTokenActiveInterface
 
     public function __construct(
         DBALQueryBuilder $DBALQueryBuilder,
-    )
-    {
+    ) {
         $this->DBALQueryBuilder = $DBALQueryBuilder;
     }
 
@@ -73,18 +72,22 @@ final class AnyWbTokenActiveRepository implements AnyWbTokenActiveInterface
             'profile.id = token.id'
         );
 
-        $dbal->andWhereExists(
-            UserProfileInfo::class,
-            'info',
-            'info.profile = token.id AND info.status = :status',
-        );
-
-        $dbal->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
+        $dbal
+            ->andWhereExists(
+                UserProfileInfo::class,
+                'info',
+                'info.profile = token.id AND info.status = :status',
+            )
+            ->setParameter(
+                'status',
+                UserProfileStatusActive::class,
+                UserProfileStatus::TYPE
+            );
 
 
         //$dbal->analyze();
 
-        $profile =  $dbal
+        $profile = $dbal
             ->enableCache('wildberries', 3600)
             ->fetchOne();
 

@@ -37,7 +37,6 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class AllProfileTokenRepository implements AllProfileTokenInterface
 {
-
     private EntityManagerInterface $entityManager;
 
 
@@ -88,9 +87,11 @@ final class AllProfileTokenRepository implements AllProfileTokenInterface
             'personal.event = users_profile.event',
         );
 
-
-
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
+        $qb->setParameter(
+            'status',
+            UserProfileStatusActive::class,
+            UserProfileStatus::TYPE
+        );
 
         return $qb->getQuery()->getResult();
     }

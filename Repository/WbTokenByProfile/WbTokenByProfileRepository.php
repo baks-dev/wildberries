@@ -23,7 +23,6 @@
 
 namespace BaksDev\Wildberries\Repository\WbTokenByProfile;
 
-
 use BaksDev\Auth\Email\Type\EmailStatus\EmailStatus;
 use BaksDev\Auth\Email\Type\EmailStatus\Status\EmailStatusActive;
 use BaksDev\Core\Doctrine\ORMQueryBuilder;
@@ -43,7 +42,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 final class WbTokenByProfileRepository implements WbTokenByProfileInterface
 {
-
     private TokenStorageInterface $tokenStorage;
 
     private ORMQueryBuilder $ORMQueryBuilder;
@@ -51,8 +49,7 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
     public function __construct(
         ORMQueryBuilder $ORMQueryBuilder,
         TokenStorageInterface $tokenStorage,
-    )
-    {
+    ) {
         $this->tokenStorage = $tokenStorage;
         $this->ORMQueryBuilder = $ORMQueryBuilder;
     }
@@ -80,14 +77,16 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
         );
 
         $qb->join(
-
             UserProfileInfo::class,
             'info',
             'WITH',
             'info.profile = token.id AND info.status = :status',
-        );
-
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
+        )
+            ->setParameter(
+                'status',
+                UserProfileStatusActive::class,
+                UserProfileStatus::TYPE
+            );
 
 
         /* Кешируем результат ORM */
@@ -111,30 +110,31 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
         $qb->setParameter('profile', $profile, UserProfileUid::TYPE);
 
         $qb->join(
-
             WbTokenEvent::class,
             'event',
             'WITH',
             'event.id = token.event AND event.active = true',
         );
 
+        $qb
+            ->join(
+                UserProfileInfo::class,
+                'info',
+                'WITH',
+                'info.profile = token.id AND info.status = :status',
+            )
+            ->setParameter(
+                'status',
+                UserProfileStatusActive::class,
+                UserProfileStatus::TYPE
+            );
+
         $qb->join(
-
-            UserProfileInfo::class,
-            'info',
-            'WITH',
-            'info.profile = token.id AND info.status = :status',
-        );
-
-        $qb->join(
-
             WbTokenCookie::class,
             'cookie',
             'WITH',
             'cookie.event = token.event',
         );
-
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
 
 
         /* Кешируем результат ORM */

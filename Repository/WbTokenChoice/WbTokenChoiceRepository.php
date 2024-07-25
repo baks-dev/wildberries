@@ -51,8 +51,7 @@ final class WbTokenChoiceRepository implements WbTokenChoiceInterface
         TranslatorInterface $translator,
         WbTokenByProfileInterface $wbTokenByProfile,
         ORMQueryBuilder $ORMQueryBuilder
-    )
-    {
+    ) {
         $this->entityManager = $entityManager;
         $this->translator = $translator;
         $this->wbTokenByProfile = $wbTokenByProfile;
@@ -78,12 +77,18 @@ final class WbTokenChoiceRepository implements WbTokenChoiceInterface
             'event.id = token.event AND event.profile = token.id',
         );
 
-        $qb->join(
-            UserProfileInfo::class,
-            'users_profile_info',
-            'WITH',
-            'users_profile_info.profile = token.id AND users_profile_info.status = :status',
-        );
+        $qb
+            ->join(
+                UserProfileInfo::class,
+                'users_profile_info',
+                'WITH',
+                'users_profile_info.profile = token.id AND users_profile_info.status = :status',
+            )
+            ->setParameter(
+                'status',
+                UserProfileStatusActive::class,
+                UserProfileStatus::TYPE
+            );
 
         $qb->leftJoin(
             UserProfile::class,
@@ -100,8 +105,6 @@ final class WbTokenChoiceRepository implements WbTokenChoiceInterface
         );
 
 
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
-        
         /* Кешируем результат ORM */
         return $qb->enableCache('wildberries', 86400)->getResult();
     }
@@ -143,14 +146,18 @@ final class WbTokenChoiceRepository implements WbTokenChoiceInterface
         $qb->setParameter('access', $UserProfileUid, UserProfileUid::TYPE);
 
 
-        $qb->join(
-            UserProfileInfo::class,
-            'users_profile_info',
-            'WITH',
-            'users_profile_info.profile = token.id AND users_profile_info.status = :status',
-        );
-
-        $qb->setParameter('status', new UserProfileStatus(UserProfileStatusActive::class), UserProfileStatus::TYPE);
+        $qb
+            ->join(
+                UserProfileInfo::class,
+                'users_profile_info',
+                'WITH',
+                'users_profile_info.profile = token.id AND users_profile_info.status = :status',
+            )
+            ->setParameter(
+                'status',
+                UserProfileStatusActive::class,
+                UserProfileStatus::TYPE
+            );
 
         $qb->leftJoin(
             UserProfile::class,

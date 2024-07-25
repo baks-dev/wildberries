@@ -36,6 +36,9 @@ class BaksDevWildberriesBundle extends AbstractBundle
 
     public const PATH = __DIR__.DIRECTORY_SEPARATOR;
 
+    /**
+     * @note: Индекс сортировки 410
+     */
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $services = $container->services()
