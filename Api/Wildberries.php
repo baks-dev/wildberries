@@ -86,7 +86,7 @@ abstract class Wildberries
         {
             if(!$this->profile)
             {
-                $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [__FILE__.':'.__LINE__]);
+                $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [self::class.':'.__LINE__]);
 
                 throw new InvalidArgumentException(
                     'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)'
