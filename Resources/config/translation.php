@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,23 +23,13 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use BaksDev\Wildberries\Type\Event\WbTokenEventType;
-use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
-use Symfony\Config\DoctrineConfig;
+use BaksDev\Wildberries\BaksDevWildberriesBundle;
+use Symfony\Config\FrameworkConfig;
 
-return static function(DoctrineConfig $doctrine, ContainerConfigurator $configurator): void {
+return static function (FrameworkConfig $config) {
 
-    $doctrine->dbal()->type(WbTokenEventUid::TYPE)->class(WbTokenEventType::class);
+    $config
+        ->translator()
+        ->paths([BaksDevWildberriesBundle::PATH.implode(DIRECTORY_SEPARATOR, ['Resources', 'translations', ''])]); // .'Resources/translations/']);
 
-    $emDefault = $doctrine->orm()->entityManager('default')->autoMapping(true);
-
-    $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
-
-    $emDefault
-        ->mapping('wildberries')
-        ->type('attribute')
-        ->dir($MODULE . 'Entity')
-        ->isBundle(false)
-        ->prefix('BaksDev\Wildberries\Entity')
-        ->alias('wildberries');
 };

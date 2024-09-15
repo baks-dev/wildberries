@@ -21,19 +21,19 @@
  *  THE SOFTWARE.
  */
 
+use BaksDev\Wildberries\BaksDevWildberriesBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 return function (RoutingConfigurator $routes) {
 
-    $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
+    $MODULE = BaksDevWildberriesBundle::PATH;
 
     $routes->import(
         $MODULE.'Controller',
         'attribute',
         false,
-        $MODULE.'Controller/**/*Test.php'
+        $MODULE.implode(DIRECTORY_SEPARATOR, ['Controller', '**', '*Test.php'])
     )
         ->prefix(\BaksDev\Core\Type\Locale\Locale::routes())
-        ->namePrefix('wildberries:')
-    ;
+        ->namePrefix('wildberries:');
 };

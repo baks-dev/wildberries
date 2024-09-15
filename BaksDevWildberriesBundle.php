@@ -39,18 +39,18 @@ class BaksDevWildberriesBundle extends AbstractBundle
     /**
      * @note: Индекс сортировки 410
      */
-    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
-    {
-        $services = $container->services()
-            ->defaults()
-            ->autowire()
-            ->autoconfigure();
-
-        $services->load(self::NAMESPACE, self::PATH)
-            ->exclude([
-                self::PATH.'{Entity,Resources,Type}',
-                self::PATH.'**/*Message.php',
-                self::PATH.'**/*DTO.php',
-            ]);
-    }
+//    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+//    {
+//        $services = $container->services()
+//            ->defaults()
+//            ->autowire()
+//            ->autoconfigure();
+//
+//        $services->load(self::NAMESPACE, self::PATH)
+//            ->exclude([
+//                self::PATH.'{Entity,Resources,Type}',
+//                self::PATH.'**/*Message.php',
+//                self::PATH.'**/*DTO.php',
+//            ]);
+//    }
 }

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2023.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,22 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Wildberries\BaksDevWildberriesBundle;
+use BaksDev\Wildberries\Type\Event\WbTokenEventType;
+use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
+use Symfony\Config\DoctrineConfig;
 
-return static function(ContainerConfigurator $configurator) {
+return static function (DoctrineConfig $doctrine): void {
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure();
+    $doctrine->dbal()->type(WbTokenEventUid::TYPE)->class(WbTokenEventType::class);
 
-    $NAMESPACE = BaksDevWildberriesBundle::NAMESPACE;
-    $PATH = BaksDevWildberriesBundle::PATH;
+    $emDefault = $doctrine->orm()->entityManager('default')->autoMapping(true);
 
-    $services
-        ->load($NAMESPACE, $PATH)
-        ->exclude([
-            $PATH.'{Entity,Resources,Type}',
-            $PATH.'**/*Message.php',
-            $PATH.'**/*DTO.php',
-        ])
-    ;
+
+    $emDefault
+        ->mapping('wildberries')
+        ->type('attribute')
+        ->dir(BaksDevWildberriesBundle::PATH.'Entity')
+        ->isBundle(false)
+        ->prefix(BaksDevWildberriesBundle::NAMESPACE.'\\Entity')
+        ->alias('wildberries');
 };
