@@ -35,7 +35,7 @@
         </button>
     </li>
 
-   {# <li class="nav-item">
+    {# <li class="nav-item">
         <button class="btn fw-bolder nav-link"
                 data-bs-toggle="tab"
                 type="button"
@@ -46,11 +46,11 @@
                 aria-controls="nav-token"
         >
             <small class="text-uppercase px-3">
-                #}{# Описание #}{#
-                Профили с доступом
-            </small>
-        </button>
-    </li>#}
+    #}{# Описание #}{#
+    Профили с доступом
+</small>
+</button>
+</li> #}
 
 </ul>
 
@@ -60,7 +60,7 @@
     <div class="tab-pane fade show active" id="tab_token" role="tabpanel">
 
         {# Если администратор ресурса  #}
-        {% if is_granted('ROLE_ADMIN') and form.profile is defined  %}
+        {% if is_granted('ROLE_ADMIN') and form.profile is defined %}
             {{ form_row(form.profile, { label: 'Профиль пользователя', placeholder: 'Выберите профиль из списка...' }) }}
         {% endif %}
 
@@ -94,7 +94,7 @@
 
     </div>
 
-    {#<div class="tab-pane fade" id="tab_profile" role="tabpanel">
+    {# <div class="tab-pane fade" id="tab_profile" role="tabpanel">
 
         <div id="wb_token_form_access_collection">
             {% for access in form.access %}
@@ -121,50 +121,47 @@
                                 </svg>
                             </span>
                         </button>
+    #}{# Профиль пользователя #}{#
+    {{ form_widget(access.profile, { label : false, placeholder : 'Выберите профиль из списка...', attr: { class: 'mb-0' }  } ) }}
+</div>
 
-                        #}{# Профиль пользователя #}{#
-                        {{ form_widget(access.profile, { label : false, placeholder : 'Выберите профиль из списка...', attr: { class: 'mb-0' }  } ) }}
-                    </div>
+</div>
 
-                </div>
+{% endfor %}
+</div>
+    #}{# {{ include(_self|replace({ "_call.html.twig": "phone/_phone.prototype.html.twig" }) )|e('html_attr') }} #}{#
+    <button type="button"
+            class="btn btn-sm btn-outline-primary border-0 mt-3"
+            id="add-collection-access"
+            data-prototype="{{ include(_self|replace({ "form.html.twig": "_profile.prototype.html.twig" }) )|e('html_attr') }}"
 
-            {% endfor %}
-        </div>
+            data-collection="{{ form.access.vars.id }}_collection"
+            data-item="item_{{ form.access.vars.prototype.vars.id }}"
+            data-index="{{ form.access.count }}"
 
-        #}{# {{ include(_self|replace({ "_call.html.twig": "phone/_phone.prototype.html.twig" }) )|e('html_attr') }} #}{#
+    >
+                    <span class="svg-icon svg-icon-2">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="24"
+                             height="24"
+                             viewBox="0 0 24 24"
+                             fill="none">
+                            <rect opacity="0.5"
+                                  x="11"
+                                  y="18"
+                                  width="12"
+                                  height="2"
+                                  rx="1"
+                                  transform="rotate(-90 11 18)"
+                                  fill="currentColor">
+                        </rect>
+                            <rect x="6" y="11" width="12" height="2" rx="1" fill="currentColor"></rect>
+                        </svg>
+                    </span>
+        Добавить еще профиль
+    </button>
 
-        <button type="button"
-                class="btn btn-sm btn-outline-primary border-0 mt-3"
-                id="add-collection-access"
-                data-prototype="{{ include(_self|replace({ "form.html.twig": "_profile.prototype.html.twig" }) )|e('html_attr') }}"
-
-                data-collection="{{ form.access.vars.id }}_collection"
-                data-item="item_{{ form.access.vars.prototype.vars.id }}"
-                data-index="{{ form.access.count }}"
-
-        >
-						<span class="svg-icon svg-icon-2">
-							<svg xmlns="http://www.w3.org/2000/svg"
-                                 width="24"
-                                 height="24"
-                                 viewBox="0 0 24 24"
-                                 fill="none">
-								<rect opacity="0.5"
-                                      x="11"
-                                      y="18"
-                                      width="12"
-                                      height="2"
-                                      rx="1"
-                                      transform="rotate(-90 11 18)"
-                                      fill="currentColor">
-							</rect>
-								<rect x="6" y="11" width="12" height="2" rx="1" fill="currentColor"></rect>
-							</svg>
-						</span>
-            Добавить еще профиль
-        </button>
-
-    </div>#}
+</div> #}
 
 
 </div>

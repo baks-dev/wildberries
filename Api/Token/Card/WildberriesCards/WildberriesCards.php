@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,7 +30,6 @@ use BaksDev\Wildberries\Api\Wildberries;
 use DateInterval;
 use DomainException;
 use Generator;
-use InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -100,13 +99,13 @@ final class WildberriesCards extends Wildberries
     {
 
 
-
         /** Кешируем результат запроса */
 
         $cache = new FilesystemAdapter('wildberries');
 
-        $content = $cache->get('cards-' . $this->profile->getValue() . $this->limit . ($this->nomenclature ?: '') . ($this->updated ?: ''), function(ItemInterface $item)
-        {
+        $content = $cache->get('cards-'.$this->profile->getValue().$this->limit.($this->nomenclature ?: '').($this->updated ?: ''), function(
+            ItemInterface $item
+        ) {
 
             $item->expiresAfter(DateInterval::createFromDateString('1 hours'));
 
@@ -138,16 +137,15 @@ final class WildberriesCards extends Wildberries
                 );
 
 
-
-
-            if($response->getStatusCode() !== 200) {
+            if($response->getStatusCode() !== 200)
+            {
 
                 $item->expiresAfter(DateInterval::createFromDateString('1 seconds'));
 
                 $content = $response->toArray(false);
 
                 throw new DomainException(
-                    message: $response->getStatusCode() . ': ' . $content['errorText'] ?? self::class,
+                    message: $response->getStatusCode().': '.$content['errorText'] ?? self::class,
                     code: $response->getStatusCode()
                 );
             }
@@ -161,7 +159,8 @@ final class WildberriesCards extends Wildberries
         $this->updated = $content['cursor']['updatedAt'] ?? null;
         $this->nomenclature = $content['cursor']['nmID'] ?? null;
 
-        foreach($content['cards'] as $data) {
+        foreach($content['cards'] as $data)
+        {
             yield new Card($this->getProfile(), $data);
         }
     }
