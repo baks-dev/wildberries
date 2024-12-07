@@ -28,7 +28,6 @@ namespace BaksDev\Wildberries\Api\Token\Card\WildberriesCards;
 use BaksDev\Wildberries\Api\Token\Warehouse\PartnerWildberries\SellerWarehouse;
 use BaksDev\Wildberries\Api\Wildberries;
 use DateInterval;
-use DomainException;
 use Generator;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -144,10 +143,12 @@ final class WildberriesCards extends Wildberries
 
                 $content = $response->toArray(false);
 
-                throw new DomainException(
-                    message: $response->getStatusCode().': '.$content['errorText'] ?? self::class,
-                    code: $response->getStatusCode()
-                );
+                return false;
+
+                //                throw new DomainException(
+                //                    message: $response->getStatusCode().': '.$content['errorText'] ?? self::class,
+                //                    code: $response->getStatusCode()
+                //                );
             }
 
             return $response->toArray(false);
