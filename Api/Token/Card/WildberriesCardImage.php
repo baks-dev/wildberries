@@ -52,7 +52,7 @@ final class WildberriesCardImage
     /**
      * @param string $url - url фото загрузки
      * @param mixed $Image - DTO для присвоения значений
-     * @param string $nameDir - Директория загрузки файла (Entity::TABLE)
+     * @param string $nameDir - Директория загрузки файла
      */
     public function get(string $url, object $Image, string $nameDir, $reload = false,): mixed
     {

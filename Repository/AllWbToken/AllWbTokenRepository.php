@@ -40,21 +40,12 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 
-final class AllWbTokenRepository implements AllWbTokenInterface
+final readonly class AllWbTokenRepository implements AllWbTokenInterface
 {
-    private PaginatorInterface $paginator;
-    private DBALQueryBuilder $DBALQueryBuilder;
-
-
     public function __construct(
-        DBALQueryBuilder $DBALQueryBuilder,
-        PaginatorInterface $paginator,
-    )
-    {
-
-        $this->paginator = $paginator;
-        $this->DBALQueryBuilder = $DBALQueryBuilder;
-    }
+        private DBALQueryBuilder $DBALQueryBuilder,
+        private PaginatorInterface $paginator,
+    ) {}
 
 
     /**
@@ -62,100 +53,112 @@ final class AllWbTokenRepository implements AllWbTokenInterface
      */
     public function fetchAllWbTokenAssociative(SearchDTO $search, ?UserProfileUid $profile): PaginatorInterface
     {
-        $qb = $this->DBALQueryBuilder
+        $dbal = $this->DBALQueryBuilder
             ->createQueryBuilder(self::class)
             ->bindLocal();
 
-        $qb->select('token.id');
-        $qb->addSelect('token.event');
-        $qb->from(WbToken::TABLE, 'token');
+        $dbal->select('token.id');
+        $dbal->addSelect('token.event');
+        $dbal->from(WbToken::class, 'token');
 
         /** сли не админ - только токен профиля */
         if($profile)
         {
-            $qb->where('token.id = :profile')
+            $dbal->where('token.id = :profile')
                 ->setParameter('profile', $profile, UserProfileUid::TYPE);
         }
 
 
-        $qb->addSelect('event.active');
-        $qb->join('token', WbTokenEvent::TABLE, 'event', 'event.id = token.event AND event.profile = token.id');
+        $dbal->addSelect('event.active');
+        $dbal->join(
+            'token',
+            WbTokenEvent::class,
+            'event',
+            'event.id = token.event AND event.profile = token.id'
+        );
 
 
         // ОТВЕТСТВЕННЫЙ
 
         // UserProfile
-        $qb->addSelect('users_profile.event as users_profile_event');
-        $qb->leftJoin(
+        $dbal->addSelect('users_profile.event as users_profile_event');
+        $dbal->leftJoin(
             'token',
-            UserProfile::TABLE,
+            UserProfile::class,
             'users_profile',
             'users_profile.id = token.id'
         );
 
 
         // Info
-        $qb->addSelect('users_profile_info.status as users_profile_status');
-        $qb->leftJoin(
+        $dbal->addSelect('users_profile_info.status as users_profile_status');
+        $dbal->leftJoin(
             'token',
-            UserProfileInfo::TABLE,
+            UserProfileInfo::class,
             'users_profile_info',
             'users_profile_info.profile = token.id'
         );
 
         // Event
-        $qb->leftJoin(
+        $dbal->leftJoin(
             'users_profile',
-            UserProfileEvent::TABLE,
+            UserProfileEvent::class,
             'users_profile_event',
             'users_profile_event.id = users_profile.event'
         );
 
 
         // Personal
-        $qb->addSelect('users_profile_personal.username AS users_profile_username');
+        $dbal->addSelect('users_profile_personal.username AS users_profile_username');
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
             'users_profile_event',
-            UserProfilePersonal::TABLE,
+            UserProfilePersonal::class,
             'users_profile_personal',
             'users_profile_personal.event = users_profile_event.id'
         );
 
         // Avatar
 
-        $qb->addSelect("CASE WHEN users_profile_avatar.name IS NOT NULL THEN CONCAT ( '/upload/".UserProfileAvatar::TABLE."' , '/', users_profile_avatar.name) ELSE NULL END AS users_profile_avatar");
-        $qb->addSelect("users_profile_avatar.ext AS users_profile_avatar_ext");
-        $qb->addSelect('users_profile_avatar.cdn AS users_profile_avatar_cdn');
+        $dbal->addSelect("
+            CASE 
+            WHEN users_profile_avatar.name IS NOT NULL 
+            THEN CONCAT ( '/upload/".$dbal->table(UserProfileAvatar::class)."' , '/', users_profile_avatar.name) 
+            ELSE NULL 
+            END AS users_profile_avatar
+        ");
 
-        $qb->leftJoin(
+        $dbal->addSelect("users_profile_avatar.ext AS users_profile_avatar_ext");
+        $dbal->addSelect('users_profile_avatar.cdn AS users_profile_avatar_cdn');
+
+        $dbal->leftJoin(
             'users_profile_event',
-            UserProfileAvatar::TABLE,
+            UserProfileAvatar::class,
             'users_profile_avatar',
             'users_profile_avatar.event = users_profile_event.id'
         );
 
         /** ACCOUNT */
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
             'users_profile_info',
-            Account::TABLE,
+            Account::class,
             'account',
             'account.id = users_profile_info.usr'
         );
 
-        $qb->addSelect('account_event.email AS account_email');
-        $qb->leftJoin(
+        $dbal->addSelect('account_event.email AS account_email');
+        $dbal->leftJoin(
             'account',
-            AccountEvent::TABLE,
+            AccountEvent::class,
             'account_event',
             'account_event.id = account.event AND account_event.account = account.id'
         );
 
-        $qb->addSelect('account_status.status as account_status');
-        $qb->leftJoin(
+        $dbal->addSelect('account_status.status as account_status');
+        $dbal->leftJoin(
             'account_event',
-            AccountStatus::TABLE,
+            AccountStatus::class,
             'account_status',
             'account_status.event = account_event.id'
         );
@@ -163,7 +166,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
         /* Поиск */
         if($search->getQuery())
         {
-            $qb
+            $dbal
                 ->createSearchQueryBuilder($search)
                 ->addSearchEqualUid('token.id')
                 ->addSearchEqualUid('token.event')
@@ -171,7 +174,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
                 ->addSearchLike('users_profile_personal.username');
         }
 
-        return $this->paginator->fetchAllAssociative($qb);
+        return $this->paginator->fetchAllAssociative($dbal);
 
     }
 }
