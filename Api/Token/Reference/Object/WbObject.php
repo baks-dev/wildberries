@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ namespace BaksDev\Wildberries\Api\Token\Reference\Object;
 
 use BaksDev\Wildberries\Api\Wildberries;
 use DateInterval;
-use DomainException;
 use Generator;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -42,7 +41,7 @@ final class WbObject extends Wildberries
      *
      * @see https://openapi.wildberries.ru/content/api/ru/#tag/Konfigurator/paths/~1content~1v2~1object~1all/get
      */
-    public function findObject(): Generator
+    public function findObject(): Generator|false
     {
         $cache = new FilesystemAdapter('wildberries');
 
@@ -66,15 +65,12 @@ final class WbObject extends Wildberries
                 );
         });
 
+        $content = $response->toArray(false);
 
         if($response->getStatusCode() !== 200)
         {
-            $content = $response->toArray(false);
-
-            throw new DomainException(
-                message: $response->getStatusCode().': '.$content['errorText'] ?? self::class,
-                code: $response->getStatusCode()
-            );
+            $this->logger->critical('wildberries: ', $content);
+            return false;
         }
 
         $content = $response->toArray(false);
