@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -54,9 +54,14 @@ final class EditController extends AbstractController
         $WbTokenDTO = new WbTokenDTO();
 
         /** Запрещаем редактировать чужой токен */
-        if($this->getAdminFilterProfile() || $this->getAdminFilterProfile()?->equals($WbTokenDTO->getProfile()) === true)
+        if($this->isAdmin() === true || $this->getProfileUid()?->equals($WbTokenEvent->getProfile()) === true)
         {
             $WbTokenEvent->getDto($WbTokenDTO);
+        }
+
+        if($request->getMethod() === 'GET')
+        {
+            $WbTokenDTO->hiddenToken();
         }
 
         // Форма
@@ -71,7 +76,7 @@ final class EditController extends AbstractController
             $this->refreshTokenForm($form);
 
             /** Запрещаем редактировать чужой токен */
-            if($this->getAdminFilterProfile() && $this->getAdminFilterProfile()->equals($WbTokenDTO->getProfile()) === false)
+            if($this->isAdmin() === false && $this->getProfileUid()?->equals($WbTokenDTO->getProfile()) !== true)
             {
                 $this->addFlash('admin.breadcrumb.edit', 'admin.danger.edit', 'admin.wb.token', '404');
                 return $this->redirectToReferer();

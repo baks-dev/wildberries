@@ -5,3 +5,17 @@
 <script nonce='{{ csp_nonce() }}' async data-src="/assets/js/radio.input.min.js?v={{ version }}" class="lazy"></script>
 <script nonce='{{ csp_nonce() }}' async data-src="/assets/wildberries/script.min.js?v={{ version }}"
         class="lazy"></script>
+
+<script nonce='{{ csp_nonce() }}'>
+
+
+    /** Пересобирваем tooltip */
+    var tooltipTriggerList = [].slice.call(user_delivery.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+
+    tooltipTriggerList.map(function(tooltipTriggerEl)
+    {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+</script>

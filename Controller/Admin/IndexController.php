@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -53,17 +53,17 @@ final class IndexController extends AbstractController
         );
         $searchForm->handleRequest($request);
 
-
-        //$ADMIN =  $this->getFilterProfile();
-
-
         // Фильтр
         // $filter = new ProductsStocksFilterDTO($request, $ROLE_ADMIN ? null : $this->getProfileUid());
         // $filterForm = $this->createForm(ProductsStocksFilterForm::class, $filter);
         // $filterForm->handleRequest($request);
 
         // Получаем список
-        $WbToken = $allWbToken->fetchAllWbTokenAssociative($search, $this->getAdminFilterProfile());
+        $this->isAdmin() ?: $allWbToken->profile($this->getProfileUid());
+
+        $WbToken = $allWbToken
+            ->search($search)
+            ->findPaginator();
 
         return $this->render(
             [

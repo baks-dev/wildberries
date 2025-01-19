@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
 
 namespace BaksDev\Wildberries\Entity;
 
-
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
@@ -31,14 +30,10 @@ use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/* Event */
-
 #[ORM\Entity]
 #[ORM\Table(name: 'wb_token')]
 class WbToken
 {
-    const TABLE = 'wb_token';
-
     /** ID */
     #[Assert\NotBlank]
     #[Assert\Uuid]
