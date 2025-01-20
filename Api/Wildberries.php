@@ -25,40 +25,43 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Api;
 
+use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 
 abstract class Wildberries
 {
-
     private ?WbAuthorizationToken $wbAuthorizationToken = null;
 
-    private WbTokenByProfileInterface $TokenByProfile;
-
-    protected LoggerInterface $logger;
-
-    protected ?UserProfileUid $profile = null;
+    protected UserProfileUid|false $profile = false;
 
     private array $headers;
 
     public function __construct(
-        WbTokenByProfileInterface $TokenByProfile,
-        LoggerInterface $WildberriesLogger,
-    )
-    {
-        $this->TokenByProfile = $TokenByProfile;
-        $this->logger = $WildberriesLogger;
-    }
+        #[Target('wildberriesLogger')] protected LoggerInterface $logger,
+        private readonly WbTokenByProfileInterface $TokenByProfile,
+    ) {}
 
 
-    public function profile(UserProfileUid $profile): self
+    public function profile(UserProfile|UserProfileUid|string $profile): self
     {
+        if($profile instanceof UserProfile)
+        {
+            $profile = $profile->getId();
+        }
+
+        if(is_string($profile))
+        {
+            $profile = new UserProfileUid($profile);
+        }
+
         $this->profile = $profile;
 
         return $this;
@@ -67,7 +70,7 @@ abstract class Wildberries
     /**
      * Profile
      */
-    public function getProfile(): ?UserProfileUid
+    public function getProfile(): UserProfileUid|false
     {
         return $this->profile;
     }
@@ -83,7 +86,7 @@ abstract class Wildberries
 
         if($this->wbAuthorizationToken === null)
         {
-            if(!$this->profile)
+            if(false === $this->profile)
             {
                 $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [self::class.':'.__LINE__]);
 
@@ -114,7 +117,7 @@ abstract class Wildberries
 
     protected function CookieHttpClient(): RetryableHttpClient
     {
-        if(!$this->profile)
+        if(false === $this->profile)
         {
             throw new InvalidArgumentException(
                 'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)'
