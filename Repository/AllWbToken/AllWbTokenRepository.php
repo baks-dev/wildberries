@@ -198,7 +198,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
         if($this->search->getQuery())
         {
             $dbal
-                ->createSearchQueryBuilder($search)
+                ->createSearchQueryBuilder($this->search)
                 ->addSearchEqualUid('token.id')
                 ->addSearchEqualUid('token.event')
                 ->addSearchLike('account_event.email')

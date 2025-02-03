@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Repository\AllProfileToken;
 
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use BaksDev\Users\Profile\UserProfile\Entity\Personal\UserProfilePersonal;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
@@ -33,66 +34,73 @@ use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\Status\UserProfileS
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
-use Doctrine\ORM\EntityManagerInterface;
+use Generator;
 
 final class AllProfileTokenRepository implements AllProfileTokenInterface
 {
-    private EntityManagerInterface $entityManager;
 
+    private bool $active = false;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
+
+    public function onlyActiveToken(): self
     {
-        $this->entityManager = $entityManager;
+        $this->active = true;
+        return $this;
     }
 
-
-    /**
-     * Метод возвращает профили пользователей, добавленных токенов авторизации
-     */
-    public function fetchAllWbTokenProfileAssociative(): ?array
+    public function findAll(): Generator
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $select = sprintf('new %s(token.id, personal.username)', UserProfileUid::class);
-        $qb->select($select);
+        $dbal->from(WbToken::class, 'token');
 
-        $qb->from(WbToken::class, 'token');
+        if($this->active)
+        {
+            $dbal->join(
+                'token',
+                WbTokenEvent::class,
+                'event',
+                'event.id = token.event AND event.active = true',
+            );
+        }
 
-        $qb->join(
-            WbTokenEvent::class,
-            'event',
-            'WITH',
-            'event.id = token.event AND event.profile = token.id AND event.active = true',
-        );
+        $dbal
+            ->join(
+                'token',
+                UserProfileInfo::class,
+                'users_profile_info',
+                'users_profile_info.profile = token.id AND users_profile_info.status = :status',
+            )
+            ->setParameter(
+                'status',
+                UserProfileStatusActive::class,
+                UserProfileStatus::TYPE
+            );
 
-        $qb->join(
-            UserProfileInfo::class,
+        $dbal->join(
             'users_profile_info',
-            'WITH',
-            'users_profile_info.profile = token.id AND users_profile_info.status = :status',
-        );
-
-        $qb->join(
             UserProfile::class,
             'users_profile',
-            'WITH',
-            'users_profile.id = token.id',
+            'users_profile.id = users_profile_info.profile',
         );
 
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
+            'users_profile',
             UserProfilePersonal::class,
             'personal',
-            'WITH',
             'personal.event = users_profile.event',
         );
 
-        $qb->setParameter(
-            'status',
-            UserProfileStatusActive::class,
-            UserProfileStatus::TYPE
-        );
+        /** Параметры конструктора объекта гидрации */
+        $dbal->addSelect('token.id AS value');
+        $dbal->addSelect('personal.username AS attr');
 
-        return $qb->getQuery()->getResult();
+        return $dbal
+            ->enableCache('yandex-market', '1 minutes')
+            ->fetchAllHydrate(UserProfileUid::class);
     }
+
+
 }

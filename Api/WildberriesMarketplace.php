@@ -32,12 +32,11 @@ use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 
-abstract class Wildberries
+abstract class WildberriesMarketplace
 {
     private ?WbAuthorizationToken $wbAuthorizationToken = null;
 
@@ -45,10 +44,7 @@ abstract class Wildberries
 
     private array $headers;
 
-    private string|false $base;
-
     public function __construct(
-        #[Autowire(env: 'APP_ENV')] private readonly string $environment,
         #[Target('wildberriesLogger')] protected LoggerInterface $logger,
         private readonly WbTokenByProfileInterface $TokenByProfile,
     ) {}
@@ -79,22 +75,6 @@ abstract class Wildberries
         return $this->profile;
     }
 
-
-    public function content(): self
-    {
-        $this->base = 'suppliers-api.wildberries.ru';
-
-        return $this;
-    }
-
-    public function marketplace(): self
-    {
-        $this->base = 'marketplace-api.wildberries.ru';
-
-        return $this;
-    }
-
-
     public function TokenHttpClient(?WbAuthorizationToken $WbAuthorizationToken = null): RetryableHttpClient
     {
         if($WbAuthorizationToken !== null)
@@ -122,8 +102,6 @@ abstract class Wildberries
             }
         }
 
-        $this->base ?: $this->base = 'suppliers-api.wildberries.ru';
-
         $this->headers['Authorization'] = $this->wbAuthorizationToken->getToken();
         $this->headers['accept'] = 'application/json';
         $this->headers['Content-Type'] = 'application/json';
@@ -131,64 +109,9 @@ abstract class Wildberries
         return new RetryableHttpClient(
             HttpClient::create(['headers' => $this->headers])
                 ->withOptions([
-                    'base_uri' => sprintf('https://%s', $this->base),
+                    'base_uri' => 'https://marketplace-api.wildberries.ru',
                     'verify_host' => false
                 ])
         );
-    }
-
-    protected function CookieHttpClient(): RetryableHttpClient
-    {
-        if(false === $this->profile)
-        {
-            throw new InvalidArgumentException(
-                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)'
-            );
-        }
-
-        $WbAuthorizationCookie = $this->TokenByProfile->getTokenCookie($this->profile);
-
-        if(!$WbAuthorizationCookie)
-        {
-            throw new DomainException(sprintf('Cookie авторизации Wildberries не найдены: %s', $this->profile));
-        }
-
-        $this->headers = [
-            'Content-Type' => 'application/json',
-            'Cookie' => 'WBToken='.$WbAuthorizationCookie->getToken().'; x-supplier-id='.
-                $WbAuthorizationCookie->getIdentifier().';',
-        ];
-
-        return new RetryableHttpClient(
-            HttpClient::create(['headers' => $this->headers])
-                ->withOptions([
-                    'base_uri' => 'https://seller.wildberries.ru/',
-                ])
-        );
-    }
-
-    protected function getCurlHeader(): string
-    {
-        $this->headers['accept'] = 'application/json';
-        $this->headers['Content-Type'] = 'application/json';
-
-        return '-H "'.implode('" -H "', array_map(
-                function($key, $value) {
-                    return "$key: $value";
-                },
-                array_keys($this->headers),
-                $this->headers
-            )).'"';
-    }
-
-
-    /**
-     * Метод проверяет что окружение является PROD,
-     * тем самым позволяет выполнять операции запроса на сторонний сервис
-     * ТОЛЬКО в PROD окружении
-     */
-    protected function isExecuteEnvironment(): bool
-    {
-        return $this->environment === 'prod';
     }
 }

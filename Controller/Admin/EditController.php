@@ -65,11 +65,13 @@ final class EditController extends AbstractController
         }
 
         // Форма
-        $form = $this->createForm(WbTokenForm::class, $WbTokenDTO, [
-            'action' => $this->generateUrl('wildberries:admin.newedit.edit', ['id' => $WbTokenDTO->getEvent() ?: new WbTokenEventUid()]),
-        ]);
-
-        $form->handleRequest($request);
+        $form = $this
+            ->createForm(WbTokenForm::class, $WbTokenDTO, [
+                'action' => $this->generateUrl(
+                    route: 'wildberries:admin.newedit.edit',
+                    parameters: ['id' => $WbTokenDTO->getEvent() ?: new WbTokenEventUid()]),
+            ])
+            ->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid() && $form->has('wb_token'))
         {
@@ -82,18 +84,18 @@ final class EditController extends AbstractController
                 return $this->redirectToReferer();
             }
 
-            $WbToken = $WbTokenHandler->handle($WbTokenDTO);
+            $handle = $WbTokenHandler->handle($WbTokenDTO);
 
-            if($WbToken instanceof WbToken)
-            {
-                $this->addFlash('admin.breadcrumb.edit', 'admin.success.edit', 'admin.wb.token');
-
-                return $this->redirectToRoute('wildberries:admin.index');
-            }
-
-            $this->addFlash('admin.breadcrumb.edit', 'admin.danger.edit', 'admin.wb.token', $WbToken);
+            $this->addFlash
+            (
+                'admin.breadcrumb.edit',
+                $handle instanceof WbToken ? 'admin.success.edit' : 'admin.danger.edit',
+                'admin.wb.token',
+                $handle
+            );
 
             return $this->redirectToReferer();
+
         }
 
         return $this->render(['form' => $form->createView()]);

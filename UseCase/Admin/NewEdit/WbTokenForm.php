@@ -76,7 +76,7 @@ final class WbTokenForm extends AbstractType
         $builder->add('percent', TextType::class);
 
 
-        $builder->add('token', TextareaType::class);
+        $builder->add('token', TextareaType::class, ['required' => false]);
 
         $builder->add('active', CheckboxType::class, ['required' => false]);
 

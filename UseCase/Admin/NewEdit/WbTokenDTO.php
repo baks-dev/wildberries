@@ -47,11 +47,9 @@ final class WbTokenDTO implements WbTokenEventInterface
     #[Assert\Uuid]
     private ?UserProfileUid $profile = null;
 
-
     /**
      * Токен
      */
-    #[Assert\NotBlank]
     private ?string $token;
 
     /**
@@ -109,7 +107,7 @@ final class WbTokenDTO implements WbTokenEventInterface
         return $this->token;
     }
 
-    public function setToken(string $token): self
+    public function setToken(?string $token): self
     {
         if(!empty($token))
         {
