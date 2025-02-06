@@ -67,9 +67,9 @@
         {{ form_row(form.token, { label: 'Токен авторизации' }) }}
 
         {% if form.percent.vars.data %}
-            <div class="alert alert-warning" role="alert">
-                В целях безопастности токен зашифрован и не отображается в форме. Оставьте поле пустым, если обновление
-                указанного ранее токена не требуется!
+            <div class="alert alert-warning small p-1 ps-2 pe-0" role="alert">
+                В целях безопастности токен зашифрован и не отображается. Оставьте поле пустым, если не требуется
+                обновления
             </div>
         {% endif %}
 
@@ -93,6 +93,18 @@
 
             {{ form_label(form.percent, 'Торговая наценка', { label_attr: { class: 'm-0'}} ) }}
 
+        </div>
+
+        <div class="alert alert-danger small p-1 px-3 " role="alert">
+            <div class="d-flex align-items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                </svg>
+                <span>
+                При указании торговой наценки Вам необходимо учитывать процент комиссии банка за услуги перевода
+                </span>
+            </div>
         </div>
 
         <div class="mb-3">
