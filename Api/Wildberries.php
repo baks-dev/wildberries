@@ -79,15 +79,14 @@ abstract class Wildberries
         return $this->profile;
     }
 
-
-    public function content(): self
+    protected function content(): self
     {
         $this->base = 'suppliers-api.wildberries.ru';
 
         return $this;
     }
 
-    public function marketplace(): self
+    protected function marketplace(): self
     {
         $this->base = 'marketplace-api.wildberries.ru';
 
