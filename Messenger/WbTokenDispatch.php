@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Messenger;
 
 use BaksDev\Core\Cache\AppCacheInterface;
-use BaksDev\Wildberries\Package\Api\SupplyAll\WildberriesSupplyAll;
+use BaksDev\Wildberries\Package\Api\SupplyAll\WildberriesSupplyAllRequest;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
