@@ -45,7 +45,7 @@ abstract class Wildberries
 
     private array $headers;
 
-    private string|false $base;
+    private string|false $base = false;
 
     public function __construct(
         #[Autowire(env: 'APP_ENV')] private readonly string $environment,
