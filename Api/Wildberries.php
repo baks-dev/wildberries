@@ -81,7 +81,7 @@ abstract class Wildberries
 
     protected function content(): self
     {
-        $this->base = 'suppliers-api.wildberries.ru';
+        $this->base = 'content-api.wildberries.ru';
 
         return $this;
     }
