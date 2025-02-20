@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Api;
 
+use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
@@ -36,6 +37,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Contracts\Cache\CacheInterface;
 
 abstract class Wildberries
 {
@@ -51,6 +53,7 @@ abstract class Wildberries
         #[Autowire(env: 'APP_ENV')] private readonly string $environment,
         #[Target('wildberriesLogger')] protected LoggerInterface $logger,
         private readonly WbTokenByProfileInterface $TokenByProfile,
+        private readonly AppCacheInterface $cache,
     ) {}
 
 
@@ -190,4 +193,10 @@ abstract class Wildberries
     {
         return $this->environment === 'prod';
     }
+
+    protected function getCacheInit(string $namespace): CacheInterface
+    {
+        return $this->cache->init($namespace);
+    }
+
 }
