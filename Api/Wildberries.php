@@ -96,6 +96,20 @@ abstract class Wildberries
         return $this;
     }
 
+    protected function buyerChat(): self
+    {
+        $this->base = 'buyer-chat-api.wildberries.ru';
+
+        return $this;
+    }
+
+    protected function feedbacks(): self
+    {
+        $this->base = 'feedbacks-api.wildberries.ru';
+
+        return $this;
+    }
+
 
     public function TokenHttpClient(?WbAuthorizationToken $WbAuthorizationToken = null): RetryableHttpClient
     {
