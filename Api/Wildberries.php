@@ -110,6 +110,20 @@ abstract class Wildberries
         return $this;
     }
 
+    protected function analytics(): self
+    {
+        $this->base = 'seller-analytics-api.wildberries.ru';
+
+        return $this;
+    }
+
+    protected function statistics(): self
+    {
+        $this->base = 'statistics-api.wildberries.ru';
+
+        return $this;
+    }
+
 
     public function TokenHttpClient(?WbAuthorizationToken $WbAuthorizationToken = null): RetryableHttpClient
     {
