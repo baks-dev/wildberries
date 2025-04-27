@@ -72,7 +72,7 @@ class WbTokenEvent extends EntityEvent
     /**
      * Cookie
      */
-    #[ORM\OneToOne(targetEntity: WbTokenCookie::class, mappedBy: 'event', cascade: ['all'])]
+    #[ORM\OneToOne(targetEntity: WbTokenCookie::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private ?WbTokenCookie $cookie = null;
 
     /**
@@ -84,7 +84,7 @@ class WbTokenEvent extends EntityEvent
     /**
      * Модификатор
      */
-    #[ORM\OneToOne(targetEntity: WbTokenModify::class, mappedBy: 'event', cascade: ['all'])]
+    #[ORM\OneToOne(targetEntity: WbTokenModify::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private WbTokenModify $modify;
 
     /**

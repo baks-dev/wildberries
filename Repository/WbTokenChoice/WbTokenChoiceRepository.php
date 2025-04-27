@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -35,29 +35,14 @@ use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class WbTokenChoiceRepository implements WbTokenChoiceInterface
 {
-    private EntityManagerInterface $entityManager;
-    private TranslatorInterface $translator;
-    private WbTokenByProfileInterface $wbTokenByProfile;
-    private ORMQueryBuilder $ORMQueryBuilder;
-
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        TranslatorInterface $translator,
-        WbTokenByProfileInterface $wbTokenByProfile,
-        ORMQueryBuilder $ORMQueryBuilder
-    )
-    {
-        $this->entityManager = $entityManager;
-        $this->translator = $translator;
-        $this->wbTokenByProfile = $wbTokenByProfile;
-        $this->ORMQueryBuilder = $ORMQueryBuilder;
-    }
+        private readonly WbTokenByProfileInterface $wbTokenByProfile,
+        private readonly ORMQueryBuilder $ORMQueryBuilder
+    ) {}
 
     /**
      * Возвращает всю коллекцию идентификаторов токенов
@@ -86,9 +71,9 @@ final class WbTokenChoiceRepository implements WbTokenChoiceInterface
                 'users_profile_info.profile = token.id AND users_profile_info.status = :status',
             )
             ->setParameter(
-                'status',
-                UserProfileStatusActive::class,
-                UserProfileStatus::TYPE
+                key: 'status',
+                value: UserProfileStatusActive::class,
+                type: UserProfileStatus::TYPE
             );
 
         $qb->leftJoin(
@@ -107,7 +92,9 @@ final class WbTokenChoiceRepository implements WbTokenChoiceInterface
 
 
         /* Кешируем результат ORM */
-        return $qb->enableCache('wildberries', 86400)->getResult();
+        return $qb
+            ->enableCache('wildberries', '1 day')
+            ->getResult();
     }
 
     /**
@@ -136,15 +123,15 @@ final class WbTokenChoiceRepository implements WbTokenChoiceInterface
             'event.id = token.event',
         );
 
-        $qb->join(
+        /*$qb->join(
             WbTokenAccess::class,
             'access',
             'WITH',
             'access.event = token.event AND access.profile = :access',
-        );
+        );*/
 
 
-        $qb->setParameter('access', $UserProfileUid, UserProfileUid::TYPE);
+        //$qb->setParameter('access', $UserProfileUid, UserProfileUid::TYPE);
 
 
         $qb
