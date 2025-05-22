@@ -39,6 +39,8 @@ final class Role implements RoleInterface, MenuAdminInterface
     /** Транспорт доставки заказов */
     public const string ROLE = 'ROLE_WB_TOKEN';
 
+    public const string KEY = 'BxDCasSuc';
+
     public function getRole(): string
     {
         return self::ROLE;
@@ -53,6 +55,14 @@ final class Role implements RoleInterface, MenuAdminInterface
     public function getPath(): string
     {
         return 'wildberries:admin.index';
+    }
+
+    /**
+     * Метод возвращает ключ раздела (для меню телеграм)
+     */
+    public function getPathKey(): string
+    {
+        return self::KEY;
     }
 
     /**
