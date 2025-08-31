@@ -27,10 +27,11 @@ use BaksDev\Users\User\Tests\TestUserAccount;
 use BaksDev\Wildberries\Entity\WbToken;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/** @group wildberries */
+#[Group('wildberries')]
 #[When(env: 'test')]
 final class DeleteControllerTest extends WebTestCase
 {

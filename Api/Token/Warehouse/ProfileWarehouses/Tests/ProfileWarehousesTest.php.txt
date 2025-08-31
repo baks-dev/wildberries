@@ -32,10 +32,7 @@ use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group wildberries
- * @group wildberries-profile-warehouses
- */
+
 #[When(env: 'test')]
 final class ProfileWarehousesTest extends KernelTestCase
 {
