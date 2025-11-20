@@ -144,4 +144,9 @@ class WbTokenEvent extends EntityEvent
     {
         return $this->profile;
     }
+
+    public function getPercent(): ?string
+    {
+        return $this->percent;
+    }
 }

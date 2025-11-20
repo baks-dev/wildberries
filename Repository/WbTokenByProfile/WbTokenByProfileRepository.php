@@ -63,7 +63,7 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
     {
         $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
 
-        $select = sprintf('new %s(token.id, event.token)', WbAuthorizationToken::class);
+        $select = sprintf('new %s(token.id, event.token, event.percent)', WbAuthorizationToken::class);
         $qb->select($select);
 
         $qb->from(WbToken::class, 'token');
@@ -91,7 +91,9 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
 
 
         /* Кешируем результат ORM */
-        return $qb->enableCache('users-profile-group', 86400)->getOneOrNullResult();
+        return $qb
+            ->enableCache('users-profile-group', 86400)
+            ->getOneOrNullResult();
 
     }
 

@@ -82,6 +82,22 @@ abstract class Wildberries
         return $this->profile;
     }
 
+    /**
+     * Торговая наценка
+     *
+     * Положительное либо отрицательное число в рублях, либо с процентом, пример:
+     *
+     * 100.1
+     * -100.1
+     * 10.1%
+     * -10.1%
+     *
+     */
+    public function getPercent(): string
+    {
+        return $this->wbAuthorizationToken?->getPercent() ?: '0';
+    }
+
     protected function content(): self
     {
         $this->base = 'content-api.wildberries.ru';
