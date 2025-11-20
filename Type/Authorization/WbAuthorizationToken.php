@@ -56,6 +56,7 @@ final class WbAuthorizationToken
     {
         $this->profile = $profile;
         $this->token = $token;
+        $this->percent = $percent;
     }
 
 

@@ -105,6 +105,13 @@ abstract class Wildberries
         return $this;
     }
 
+    protected function discountsPrices(): self
+    {
+        $this->base = 'discounts-prices-api.wildberries.ru';
+
+        return $this;
+    }
+
     protected function marketplace(): self
     {
         $this->base = 'marketplace-api.wildberries.ru';
@@ -156,7 +163,7 @@ abstract class Wildberries
                 $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [self::class.':'.__LINE__]);
 
                 throw new InvalidArgumentException(
-                    'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)'
+                    'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)',
                 );
             }
 
@@ -178,8 +185,8 @@ abstract class Wildberries
             HttpClient::create(['headers' => $this->headers])
                 ->withOptions([
                     'base_uri' => sprintf('https://%s', $this->base),
-                    'verify_host' => false
-                ])
+                    'verify_host' => false,
+                ]),
         );
     }
 
@@ -188,7 +195,7 @@ abstract class Wildberries
         if(false === $this->profile)
         {
             throw new InvalidArgumentException(
-                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)'
+                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)',
             );
         }
 
@@ -209,7 +216,7 @@ abstract class Wildberries
             HttpClient::create(['headers' => $this->headers])
                 ->withOptions([
                     'base_uri' => 'https://seller.wildberries.ru/',
-                ])
+                ]),
         );
     }
 
@@ -223,7 +230,7 @@ abstract class Wildberries
                     return "$key: $value";
                 },
                 array_keys($this->headers),
-                $this->headers
+                $this->headers,
             )).'"';
     }
 
