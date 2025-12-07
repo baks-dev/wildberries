@@ -27,6 +27,7 @@ use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
+use BaksDev\Wildberries\Type\id\WbTokenUid;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -38,19 +39,20 @@ class WbToken
     #[Assert\NotBlank]
     #[Assert\Uuid]
     #[ORM\Id]
-    #[ORM\Column(type: UserProfileUid::TYPE)]
-    private UserProfileUid $id;
+    #[ORM\Column(type: WbTokenUid::TYPE)]
+    private WbTokenUid $id;
 
     /** ID События */
     #[Assert\NotBlank]
     #[Assert\Uuid]
-    #[ORM\Column(type: WbTokenEventUid::TYPE, unique: true)]
+    #[ORM\Column(type: WbTokenEventUid::TYPE)]
     private WbTokenEventUid $event;
 
 
-    public function __construct(UserProfile|UserProfileUid $profile)
+    public function __construct()
     {
-        $this->id = $profile instanceof UserProfile ? $profile->getId() : $profile;
+        //$this->id = $profile instanceof UserProfile ? $profile->getId() : $profile;
+        $this->id = new WbTokenUid();
     }
 
     public function __toString(): string
@@ -58,7 +60,7 @@ class WbToken
         return (string) $this->id;
     }
 
-    public function getId(): UserProfileUid
+    public function getId(): WbTokenUid
     {
         return $this->id;
     }

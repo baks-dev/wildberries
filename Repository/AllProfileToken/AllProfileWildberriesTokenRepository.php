@@ -32,11 +32,12 @@ use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\Status\UserProfileStatusActive;
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
-use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
+use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
+use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
 use BaksDev\Wildberries\Entity\WbToken;
 use Generator;
 
-final class AllProfileTokenRepository implements AllProfileTokenInterface
+final class AllProfileWildberriesTokenRepository implements AllProfileWildberriesTokenInterface
 {
 
     private bool $active = false;
@@ -49,7 +50,7 @@ final class AllProfileTokenRepository implements AllProfileTokenInterface
         return $this;
     }
 
-    public function findAll(): Generator
+    public function findAll(): Generator|false
     {
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
@@ -59,23 +60,31 @@ final class AllProfileTokenRepository implements AllProfileTokenInterface
         {
             $dbal->join(
                 'token',
-                WbTokenEvent::class,
-                'event',
-                'event.id = token.event AND event.active = true',
+                WbTokenActive::class,
+                'wb_token_active',
+                'wb_token_active.event = token.event AND wb_token_active.value IS TRUE',
             );
         }
 
+
+        $dbal->join(
+            'token',
+            WbTokenProfile::class,
+            'wb_token_profile',
+            'wb_token_profile.event = token.event',
+        );
+
         $dbal
             ->join(
-                'token',
+                'wb_token_profile',
                 UserProfileInfo::class,
                 'users_profile_info',
-                'users_profile_info.profile = token.id AND users_profile_info.status = :status',
+                'users_profile_info.profile = wb_token_profile.value AND users_profile_info.status = :status',
             )
             ->setParameter(
                 'status',
                 UserProfileStatusActive::class,
-                UserProfileStatus::TYPE
+                UserProfileStatus::TYPE,
             );
 
         $dbal->join(
@@ -94,7 +103,7 @@ final class AllProfileTokenRepository implements AllProfileTokenInterface
         );
 
         /** Параметры конструктора объекта гидрации */
-        $dbal->addSelect('token.id AS value');
+        $dbal->addSelect('wb_token_profile.value');
         $dbal->addSelect('personal.username AS attr');
 
         return $dbal

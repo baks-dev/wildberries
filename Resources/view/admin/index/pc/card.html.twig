@@ -1,5 +1,7 @@
 {% trans_default_domain("admin.wb.token") %}
 
+{# @var item \BaksDev\Wildberries\Repository\AllWbToken\WbTokenPaginatorResult #}
+
 <tr class="vertical-middle">
 
     <td class="text-nowrap">
@@ -12,19 +14,10 @@
         <div class="d-flex w-50 gap-3">
 
             {# Обложка #}
-            {% set image_path = '/assets/'~version~'/img/blank.svg' %}
-
-            {% if item.users_profile_avatar_ext is defined and item.users_profile_avatar_ext is not null %}
-                {% set img_host =  item.users_profile_avatar_cdn == true  ? CDN_HOST : '' %}
-                {% set img_dir = item.users_profile_avatar %}
-                {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ item.users_profile_avatar_ext %}
-                {% set image_path = img_host ~ img_dir ~ img_file %}
-            {% endif %}
-
             <div>
                 <span
                         class="icon rounded-circle bg-cover lazy p-1"
-                        data-bg="{{ image_path }}"
+                        data-bg="{{ cdn_image_path(item.usersProfileAvatar, item.usersProfileAvatarExt, item.usersProfileAvatarCdn) }}"
                 > </span>
             </div>
 
@@ -35,7 +28,7 @@
                    data-bs-toggle="modal"
                    data-bs-target="#modal"
                 >
-                    {{ item.users_profile_username }}
+                    {{ item.usersProfileUsername }}
                 </a>
 
                 <div class="text-muted fs-7 fw-bolder d-flex gap-3">
@@ -62,7 +55,7 @@
                             <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
                         </svg>
 
-                        {{ item.account_email }}
+                        {{ item.accountEmail }}
                     </span>
                 </div>
 
@@ -83,7 +76,45 @@
     </td>
 
     <td class="text-center">
-        {{ user_profile_status(item.users_profile_status) }}
+        {{ user_profile_status(item.usersProfileStatus) }}
+    </td>
+
+    <td>&nbsp;</td>
+
+    <td class="text-center">
+        {% if item.card %}
+
+            {# <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-success"
+                 viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/>
+            </svg> #}
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-success"
+                 viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+
+        {% else %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-danger"
+                 viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/>
+            </svg>
+        {% endif %}
+    </td>
+
+    <td class="text-center">
+        {% if item.stocks %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-success"
+                 viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+
+        {% else %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-danger"
+                 viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/>
+            </svg>
+        {% endif %}
     </td>
 
     {% if is_granted('ROLE_ADMIN') %}

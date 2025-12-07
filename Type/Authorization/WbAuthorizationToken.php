@@ -27,6 +27,7 @@ namespace BaksDev\Wildberries\Type\Authorization;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Cookie\WbTokenCookie;
+use BaksDev\Wildberries\Type\Token\WbTokenString;
 use Doctrine\DBAL\Types\Types;
 
 /** @see WbTokenCookie */
@@ -36,7 +37,7 @@ final class WbAuthorizationToken
     /**
      * ID настройки (профиль пользователя)
      */
-    private readonly UserProfileUid $profile;
+    private readonly string $profile;
 
     /**
      * Токен
@@ -51,28 +52,59 @@ final class WbAuthorizationToken
      */
     private ?string $percent = null;
 
+    private ?bool $card = null;
 
-    public function __construct(UserProfileUid $profile, string $token, ?string $percent = null)
+    private ?bool $stock = null;
+
+    private ?string $warehouse = null;
+
+    public function __construct(
+        UserProfileUid|string $profile,
+        string $token,
+        ?string $warehouse = null,
+        ?string $percent = null,
+        ?bool $card = null,
+        ?bool $stock = null
+    )
     {
-        $this->profile = $profile;
+        $this->profile = (string) $profile;
         $this->token = $token;
         $this->percent = $percent;
+        $this->card = $card;
+        $this->stock = $stock;
+        $this->warehouse = $warehouse;
     }
 
 
     public function getProfile(): UserProfileUid
     {
-        return $this->profile;
+        return new UserProfileUid($this->profile);
     }
 
 
-    public function getToken(): string
+    public function getToken(): WbTokenString
     {
-        return $this->token;
+        return new WbTokenString($this->token);
+    }
+
+    public function getWarehouse(): ?string
+    {
+        return $this->warehouse;
     }
 
     public function getPercent(): ?string
     {
         return $this->percent;
     }
+
+    public function isCard(): bool
+    {
+        return $this->card === true;
+    }
+
+    public function isStock(): ?bool
+    {
+        return $this->stock === true;
+    }
+
 }

@@ -28,8 +28,17 @@ use BaksDev\Core\Entity\EntityEvent;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Access\WbTokenAccess;
 use BaksDev\Wildberries\Entity\Cookie\WbTokenCookie;
-use BaksDev\Wildberries\Entity\Modify\WbTokenModify;
+use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
+use BaksDev\Wildberries\Entity\Event\Card\WbTokenCard;
+use BaksDev\Wildberries\Entity\Event\Modify\WbTokenModify;
+use BaksDev\Wildberries\Entity\Event\Percent\WbTokenPercent;
+use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
+use BaksDev\Wildberries\Entity\Event\Stocks\WbTokenStocks;
+use BaksDev\Wildberries\Entity\Event\Token\WbTokenValue;
+use BaksDev\Wildberries\Entity\Event\Warehouse\WbTokenWarehouse;
+use BaksDev\Wildberries\Entity\WbToken;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
+use BaksDev\Wildberries\Type\id\WbTokenUid;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
@@ -39,11 +48,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'wb_token_event')]
-#[ORM\Index(columns: ['profile', 'active'])]
 class WbTokenEvent extends EntityEvent
 {
-    const TABLE = 'wb_token_event';
-
     /**
      * Идентификатор События
      */
@@ -54,48 +60,51 @@ class WbTokenEvent extends EntityEvent
     private WbTokenEventUid $id;
 
     /**
-     * ID настройки (профиль пользователя)
+     * Идентификатор Main
      */
     #[Assert\NotBlank]
     #[Assert\Uuid]
-    #[ORM\Column(type: UserProfileUid::TYPE)]
-    private UserProfileUid $profile;
-
-
-    /**
-     * Токен
-     */
-    #[Assert\NotBlank]
-    #[ORM\Column(type: Types::TEXT)]
-    private string $token;
+    #[ORM\Column(type: WbTokenUid::TYPE)]
+    private WbTokenUid $main;
 
     /**
-     * Cookie
+     * ID профиля пользователя
      */
-    #[ORM\OneToOne(targetEntity: WbTokenCookie::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
-    private ?WbTokenCookie $cookie = null;
+    #[ORM\OneToOne(targetEntity: WbTokenProfile::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenProfile $profile = null;
 
-    /**
-     * Статус true = активен / false = заблокирован
-     */
-    #[ORM\Column(type: Types::BOOLEAN)]
-    private bool $active = true;
+
+    /** WbTokenValue */
+    #[ORM\OneToOne(targetEntity: WbTokenValue::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenValue $token = null;
+
+
+    /** WbTokenActive */
+    #[ORM\OneToOne(targetEntity: WbTokenActive::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenActive $active = null;
+
+
+    /** WbTokenCard */
+    #[ORM\OneToOne(targetEntity: WbTokenCard::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenCard $card = null;
+
+    /** WbTokenStocks */
+    #[ORM\OneToOne(targetEntity: WbTokenStocks::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenStocks $stock = null;
+
+    /** WbTokenPercent */
+    #[ORM\OneToOne(targetEntity: WbTokenPercent::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenPercent $percent = null;
+
+    /** WbTokenWarehouse */
+    #[ORM\OneToOne(targetEntity: WbTokenWarehouse::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenWarehouse $warehouse = null;
 
     /**
      * Модификатор
      */
     #[ORM\OneToOne(targetEntity: WbTokenModify::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private WbTokenModify $modify;
-
-    /**
-     * Торговая наценка
-     * строковое число (пример: 100|-100)
-     * строковое число с процентом - процент (пример: 10%|-10%)
-     */
-    #[Assert\NotBlank]
-    #[ORM\Column(type: Types::STRING, nullable: true)]
-    private ?string $percent = null;
-
 
     public function __construct()
     {
@@ -111,6 +120,17 @@ class WbTokenEvent extends EntityEvent
     public function __toString(): string
     {
         return (string) $this->id;
+    }
+
+    public function getMain(): WbTokenUid
+    {
+        return $this->main;
+    }
+
+    public function setMain(WbToken|WbTokenUid $main): self
+    {
+        $this->main = $main instanceof WbToken ? $main->getId() : $main;
+        return $this;
     }
 
     public function getDto($dto): mixed
@@ -142,11 +162,11 @@ class WbTokenEvent extends EntityEvent
 
     public function getProfile(): UserProfileUid
     {
-        return $this->profile;
+        return $this->profile->getValue();
     }
 
     public function getPercent(): ?string
     {
-        return $this->percent;
+        return $this->percent->getValue();
     }
 }

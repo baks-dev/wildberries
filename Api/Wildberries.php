@@ -28,8 +28,11 @@ namespace BaksDev\Wildberries\Api;
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\Entity\WbToken;
+use BaksDev\Wildberries\Repository\WbToken\WbTokenInterface;
 use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
+use BaksDev\Wildberries\Type\id\WbTokenUid;
 use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -43,18 +46,40 @@ abstract class Wildberries
 {
     private ?WbAuthorizationToken $wbAuthorizationToken = null;
 
+    private WbTokenUid|false $identifier = false;
+
     protected UserProfileUid|false $profile = false;
 
     private array $headers;
 
     private string|false $base = false;
 
+    private WbTokenUid|false $token = false;
+
     public function __construct(
         #[Autowire(env: 'APP_ENV')] private readonly string $environment,
         #[Target('wildberriesLogger')] protected LoggerInterface $logger,
         private readonly WbTokenByProfileInterface $TokenByProfile,
+        private readonly WbTokenInterface $WbToken,
         private readonly AppCacheInterface $cache,
     ) {}
+
+
+    public function forTokenIdentifier(WbToken|WbTokenUid $identifier): self
+    {
+        if($identifier instanceof WbToken)
+        {
+            $identifier = $identifier->getId();
+        }
+
+        $this->wbAuthorizationToken = $this->WbToken
+            ->forTokenIdentifier($identifier)
+            ->find();
+
+        $this->identifier = $identifier;
+
+        return $this;
+    }
 
 
     public function profile(UserProfile|UserProfileUid|string $profile): self
@@ -96,6 +121,24 @@ abstract class Wildberries
     public function getPercent(): string
     {
         return $this->wbAuthorizationToken?->getPercent() ?: '0';
+    }
+
+    public function isCard(): bool
+    {
+        return $this->wbAuthorizationToken?->isCard() === true;
+    }
+
+    public function isStock(): bool
+    {
+        return $this->wbAuthorizationToken?->isStock() === true;
+    }
+
+    /**
+     * Метод возвращает идентификатор склада
+     */
+    public function getWarehouse(): ?string
+    {
+        return $this->wbAuthorizationToken->getWarehouse();
     }
 
     protected function content(): self
@@ -167,9 +210,11 @@ abstract class Wildberries
                 );
             }
 
-            $this->wbAuthorizationToken = $this->TokenByProfile->getToken($this->profile);
+            $this->wbAuthorizationToken = $this->TokenByProfile
+                ->forProfile($this->profile)
+                ->getToken();
 
-            if(!$this->wbAuthorizationToken)
+            if(false === ($this->wbAuthorizationToken instanceof WbAuthorizationToken))
             {
                 throw new DomainException(sprintf('Токен авторизации Wildberries не найден: %s', $this->profile));
             }
@@ -177,7 +222,7 @@ abstract class Wildberries
 
         $this->base ?: $this->base = 'suppliers-api.wildberries.ru';
 
-        $this->headers['Authorization'] = $this->wbAuthorizationToken->getToken();
+        $this->headers['Authorization'] = $this->wbAuthorizationToken->getToken()->getValue();
         $this->headers['accept'] = 'application/json';
         $this->headers['Content-Type'] = 'application/json';
 
@@ -186,36 +231,6 @@ abstract class Wildberries
                 ->withOptions([
                     'base_uri' => sprintf('https://%s', $this->base),
                     'verify_host' => false,
-                ]),
-        );
-    }
-
-    protected function CookieHttpClient(): RetryableHttpClient
-    {
-        if(false === $this->profile)
-        {
-            throw new InvalidArgumentException(
-                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)',
-            );
-        }
-
-        $WbAuthorizationCookie = $this->TokenByProfile->getTokenCookie($this->profile);
-
-        if(!$WbAuthorizationCookie)
-        {
-            throw new DomainException(sprintf('Cookie авторизации Wildberries не найдены: %s', $this->profile));
-        }
-
-        $this->headers = [
-            'Content-Type' => 'application/json',
-            'Cookie' => 'WBToken='.$WbAuthorizationCookie->getToken().'; x-supplier-id='.
-                $WbAuthorizationCookie->getIdentifier().';',
-        ];
-
-        return new RetryableHttpClient(
-            HttpClient::create(['headers' => $this->headers])
-                ->withOptions([
-                    'base_uri' => 'https://seller.wildberries.ru/',
                 ]),
         );
     }

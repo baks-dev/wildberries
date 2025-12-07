@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,53 +21,21 @@
  *  THE SOFTWARE.
  */
 
-declare(strict_types=1);
+namespace BaksDev\Wildberries\Repository\AllWbTokensByProfile;
 
-namespace BaksDev\Wildberries\UseCase\Admin\NewEdit\Cookie;
+use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\Type\id\WbTokenUid;
+use Generator;
 
-use BaksDev\Wildberries\Entity\Cookie\WbTokenCookieInterface;
-
-/** @see WbTokenCookie */
-final class WbTokenCookieDTO implements WbTokenCookieInterface
+interface AllWbTokensByProfileInterface
 {
+    public function forProfile(UserProfile|UserProfileUid $profile): self;
 
     /**
-     * Токен (WBToken)
+     * Метод возвращает идентификаторы токенов профиля пользователя
+     *
+     * @return Generator<WbTokenUid>|false
      */
-    private ?string $token = null;
-
-    /**
-     * Идентификатор магазина (x-supplier-id)
-     */
-    private ?string $identifier = null;
-
-
-    /**
-     * Token
-     */
-    public function getToken(): ?string
-    {
-        return $this->token;
-    }
-
-
-    public function setToken(?string $token): void
-    {
-        $this->token = $token;
-    }
-
-
-    /**
-     * Идентификатор магазина
-     */
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-
-    public function setIdentifier(?string $identifier): void
-    {
-        $this->identifier = $identifier;
-    }
+    public function findAll(): Generator|false;
 }

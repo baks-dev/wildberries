@@ -25,59 +25,118 @@ namespace BaksDev\Wildberries\Repository\WbTokenByProfile;
 
 use BaksDev\Auth\Email\Type\EmailStatus\EmailStatus;
 use BaksDev\Auth\Email\Type\EmailStatus\Status\EmailStatusActive;
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Doctrine\ORMQueryBuilder;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\Info\UserProfileInfo;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\Status\UserProfileStatusActive;
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
+use BaksDev\Users\User\Repository\UserTokenStorage\UserTokenStorageInterface;
 use BaksDev\Users\User\Type\Id\UserUid;
 use BaksDev\Wildberries\Entity\Cookie\WbTokenCookie;
-use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
+use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
+use BaksDev\Wildberries\Entity\Event\Card\WbTokenCard;
+use BaksDev\Wildberries\Entity\Event\Percent\WbTokenPercent;
+use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
+use BaksDev\Wildberries\Entity\Event\Stocks\WbTokenStocks;
+use BaksDev\Wildberries\Entity\Event\Token\WbTokenValue;
+use BaksDev\Wildberries\Entity\Event\Warehouse\WbTokenWarehouse;
 use BaksDev\Wildberries\Entity\WbToken;
-use BaksDev\Wildberries\Type\Authorization\WbAuthorizationCookie;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use InvalidArgumentException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 final class WbTokenByProfileRepository implements WbTokenByProfileInterface
 {
-    private TokenStorageInterface $tokenStorage;
 
-    private ORMQueryBuilder $ORMQueryBuilder;
+    private UserProfileUid|false $profile = false;
 
-    public function __construct(
-        ORMQueryBuilder $ORMQueryBuilder,
-        TokenStorageInterface $tokenStorage,
-    )
+    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
+
+    public function forProfile(UserProfileUid|UserProfile $profile): self
     {
-        $this->tokenStorage = $tokenStorage;
-        $this->ORMQueryBuilder = $ORMQueryBuilder;
-    }
+        if($profile instanceof UserProfile)
+        {
+            $profile = $profile->getId();
+        }
 
+        $this->profile = $profile;
+
+        return $this;
+    }
 
     /**
      * Токен авторизации Wildberries
      */
-    public function getToken(UserProfileUid $profile): ?WbAuthorizationToken
+    public function getToken(): WbAuthorizationToken|false
     {
-        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
+        if(false === ($this->profile instanceof UserProfileUid))
+        {
+            throw new InvalidArgumentException('Invalid Argument UserProfileUid');
+        }
 
-        $select = sprintf('new %s(token.id, event.token, event.percent)', WbAuthorizationToken::class);
-        $qb->select($select);
+        $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $qb->from(WbToken::class, 'token');
-        $qb->where('token.id = :profile');
-        $qb->setParameter('profile', $profile, UserProfileUid::TYPE);
-
-        $qb->join(
-            WbTokenEvent::class,
-            'event',
-            'WITH',
-            'event.id = token.event AND event.active = true',
+        $dbal->from(WbToken::class, 'token');
+        $dbal->where('token.id = :profile');
+        $dbal->setParameter(
+            key: 'profile',
+            value: $this->profile,
+            type: UserProfileUid::TYPE,
         );
 
-        $qb->join(
+        $dbal->join(
+            'token',
+            WbTokenProfile::class,
+            'wb_token_profile',
+            'wb_token_profile.event = token.event',
+        );
+
+        $dbal->join(
+            'token',
+            WbTokenActive::class,
+            'wb_token_active',
+            'wb_token_active.event = token.event AND event.active IS TRUE',
+        );
+
+        $dbal->join(
+            'token',
+            WbTokenValue::class,
+            'wb_token_value',
+            'wb_token_value.event = token.event',
+        );
+
+        $dbal->join(
+            'token',
+            WbTokenPercent::class,
+            'wb_token_percent',
+            'wb_token_percent.event = token.event',
+        );
+
+        $dbal->join(
+            'token',
+            WbTokenCard::class,
+            'wb_token_card',
+            'wb_token_card.event = token.event',
+        );
+
+        $dbal->join(
+            'token',
+            WbTokenStocks::class,
+            'wb_token_stocks',
+            'wb_token_stocks.event = token.event',
+        );
+
+        $dbal->join(
+            'token',
+            WbTokenWarehouse::class,
+            'wb_token_warehouse',
+            'wb_token_warehouse.event = token.event',
+        );
+
+
+        $dbal->join(
             UserProfileInfo::class,
             'info',
             'WITH',
@@ -86,104 +145,24 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
             ->setParameter(
                 'status',
                 UserProfileStatusActive::class,
-                UserProfileStatus::TYPE
+                UserProfileStatus::TYPE,
             );
 
+        //$select = sprintf('new %s(token.id, event.token, event.percent)', WbAuthorizationToken::class);
+        //$dbal->select($select);
+
+        $dbal
+            ->addSelect('wb_token_profile.value AS profile')
+            ->addSelect('wb_token_value.value AS token')
+            ->addSelect('wb_token_card.value AS card')
+            ->addSelect('wb_token_stocks.value AS stock')
+            ->addSelect('wb_token_percent.value AS percent')
+            ->addSelect('wb_token_warehouse.value AS warehouse');
 
         /* Кешируем результат ORM */
-        return $qb
-            ->enableCache('users-profile-group', 86400)
-            ->getOneOrNullResult();
-
-    }
-
-
-    /**
-     * Cookie авторизации Wildberries
-     */
-    public function getTokenCookie(UserProfileUid $profile): ?WbAuthorizationCookie
-    {
-        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
-
-        $select = sprintf('new %s(token.id, cookie.identifier, cookie.token)', WbAuthorizationCookie::class);
-        $qb->select($select);
-
-        $qb->from(WbToken::class, 'token');
-        $qb->where('token.id = :profile');
-        $qb->setParameter('profile', $profile, UserProfileUid::TYPE);
-
-        $qb->join(
-            WbTokenEvent::class,
-            'event',
-            'WITH',
-            'event.id = token.event AND event.active = true',
-        );
-
-        $qb
-            ->join(
-                UserProfileInfo::class,
-                'info',
-                'WITH',
-                'info.profile = token.id AND info.status = :status',
-            )
-            ->setParameter(
-                'status',
-                UserProfileStatusActive::class,
-                UserProfileStatus::TYPE
-            );
-
-        $qb->join(
-            WbTokenCookie::class,
-            'cookie',
-            'WITH',
-            'cookie.event = token.event',
-        );
-
-
-        /* Кешируем результат ORM */
-        return $qb->enableCache('wildberries', 86400)->getOneOrNullResult();
-
-    }
-
-
-    /**
-     * Текущий Активный профиль пользователя любой
-     */
-    public function getCurrentUserProfile(): ?UserProfileUid
-    {
-        /** @var UserUid $usr */
-        $usr = $this->tokenStorage->getToken()
-            ?->getUser()
-            ?->getId();
-
-        if(!$usr)
-        {
-            throw new InvalidArgumentException('Невозможно определить авторизованного пользователя');
-        }
-
-        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
-
-        $select = sprintf('new %s(profile.id)', UserProfileUid::class);
-        $qb->select($select);
-
-        $qb->from(UserProfileInfo::class, 'profile_info');
-        $qb->where('profile_info.usr = :user');
-
-        $qb->andWhere('profile_info.active = true');
-        $qb->andWhere('profile_info.status = :status');
-
-        $qb->setParameter('user', $usr, UserUid::TYPE);
-        $qb->setParameter('status', new EmailStatus(EmailStatusActive::class), EmailStatus::TYPE);
-
-        $qb->join(
-            UserProfile::class,
-            'profile',
-            'WITH',
-            'profile.id = profile_info.profile',
-        );
-
-        /* Кешируем результат ORM */
-        return $qb->enableCache('wildberries', 86400)->getOneOrNullResult();
+        return $dbal
+            ->enableCache('users-profile-group', '1 day')
+            ->fetchHydrate(WbAuthorizationToken::class);
 
     }
 

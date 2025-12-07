@@ -27,6 +27,13 @@ namespace BaksDev\Wildberries\UseCase\Admin\NewEdit;
 
 use BaksDev\Users\Profile\UserProfile\Repository\UserProfileChoice\UserProfileChoiceInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Active\WbTokenActiveForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Card\WbTokenCardForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Percent\WbTokenPercentForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Profile\WbTokenProfileForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Stocks\WbTokenStockForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Token\WbTokenValueForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Warehouse\WbTokenWarehouseForm;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -40,53 +47,28 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class WbTokenForm extends AbstractType
 {
 
-    private UserProfileChoiceInterface $profileChoice;
-
-
-    public function __construct(UserProfileChoiceInterface $profileChoice)
-    {
-        $this->profileChoice = $profileChoice;
-    }
-
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var WbTokenDTO $data */
-        $data = $builder->getData();
 
-        if(!$data->getProfile())
-        {
-            /* TextType */
-            $builder->add('profile', ChoiceType::class, [
-                'choices' => $this->profileChoice->getActiveUserProfile(),
-                'choice_value' => function(?UserProfileUid $profile) {
-                    return $profile?->getValue();
-                },
-                'choice_label' => function(UserProfileUid $profile) {
-                    return $profile->getAttr();
-                },
-                'label' => false,
-                'expanded' => false,
-                'multiple' => false,
-                'required' => false,
-                'attr' => ['data-select' => 'select2',]
-            ]);
-        }
+        $builder->add('active', WbTokenActiveForm::class, ['required' => false, 'label' => false]);
 
-        $builder->add('percent', TextType::class);
+        $builder->add('card', WbTokenCardForm::class, ['required' => false, 'label' => false]);
 
+        $builder->add('stock', WbTokenStockForm::class, ['required' => false, 'label' => false]);
 
-        $builder->add('token', TextareaType::class, ['required' => false]);
+        $builder->add('profile', WbTokenProfileForm::class, ['required' => false, 'label' => false]);
 
-        $builder->add('active', CheckboxType::class, ['required' => false]);
+        $builder->add('percent', WbTokenPercentForm::class, ['required' => false, 'label' => false]);
 
-        $builder->add('cookie', Cookie\WbTokenCookieForm::class, ['label' => false]);
+        $builder->add('token', WbTokenValueForm::class, ['required' => false, 'label' => false]);
+
+        $builder->add('warehouse', WbTokenWarehouseForm::class, ['required' => false, 'label' => false]);
 
 
         /* Сохранить ******************************************************/
         $builder->add(
             'wb_token', SubmitType::class,
-            ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-primary']]
+            ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-primary']],
         );
     }
 

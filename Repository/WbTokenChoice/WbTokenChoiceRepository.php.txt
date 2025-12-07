@@ -25,105 +25,112 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Repository\WbTokenChoice;
 
-use BaksDev\Core\Doctrine\ORMQueryBuilder;
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\Info\UserProfileInfo;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\Personal\UserProfilePersonal;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\Status\UserProfileStatusActive;
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
-use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
+use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
 use BaksDev\Wildberries\Entity\WbToken;
 use BaksDev\Wildberries\Repository\WbTokenByProfile\WbTokenByProfileInterface;
+use Generator;
 
-final class WbTokenChoiceRepository implements WbTokenChoiceInterface
+final readonly class WbTokenChoiceRepository implements WbTokenChoiceInterface
 {
 
     public function __construct(
-        private readonly WbTokenByProfileInterface $wbTokenByProfile,
-        private readonly ORMQueryBuilder $ORMQueryBuilder
+        private WbTokenByProfileInterface $wbTokenByProfile,
+        private DBALQueryBuilder $DBALQueryBuilder
     ) {}
 
     /**
      * Возвращает всю коллекцию идентификаторов токенов
+     *
+     * @return Generator<UserProfileUid>|false
      */
-    public function getTokenCollection(): ?array
+    public function getTokenCollection(): Generator|false
     {
-        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
+        $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $select = sprintf('new %s(token.id, users_profile_personal.username)', UserProfileUid::class);
-        $qb->select($select);
+        $dbal->from(WbToken::class, 'token');
 
-        $qb->from(WbToken::class, 'token');
-
-        $qb->join(
-            WbTokenEvent::class,
-            'event',
-            'WITH',
-            'event.id = token.event AND event.profile = token.id',
+        $dbal->join(
+            'token',
+            WbTokenProfile::class,
+            'wb_token_profile',
+            'wb_token_profile.event = token.event',
         );
 
-        $qb
+        $dbal
             ->join(
+                'wb_token_profile',
                 UserProfileInfo::class,
                 'users_profile_info',
-                'WITH',
-                'users_profile_info.profile = token.id AND users_profile_info.status = :status',
+                'users_profile_info.profile = wb_token_profile.value AND users_profile_info.status = :status',
             )
             ->setParameter(
                 key: 'status',
                 value: UserProfileStatusActive::class,
-                type: UserProfileStatus::TYPE
+                type: UserProfileStatus::TYPE,
             );
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
+            'wb_token_profile',
             UserProfile::class,
             'users_profile',
-            'WITH',
-            'users_profile.id = token.id',
+            'users_profile.id = wb_token_profile.value',
         );
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
+            'users_profile',
             UserProfilePersonal::class,
             'users_profile_personal',
-            'WITH',
             'users_profile_personal.event = users_profile.event',
         );
 
 
+        //        $select = sprintf('new %s(token.id, users_profile_personal.username)', UserProfileUid::class);
+        //        $dbal->select($select);
+
+        $dbal
+            ->addSelect('wb_token_profile.value AS value')
+            ->addSelect('users_profile_personal.username AS attr');
+
         /* Кешируем результат ORM */
-        return $qb
+        return $dbal
             ->enableCache('wildberries', '1 day')
-            ->getResult();
+            ->fetchAllHydrate(UserProfileUid::class);
     }
 
     /**
      * Возвращает коллекцию идентификаторов, доступных активному профилю пользователя
+     *
+     * @return Generator<UserProfileUid>|false
      */
-    public function getAccessProfileTokenCollection(): ?array
+    public function getAccessProfileTokenCollection(): Generator|false
     {
         $UserProfileUid = $this->wbTokenByProfile->getCurrentUserProfile();
 
-        if(!$UserProfileUid)
+        if(false === ($UserProfileUid instanceof UserProfileUid))
         {
-            return [];
+            return false;
         }
 
-        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
+        $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $select = sprintf('new %s(token.id, users_profile_personal.username)', UserProfileUid::class);
-        $qb->select($select);
 
-        $qb->from(WbToken::class, 'token');
+        $dbal->from(WbToken::class, 'token');
 
-        $qb->join(
-            WbTokenEvent::class,
-            'event',
-            'WITH',
-            'event.id = token.event',
+        $dbal->join(
+            'token',
+            WbTokenProfile::class,
+            'wb_token_profile',
+            'wb_token_profile.event = token.event',
         );
 
-        /*$qb->join(
+        /*$dbal->join(
             WbTokenAccess::class,
             'access',
             'WITH',
@@ -131,39 +138,48 @@ final class WbTokenChoiceRepository implements WbTokenChoiceInterface
         );*/
 
 
-        //$qb->setParameter('access', $UserProfileUid, UserProfileUid::TYPE);
+        //$dbal->setParameter('access', $UserProfileUid, UserProfileUid::TYPE);
 
 
-        $qb
+        $dbal
             ->join(
+                'wb_token_profile',
                 UserProfileInfo::class,
                 'users_profile_info',
-                'WITH',
-                'users_profile_info.profile = token.id AND users_profile_info.status = :status',
+                'users_profile_info.profile = wb_token_profile.value AND users_profile_info.status = :status',
             )
             ->setParameter(
                 'status',
                 UserProfileStatusActive::class,
-                UserProfileStatus::TYPE
+                UserProfileStatus::TYPE,
             );
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
+            'wb_token_profile',
             UserProfile::class,
             'users_profile',
-            'WITH',
-            'users_profile.id = token.id',
+            'users_profile.id = wb_token_profile.value',
         );
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
+            'users_profile',
             UserProfilePersonal::class,
             'users_profile_personal',
-            'WITH',
             'users_profile_personal.event = users_profile.event',
         );
 
 
+        //$select = sprintf('new %s(token.id, users_profile_personal.username)', UserProfileUid::class);
+        //$dbal->select($select);
+
+        $dbal
+            ->addSelect('wb_token_profile.value AS value')
+            ->addSelect('users_profile_personal.username AS attr');
+
         /* Кешируем результат ORM */
-        return $qb->enableCache('wildberries', 86400)->getResult();
+        return $dbal
+            ->enableCache('wildberries', '1 day')
+            ->fetchAllHydrate(UserProfileUid::class);
 
     }
 }

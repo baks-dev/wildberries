@@ -23,42 +23,39 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Entity\Cookie;
+namespace BaksDev\Wildberries\Entity\Event\Token;
+
 
 use BaksDev\Core\Entity\EntityEvent;
+use BaksDev\Core\Entity\EntityState;
+use BaksDev\Files\Resources\Upload\UploadEntityInterface;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
+use BaksDev\Wildberries\Type\Token\WbTokenString;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * WbTokenValue
+ *
+ * @see WbTokenEvent
+ */
 #[ORM\Entity]
-#[ORM\Table(name: 'wb_token_cookie')]
-class WbTokenCookie extends EntityEvent
+#[ORM\Table(name: 'wb_token_value')]
+class WbTokenValue extends EntityEvent
 {
-    /**
-     * ID события
-     */
+    /** Связь на событие */
     #[Assert\NotBlank]
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: WbTokenEvent::class, inversedBy: 'cookie')]
+    #[ORM\OneToOne(targetEntity: WbTokenEvent::class, inversedBy: 'token')]
     #[ORM\JoinColumn(name: 'event', referencedColumnName: 'id')]
     private WbTokenEvent $event;
 
-    /**
-     * Идентификатор магазина (x-supplier-id)
-     */
+    /** Значение свойства */
     #[Assert\NotBlank]
-    #[ORM\Column(type: Types::STRING)]
-    private ?string $identifier;
-
-    /**
-     * Токен (WBToken)
-     */
-    #[Assert\NotBlank]
-    #[ORM\Column(type: Types::STRING)]
-    private ?string $token;
-
+    #[ORM\Column(type: WbTokenString::TYPE)]
+    private WbTokenString $value;
 
     public function __construct(WbTokenEvent $event)
     {
@@ -70,11 +67,17 @@ class WbTokenCookie extends EntityEvent
         return (string) $this->event;
     }
 
+    public function getValue(): WbTokenString
+    {
+        return $this->value;
+    }
+
+    /** @return WbTokenValueInterface */
     public function getDto($dto): mixed
     {
         $dto = is_string($dto) && class_exists($dto) ? new $dto() : $dto;
 
-        if($dto instanceof WbTokenCookieInterface)
+        if($dto instanceof WbTokenValueInterface)
         {
             return parent::getDto($dto);
         }
@@ -82,16 +85,11 @@ class WbTokenCookie extends EntityEvent
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
 
-
+    /** @var WbTokenValueInterface $dto */
     public function setEntity($dto): mixed
     {
-        if($dto instanceof WbTokenCookieInterface || $dto instanceof self)
+        if($dto instanceof WbTokenValueInterface)
         {
-            if(empty($dto->getToken()) || empty($dto->getIdentifier()))
-            {
-                return false;
-            }
-
             return parent::setEntity($dto);
         }
 

@@ -25,128 +25,35 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\UseCase\Admin\NewEdit;
 
-use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Core\Entity\AbstractHandler;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\WbToken;
 use BaksDev\Wildberries\Messenger\WbTokenMessage;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Target;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-final readonly class WbTokenHandler
+final class WbTokenHandler extends AbstractHandler
 {
-    public function __construct(
-        #[Target('wildberriesLogger')] private LoggerInterface $logger,
-        private EntityManagerInterface $entityManager,
-        private ValidatorInterface $validator,
-        private MessageDispatchInterface $messageDispatch,
-    ) {}
-
     /** @see WbToken */
     public function handle(WbTokenDTO $command): WbToken|string
     {
-        /**
-         *  Валидация DTO
-         */
-        $errors = $this->validator->validate($command);
+        $this
+            ->setCommand($command)
+            ->preEventPersistOrUpdate(WbToken::class, WbTokenEvent::class);
 
-        if(count($errors) > 0)
+
+        /** Валидация всех объектов */
+        if($this->validatorCollection->isInvalid())
         {
-            /** Ошибка валидации */
-            $uniqid = uniqid('', false);
-            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [self::class.':'.__LINE__]);
-
-            return $uniqid;
+            return $this->validatorCollection->getErrorUniqid();
         }
 
-        if($command->getEvent())
-        {
-            $EventRepo = $this->entityManager->getRepository(WbTokenEvent::class)
-                ->find(
-                    $command->getEvent(),
-                );
-
-            if($EventRepo === null)
-            {
-                $uniqid = uniqid('', false);
-                $errorsString = sprintf(
-                    'Not found %s by id: %s',
-                    WbTokenEvent::class,
-                    $command->getEvent(),
-                );
-                $this->logger->error($uniqid.': '.$errorsString);
-
-                return $uniqid;
-            }
-
-            $EventRepo->setEntity($command);
-            $EventRepo->setEntityManager($this->entityManager);
-            $Event = $EventRepo->cloneEntity();
-        }
-        else
-        {
-            $Event = new WbTokenEvent();
-            $Event->setEntity($command);
-            $this->entityManager->persist($Event);
-        }
-
-        //        $this->entityManager->clear();
-        //        $this->entityManager->persist($Event);
-
-
-        /** @var WbToken $Main */
-        $Main = $this->entityManager->getRepository(WbToken::class)
-            ->find($command->getProfile());
-
-        if(empty($Main))
-        {
-            $Main = new WbToken($command->getProfile());
-            $this->entityManager->persist($Main);
-        }
-
-        /* присваиваем событие корню */
-        $Main->setEvent($Event);
-
-
-        /**
-         * Валидация Event
-         */
-
-        $errors = $this->validator->validate($Event);
-
-        if(count($errors) > 0)
-        {
-            /** Ошибка валидации */
-            $uniqid = uniqid('', false);
-            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [self::class.':'.__LINE__]);
-
-            return $uniqid;
-        }
-
-        /**
-         * Валидация Main
-         */
-        $errors = $this->validator->validate($Main);
-
-        if(count($errors) > 0)
-        {
-            /** Ошибка валидации */
-            $uniqid = uniqid('', false);
-            $this->logger->error(sprintf('%s: %s', $uniqid, $errors), [self::class.':'.__LINE__]);
-
-            return $uniqid;
-        }
-
-
-        $this->entityManager->flush();
+        $this->flush();
 
         /* Отправляем сообщение в шину */
         $this->messageDispatch->dispatch(
-            message: new WbTokenMessage($Main->getId(), $Main->getEvent(), $command->getEvent()),
+            message: new WbTokenMessage($this->main->getId(), $this->main->getEvent(), $command->getEvent()),
             transport: 'wildberries',
         );
 
-        return $Main;
+        return $this->main;
     }
 }

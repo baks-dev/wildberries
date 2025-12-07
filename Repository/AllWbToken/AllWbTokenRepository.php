@@ -37,8 +37,13 @@ use BaksDev\Users\Profile\UserProfile\Entity\Event\Personal\UserProfilePersonal;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\UserProfileEvent;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
+use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
+use BaksDev\Wildberries\Entity\Event\Card\WbTokenCard;
+use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
+use BaksDev\Wildberries\Entity\Event\Stocks\WbTokenStocks;
 use BaksDev\Wildberries\Entity\WbToken;
+use BaksDev\Yandex\Market\Entity\Event\Card\YaMarketTokenCard;
+use BaksDev\Yandex\Market\Entity\Event\Stocks\YaMarketTokenStocks;
 
 final class AllWbTokenRepository implements AllWbTokenInterface
 {
@@ -87,38 +92,76 @@ final class AllWbTokenRepository implements AllWbTokenInterface
             ->createQueryBuilder(self::class)
             ->bindLocal();
 
-        $dbal->select('token.id');
-        $dbal->addSelect('token.event');
-        $dbal->from(WbToken::class, 'token');
+        $dbal
+            ->select('token.id')
+            ->addSelect('token.event')
+            ->from(WbToken::class, 'token');
+
 
         /** Если не админ - только токен профиля */
 
+
+        $dbal->leftJoin(
+            'token',
+            WbTokenProfile::class,
+            'profile',
+            'profile.event = token.event '.($this->profile instanceof UserProfileUid ? ' AND profile.value = :profile' : ''),
+        );
+
         if($this->profile)
         {
-            $dbal->where('token.id = :profile')
-                ->setParameter('profile', $this->profile, UserProfileUid::TYPE);
+            $dbal->setParameter('profile', $this->profile, UserProfileUid::TYPE);
         }
 
 
-        $dbal->addSelect('event.active');
-        $dbal->join(
-            'token',
-            WbTokenEvent::class,
-            'event',
-            'event.id = token.event AND event.profile = token.id'
-        );
+        //        //$dbal->addSelect('event.active');
+        //        $dbal->join(
+        //            'token',
+        //            WbTokenEvent::class,
+        //            'event',
+        //            'event.id = token.event AND event.profile = token.id',
+        //        );
 
+
+        $dbal
+            ->addSelect('active.value AS active')
+            ->join(
+                'token',
+                WbTokenActive::class,
+                'active',
+                'active.event = token.event',
+            );
+
+
+        $dbal
+            ->addSelect('card.value AS card')
+            ->leftJoin(
+                'token',
+                WbTokenCard::class,
+                'card',
+                'card.event = token.event',
+            );
+
+        $dbal
+            ->addSelect('stocks.value AS stocks')
+            ->leftJoin(
+                'token',
+                WbTokenStocks::class,
+                'stocks',
+                'stocks.event = token.event',
+            );
 
         // ОТВЕТСТВЕННЫЙ
 
         // UserProfile
-        $dbal->addSelect('users_profile.event as users_profile_event');
-        $dbal->leftJoin(
-            'token',
-            UserProfile::class,
-            'users_profile',
-            'users_profile.id = token.id'
-        );
+        $dbal
+            ->addSelect('users_profile.event as users_profile_event')
+            ->leftJoin(
+                'token',
+                UserProfile::class,
+                'users_profile',
+                'users_profile.id = profile.value',
+            );
 
 
         // Info
@@ -127,7 +170,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
             'token',
             UserProfileInfo::class,
             'users_profile_info',
-            'users_profile_info.profile = token.id'
+            'users_profile_info.profile = token.id',
         );
 
         // Event
@@ -135,7 +178,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
             'users_profile',
             UserProfileEvent::class,
             'users_profile_event',
-            'users_profile_event.id = users_profile.event'
+            'users_profile_event.id = users_profile.event',
         );
 
 
@@ -146,7 +189,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
             'users_profile_event',
             UserProfilePersonal::class,
             'users_profile_personal',
-            'users_profile_personal.event = users_profile_event.id'
+            'users_profile_personal.event = users_profile_event.id',
         );
 
         // Avatar
@@ -166,7 +209,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
             'users_profile_event',
             UserProfileAvatar::class,
             'users_profile_avatar',
-            'users_profile_avatar.event = users_profile_event.id'
+            'users_profile_avatar.event = users_profile_event.id',
         );
 
         /** ACCOUNT */
@@ -175,7 +218,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
             'users_profile_info',
             Account::class,
             'account',
-            'account.id = users_profile_info.usr'
+            'account.id = users_profile_info.usr',
         );
 
         $dbal->addSelect('account_event.email AS account_email');
@@ -183,7 +226,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
             'account',
             AccountEvent::class,
             'account_event',
-            'account_event.id = account.event AND account_event.account = account.id'
+            'account_event.id = account.event AND account_event.account = account.id',
         );
 
         $dbal->addSelect('account_status.status as account_status');
@@ -191,11 +234,11 @@ final class AllWbTokenRepository implements AllWbTokenInterface
             'account_event',
             AccountStatus::class,
             'account_status',
-            'account_status.event = account_event.id'
+            'account_status.event = account_event.id',
         );
 
         /* Поиск */
-        if($this->search->getQuery())
+        if($this->search instanceof SearchDTO)
         {
             $dbal
                 ->createSearchQueryBuilder($this->search)
@@ -205,7 +248,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
                 ->addSearchLike('users_profile_personal.username');
         }
 
-        return $this->paginator->fetchAllAssociative($dbal);
+        return $this->paginator->fetchAllHydrate($dbal, WbTokenPaginatorResult::class);
 
     }
 }

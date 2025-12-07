@@ -51,17 +51,18 @@ final class EditController extends AbstractController
         WbTokenHandler $WbTokenHandler,
     ): Response
     {
+
         $WbTokenDTO = new WbTokenDTO();
 
         /** Запрещаем редактировать чужой токен */
-        if($this->isAdmin() === true || $this->getProfileUid()?->equals($WbTokenEvent->getProfile()) === true)
+        if($this->isAdmin() === true || $this->getProfileUid()?->equals($WbTokenEvent->getProfile()->getValue()) === true)
         {
             $WbTokenEvent->getDto($WbTokenDTO);
         }
 
         if($request->getMethod() === 'GET')
         {
-            $WbTokenDTO->hiddenToken();
+            $WbTokenDTO->getToken()->hiddenToken();
         }
 
         // Форма
@@ -78,7 +79,7 @@ final class EditController extends AbstractController
             $this->refreshTokenForm($form);
 
             /** Запрещаем редактировать чужой токен */
-            if($this->isAdmin() === false && $this->getProfileUid()?->equals($WbTokenDTO->getProfile()) !== true)
+            if($this->isAdmin() === false && $this->getProfileUid()?->equals($WbTokenDTO->getProfile()->getValue()) !== true)
             {
                 $this->addFlash('admin.breadcrumb.edit', 'admin.danger.edit', 'admin.wb.token', '404');
                 return $this->redirectToReferer();

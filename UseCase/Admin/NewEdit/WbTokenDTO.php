@@ -28,6 +28,13 @@ namespace BaksDev\Wildberries\UseCase\Admin\NewEdit;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEventInterface;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Active\WbTokenActiveDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Card\WbTokenCardDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Percent\WbTokenPercentDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Profile\WbTokenProfileDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Stocks\WbTokenStockDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Token\WbTokenValueDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Warehouse\WbTokenWarehouseDTO;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see MegamarketTokenEvent */
@@ -41,37 +48,57 @@ final class WbTokenDTO implements WbTokenEventInterface
     private ?WbTokenEventUid $id = null;
 
     /**
-     * ID настройки (профиль пользователя)
+     * Статус true = активен / false = заблокирован
      */
-    #[Assert\NotBlank]
-    #[Assert\Uuid]
-    private ?UserProfileUid $profile = null;
+    #[Assert\Valid]
+    private WbTokenActiveDTO $active;
+
+    /**
+     * Профиль пользователя
+     */
+    #[Assert\Valid]
+    private WbTokenProfileDTO $profile;
 
     /**
      * Токен
      */
-    private ?string $token;
+    #[Assert\Valid]
+    private WbTokenValueDTO $token;
 
     /**
      * Торговая наценка
      */
-    #[Assert\NotBlank]
-    private ?string $percent = '0';
-
+    #[Assert\Valid]
+    private WbTokenPercentDTO $percent;
 
     /**
-     * Статус true = активен / false = заблокирован
+     * Обновлять карточки токеном
      */
-    private bool $active = true;
+    #[Assert\Valid]
+    private WbTokenCardDTO $card;
 
-    private Cookie\WbTokenCookieDTO $cookie;
+    /**
+     * Запустить продажи
+     */
+    #[Assert\Valid]
+    private WbTokenStockDTO $stock;
+    /**
+     * Запустить продажи
+     */
+    #[Assert\Valid]
+    private WbTokenWarehouseDTO $warehouse;
 
 
     public function __construct()
     {
-        $this->cookie = new Cookie\WbTokenCookieDTO();
+        $this->active = new WbTokenActiveDTO();
+        $this->profile = new WbTokenProfileDTO();
+        $this->token = new WbTokenValueDTO();
+        $this->percent = new WbTokenPercentDTO();
+        $this->card = new WbTokenCardDTO();
+        $this->stock = new WbTokenStockDTO();
+        $this->warehouse = new WbTokenWarehouseDTO();
     }
-
 
     public function setId(?WbTokenEventUid $id): void
     {
@@ -84,87 +111,43 @@ final class WbTokenDTO implements WbTokenEventInterface
         return $this->id;
     }
 
-
-    /**
-     * Profile
-     */
-    public function getProfile(): ?UserProfileUid
+    public function getId(): ?WbTokenEventUid
     {
-        return $this->profile;
+        return $this->id;
     }
 
-
-    public function setProfile(UserProfileUid $profile): void
-    {
-        $this->profile = $profile;
-    }
-
-    /**
-     * Token
-     */
-    public function getToken(): string
-    {
-        return $this->token;
-    }
-
-    public function setToken(?string $token): self
-    {
-        if(!empty($token))
-        {
-            $this->token = $token;
-        }
-
-        return $this;
-    }
-
-    public function hiddenToken(): void
-    {
-        $this->token = null;
-    }
-
-
-
-    /**
-     * Active
-     */
-    public function getActive(): bool
+    public function getActive(): WbTokenActiveDTO
     {
         return $this->active;
     }
 
-
-    public function setActive(bool $active): void
+    public function getProfile(): WbTokenProfileDTO
     {
-        $this->active = $active;
+        return $this->profile;
     }
 
-
-    /**
-     * Cookie
-     */
-    public function getCookie(): Cookie\WbTokenCookieDTO
+    public function getToken(): WbTokenValueDTO
     {
-        return $this->cookie;
+        return $this->token;
     }
 
-
-    public function setCookie(Cookie\WbTokenCookieDTO $cookie): void
-    {
-        $this->cookie = $cookie;
-    }
-
-    /**
-     * Percent
-     */
-    public function getPercent(): ?string
+    public function getPercent(): WbTokenPercentDTO
     {
         return $this->percent;
     }
 
-    public function setPercent(?string $percent): self
+    public function getCard(): WbTokenCardDTO
     {
-        $this->percent = $percent;
-        return $this;
+        return $this->card;
     }
 
+    public function getStock(): WbTokenStockDTO
+    {
+        return $this->stock;
+    }
+
+    public function getWarehouse(): WbTokenWarehouseDTO
+    {
+        return $this->warehouse;
+    }
 }

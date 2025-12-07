@@ -54,7 +54,7 @@ final class NewController extends AbstractController
 
         if(false === $this->isAdmin())
         {
-            $WbTokenDTO->setProfile($this->getProfileUid());
+            $WbTokenDTO->getProfile()->setValue($this->getProfileUid());
         }
 
         // Форма

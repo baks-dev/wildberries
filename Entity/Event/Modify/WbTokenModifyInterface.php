@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,11 @@
  *  THE SOFTWARE.
  */
 
-namespace BaksDev\Wildberries\Repository\WbTokenChoice;
+namespace BaksDev\Wildberries\Entity\Event\Modify;
 
-interface WbTokenChoiceInterface
+use BaksDev\Core\Type\Modify\ModifyAction;
+
+interface WbTokenModifyInterface
 {
-    /**
-     * Возвращает всю коллекцию идентификаторов токенов
-     */
-    public function getTokenCollection(): ?array;
-
-    /**
-     * Возвращает коллекцию идентификаторов, доступных активному профилю пользователя
-     */
-    public function getAccessProfileTokenCollection(): ?array;
-
+    public function getAction(): ModifyAction;
 }

@@ -21,17 +21,28 @@
  *  THE SOFTWARE.
  */
 
-namespace BaksDev\Wildberries\Repository\AllProfileToken;
+declare(strict_types=1);
 
-use Generator;
+namespace BaksDev\Wildberries\UseCase\Admin\NewEdit\Warehouse;
 
-interface AllProfileTokenInterface
+use BaksDev\Wildberries\Entity\Event\Warehouse\WbTokenWarehouseInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/** @see WbTokenWarehouse */
+final class WbTokenWarehouseDTO implements WbTokenWarehouseInterface
 {
+    /** Значение свойства */
+    #[Assert\NotBlank]
+    private ?string $value = null;
 
-    public function onlyActiveToken(): self;
+    public function getValue(): ?string
+    {
+        return $this->value;
+    }
 
-    /**
-     * Метод возвращает идентификаторы профилей всех добавленных токенов
-     */
-    public function findAll(): Generator;
+    public function setValue(?string $value): self
+    {
+        $this->value = $value;
+        return $this;
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ namespace BaksDev\Wildberries\Listeners\Entity;
 
 use BaksDev\Core\Type\Ip\IpAddress;
 use BaksDev\Users\User\Entity\User;
-use BaksDev\Wildberries\Entity\Modify\WbTokenModify;
+use BaksDev\Wildberries\Entity\Event\Modify\WbTokenModify;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;

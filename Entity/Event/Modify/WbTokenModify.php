@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Entity\Modify;
+namespace BaksDev\Wildberries\Entity\Event\Modify;
 
 
 use BaksDev\Core\Entity\EntityEvent;
