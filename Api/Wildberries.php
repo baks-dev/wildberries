@@ -107,6 +107,11 @@ abstract class Wildberries
         return $this->profile;
     }
 
+    public function getTokenIdentifier(): false|WbTokenUid
+    {
+        return $this->identifier;
+    }
+
     /**
      * Торговая наценка
      *
