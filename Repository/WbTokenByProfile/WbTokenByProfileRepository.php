@@ -78,13 +78,14 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
 
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $dbal->from(WbToken::class, 'token');
-        $dbal->where('token.id = :profile');
-        $dbal->setParameter(
-            key: 'profile',
-            value: $this->profile,
-            type: UserProfileUid::TYPE,
-        );
+        $dbal
+            ->from(WbToken::class, 'token')
+            ->where('token.id = :profile')
+            ->setParameter(
+                key: 'profile',
+                value: $this->profile,
+                type: UserProfileUid::TYPE,
+            );
 
         $dbal->join(
             'token',
@@ -137,9 +138,9 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
 
 
         $dbal->join(
+            'token',
             UserProfileInfo::class,
             'info',
-            'WITH',
             'info.profile = token.id AND info.status = :status',
         )
             ->setParameter(
