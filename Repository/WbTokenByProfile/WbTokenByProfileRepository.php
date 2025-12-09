@@ -98,7 +98,7 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
             'token',
             WbTokenActive::class,
             'wb_token_active',
-            'wb_token_active.event = token.event AND event.active IS TRUE',
+            'wb_token_active.event = token.event AND wb_token_active.value IS TRUE',
         );
 
         $dbal->join(

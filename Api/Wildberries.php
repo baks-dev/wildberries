@@ -99,17 +99,17 @@ abstract class Wildberries
         return $this;
     }
 
+    public function getTokenIdentifier(): false|WbTokenUid
+    {
+        return $this->identifier;
+    }
+
     /**
      * Profile
      */
     public function getProfile(): UserProfileUid|false
     {
-        return $this->profile;
-    }
-
-    public function getTokenIdentifier(): false|WbTokenUid
-    {
-        return $this->identifier;
+        return $this->wbAuthorizationToken->getProfile();
     }
 
     /**
