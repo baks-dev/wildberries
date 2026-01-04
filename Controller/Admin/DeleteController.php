@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -50,13 +50,16 @@ final class DeleteController extends AbstractController
         WbTokenDeleteHandler $WbTokenDeleteHandler,
     ): Response
     {
-
         $WbTokenDeleteDTO = new WbTokenDeleteDTO();
         $WbTokenEvent->getDto($WbTokenDeleteDTO);
-        $form = $this->createForm(WbTokenDeleteForm::class, $WbTokenDeleteDTO, [
-            'action' => $this->generateUrl('wildberries:admin.delete', ['id' => $WbTokenDeleteDTO->getEvent()]),
-        ]);
-        $form->handleRequest($request);
+
+        $form = $this
+            ->createForm(
+                type: WbTokenDeleteForm::class,
+                data: $WbTokenDeleteDTO,
+                options: ['action' => $this->generateUrl('wildberries:admin.delete', ['id' => $WbTokenDeleteDTO->getEvent()]),
+                ])
+            ->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid() && $form->has('wb_token_delete'))
         {

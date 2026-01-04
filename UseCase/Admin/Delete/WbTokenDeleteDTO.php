@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,12 +29,12 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEvent;
 use BaksDev\Wildberries\Entity\Event\WbTokenEventInterface;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
+use BaksDev\Wildberries\UseCase\Admin\Delete\Profile\WbTokenProfileDTO;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see WbTokenEvent */
 final class WbTokenDeleteDTO implements WbTokenEventInterface
 {
-
     /**
      * Идентификатор события
      */
@@ -42,10 +42,10 @@ final class WbTokenDeleteDTO implements WbTokenEventInterface
     private readonly WbTokenEventUid $id;
 
     /**
-     * ID настройки (профиль пользователя)
+     * Профиль пользователя
      */
-    #[Assert\NotBlank]
-    private readonly UserProfileUid $profile;
+    #[Assert\Valid]
+    private WbTokenProfileDTO $profile;
 
     /**
      * Модификатор
@@ -57,6 +57,7 @@ final class WbTokenDeleteDTO implements WbTokenEventInterface
     public function __construct()
     {
         $this->modify = new Modify\ModifyDTO();
+        $this->profile = new WbTokenProfileDTO();
     }
 
 
@@ -88,15 +89,9 @@ final class WbTokenDeleteDTO implements WbTokenEventInterface
     /**
      * ID настройки (профиль пользователя)
      */
-    public function getProfile(): UserProfileUid
+    public function getProfile(): WbTokenProfileDTO
     {
         return $this->profile;
-    }
-
-
-    public function setProfile(UserProfileUid $profile): void
-    {
-        $this->profile = $profile;
     }
 
 }
