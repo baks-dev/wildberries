@@ -64,7 +64,6 @@ abstract class Wildberries
         private readonly AppCacheInterface $cache,
     ) {}
 
-
     public function forTokenIdentifier(WbToken|WbTokenUid $identifier): self
     {
         if($identifier instanceof WbToken)
@@ -74,7 +73,7 @@ abstract class Wildberries
 
         $this->wbAuthorizationToken = $this->WbToken
             ->forTokenIdentifier($identifier)
-            ->find();
+            ->find() ?: null;
 
         $this->identifier = $identifier;
 
@@ -130,13 +129,32 @@ abstract class Wildberries
 
     public function isCard(): bool
     {
-        return $this->wbAuthorizationToken?->isCard() === true;
+        return
+            ($this->wbAuthorizationToken instanceof WbAuthorizationToken)
+            && $this->wbAuthorizationToken->isCard() === true;
     }
 
     public function isStock(): bool
     {
-        return $this->wbAuthorizationToken?->isStock() === true;
+        return
+            ($this->wbAuthorizationToken instanceof WbAuthorizationToken)
+            && $this->wbAuthorizationToken->isStock() === true;
     }
+
+    public function isOrders(): bool
+    {
+        return
+            ($this->wbAuthorizationToken instanceof WbAuthorizationToken)
+            && $this->wbAuthorizationToken->isOrders() === true;
+    }
+
+    public function isSales(): bool
+    {
+        return
+            ($this->wbAuthorizationToken instanceof WbAuthorizationToken)
+            && $this->wbAuthorizationToken->isSales() === true;
+    }
+
 
     /**
      * Метод возвращает идентификатор склада
@@ -217,7 +235,7 @@ abstract class Wildberries
 
             $this->wbAuthorizationToken = $this->TokenByProfile
                 ->forProfile($this->profile)
-                ->getToken();
+                ->getToken() ?: null;
 
             if(false === ($this->wbAuthorizationToken instanceof WbAuthorizationToken))
             {

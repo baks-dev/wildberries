@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,10 @@ use BaksDev\Wildberries\Entity\Cookie\WbTokenCookie;
 use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
 use BaksDev\Wildberries\Entity\Event\Card\WbTokenCard;
 use BaksDev\Wildberries\Entity\Event\Modify\WbTokenModify;
+use BaksDev\Wildberries\Entity\Event\Orders\WbTokenOrders;
 use BaksDev\Wildberries\Entity\Event\Percent\WbTokenPercent;
 use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
+use BaksDev\Wildberries\Entity\Event\Sales\WbTokenSales;
 use BaksDev\Wildberries\Entity\Event\Stocks\WbTokenStocks;
 use BaksDev\Wildberries\Entity\Event\Token\WbTokenValue;
 use BaksDev\Wildberries\Entity\Event\Warehouse\WbTokenWarehouse;
@@ -73,16 +75,13 @@ class WbTokenEvent extends EntityEvent
     #[ORM\OneToOne(targetEntity: WbTokenProfile::class, mappedBy: 'event', cascade: ['all'])]
     private ?WbTokenProfile $profile = null;
 
-
     /** WbTokenValue */
     #[ORM\OneToOne(targetEntity: WbTokenValue::class, mappedBy: 'event', cascade: ['all'])]
     private ?WbTokenValue $token = null;
 
-
     /** WbTokenActive */
     #[ORM\OneToOne(targetEntity: WbTokenActive::class, mappedBy: 'event', cascade: ['all'])]
     private ?WbTokenActive $active = null;
-
 
     /** WbTokenCard */
     #[ORM\OneToOne(targetEntity: WbTokenCard::class, mappedBy: 'event', cascade: ['all'])]
@@ -92,6 +91,14 @@ class WbTokenEvent extends EntityEvent
     #[ORM\OneToOne(targetEntity: WbTokenStocks::class, mappedBy: 'event', cascade: ['all'])]
     private ?WbTokenStocks $stock = null;
 
+    /** WbTokenOrders */
+    #[ORM\OneToOne(targetEntity: WbTokenOrders::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenOrders $orders = null;
+
+    /** WbTokenOrders */
+    #[ORM\OneToOne(targetEntity: WbTokenSales::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenSales $sales = null;
+
     /** WbTokenPercent */
     #[ORM\OneToOne(targetEntity: WbTokenPercent::class, mappedBy: 'event', cascade: ['all'])]
     private ?WbTokenPercent $percent = null;
@@ -100,9 +107,7 @@ class WbTokenEvent extends EntityEvent
     #[ORM\OneToOne(targetEntity: WbTokenWarehouse::class, mappedBy: 'event', cascade: ['all'])]
     private ?WbTokenWarehouse $warehouse = null;
 
-    /**
-     * Модификатор
-     */
+    /** Модификатор */
     #[ORM\OneToOne(targetEntity: WbTokenModify::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private WbTokenModify $modify;
 

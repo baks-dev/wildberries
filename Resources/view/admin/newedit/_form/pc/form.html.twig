@@ -3,7 +3,7 @@
     {# ОСНОВНЫЕ НАСТРОЙКИ #}
     <div class="tab-pane fade show active" id="tab_token" role="tabpanel">
 
-        <div class="d-flex gap-3 mb-3">
+        <div class="d-flex gap-3">
             {# Если администратор ресурса  #}
             {% if is_granted('ROLE_ADMIN') and form.profile.value is defined %}
                 <div class="w-100">
@@ -36,14 +36,6 @@
                 {{ form_row(form.warehouse.value, { label: 'Идентификатор склада' }) }}
             </div>
 
-
-        </div>
-
-        <div class="d-flex gap-3">
-            <div class="w-100">
-                {{ form_row(form.token.value, { label: 'Токен авторизации' }) }}
-            </div>
-
         </div>
 
         <div class="alert alert-danger small p-1 px-3 " role="alert">
@@ -58,8 +50,15 @@
             </div>
         </div>
 
-
         <div class="d-flex gap-3">
+            <div class="w-100">
+                {{ form_row(form.token.value, { label: 'Токен авторизации' }) }}
+            </div>
+
+        </div>
+
+
+        <div class="d-flex gap-3 mb-3">
 
             <div class="flex-fill d-flex justify-content-around  radio-buttons gap-3" data-buttons="true">
 
@@ -89,7 +88,26 @@
                         <div class="form-check d-flex align-items-center">
                             {{ form_widget(form.card.value, { label: false }) }}
                             <span class="small">
-                                Обновлять карточки
+                                Карточки
+                            </span>
+                        </div>
+                    </span>
+                        </div>
+                    </div>
+                </label>
+
+            </div>
+
+            <div class="flex-fill d-flex justify-content-around radio-buttons gap-3" data-buttons="true">
+
+                <label class="btn btn-sm border-dotted rounded-3 w-100 {{ form.orders.value.vars.data ? 'active' }}">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                    <span class="h6">
+                        <div class="form-check d-flex align-items-center">
+                            {{ form_widget(form.orders.value, { label: false }) }}
+                            <span class="small">
+                                Заказы
                             </span>
                         </div>
                     </span>
@@ -108,7 +126,7 @@
                         <div class="form-check d-flex align-items-center">
                             {{ form_widget(form.stock.value, { label: false }) }}
                             <span class="small">
-                                Запустить продажи
+                                Остатки
                             </span>
                         </div>
                     </span>
@@ -118,9 +136,26 @@
 
             </div>
 
+            <div class="flex-fill d-flex justify-content-around radio-buttons gap-3" data-buttons="true">
+
+                <label class="btn btn-sm border-dotted rounded-3 w-100 {{ form.sales.value.vars.data ? 'active' }}">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                    <span class="h6">
+                        <div class="form-check d-flex align-items-center">
+                            {{ form_widget(form.sales.value, { label: false }) }}
+                            <span class="small">
+                                Продажи
+                            </span>
+                        </div>
+                    </span>
+                        </div>
+                    </div>
+                </label>
+
+            </div>
 
         </div>
-
 
     </div>
 </div>

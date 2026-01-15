@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -33,48 +33,24 @@ use Doctrine\DBAL\Types\Types;
 /** @see WbTokenCookie */
 final class WbAuthorizationToken
 {
-
     /**
      * ID настройки (профиль пользователя)
      */
     private readonly string $profile;
 
-    /**
-     * Токен
-     */
-    private readonly string $token;
-
-
-    /**
-     * Торговая наценка
-     * строковое число (пример: 100|-100)
-     * строковое число с процентом - процент (пример: 10%|-10%)
-     */
-    private ?string $percent = null;
-
-    private ?bool $card = null;
-
-    private ?bool $stock = null;
-
-    private ?string $warehouse = null;
-
     public function __construct(
         UserProfileUid|string $profile,
-        string $token,
-        ?string $warehouse = null,
-        ?string $percent = null,
-        ?bool $card = null,
-        ?bool $stock = null
+        private string $token,
+        private ?string $warehouse = null,
+        private ?string $percent = null,
+        private ?bool $card = false, // карточки
+        private ?bool $stock = false, // остатки
+        private ?bool $orders = false, // заказы
+        private ?bool $sales = false // продажи
     )
     {
         $this->profile = (string) $profile;
-        $this->token = $token;
-        $this->percent = $percent;
-        $this->card = $card;
-        $this->stock = $stock;
-        $this->warehouse = $warehouse;
     }
-
 
     public function getProfile(): UserProfileUid
     {
@@ -92,6 +68,11 @@ final class WbAuthorizationToken
         return $this->warehouse;
     }
 
+    /**
+     * Торговая наценка
+     * строковое число (пример: 100|-100)
+     * строковое число с процентом - процент (пример: 10%|-10%)
+     */
     public function getPercent(): ?string
     {
         return $this->percent;
@@ -107,4 +88,13 @@ final class WbAuthorizationToken
         return $this->stock === true;
     }
 
+    public function isOrders(): ?bool
+    {
+        return $this->orders === true;
+    }
+
+    public function isSales(): ?bool
+    {
+        return $this->sales === true;
+    }
 }

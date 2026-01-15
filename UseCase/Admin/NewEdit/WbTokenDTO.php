@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,10 @@ use BaksDev\Wildberries\Entity\Event\WbTokenEventInterface;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Active\WbTokenActiveDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Card\WbTokenCardDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Orders\WbTokenOrdersDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Percent\WbTokenPercentDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Profile\WbTokenProfileDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Sales\WbTokenSalesDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Stocks\WbTokenStockDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Token\WbTokenValueDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Warehouse\WbTokenWarehouseDTO;
@@ -72,21 +74,32 @@ final class WbTokenDTO implements WbTokenEventInterface
     private WbTokenPercentDTO $percent;
 
     /**
-     * Обновлять карточки токеном
+     * Обновлять карточки
      */
     #[Assert\Valid]
     private WbTokenCardDTO $card;
 
     /**
-     * Запустить продажи
+     * Обновлять остатки
      */
     #[Assert\Valid]
     private WbTokenStockDTO $stock;
+
     /**
-     * Запустить продажи
+     * Обновление заказов
+     */
+    #[Assert\Valid]
+    private WbTokenOrdersDTO $orders;
+
+    /**
+     * Идентификатор склада
      */
     #[Assert\Valid]
     private WbTokenWarehouseDTO $warehouse;
+
+    /** Запустить/остановить продажи */
+    #[Assert\Valid]
+    private WbTokenSalesDTO $sales;
 
 
     public function __construct()
@@ -97,14 +110,15 @@ final class WbTokenDTO implements WbTokenEventInterface
         $this->percent = new WbTokenPercentDTO();
         $this->card = new WbTokenCardDTO();
         $this->stock = new WbTokenStockDTO();
+        $this->orders = new WbTokenOrdersDTO();
         $this->warehouse = new WbTokenWarehouseDTO();
+        $this->sales = new WbTokenSalesDTO();
     }
 
     public function setId(?WbTokenEventUid $id): void
     {
         $this->id = $id;
     }
-
 
     public function getEvent(): ?WbTokenEventUid
     {
@@ -149,5 +163,15 @@ final class WbTokenDTO implements WbTokenEventInterface
     public function getWarehouse(): WbTokenWarehouseDTO
     {
         return $this->warehouse;
+    }
+
+    public function getOrders(): WbTokenOrdersDTO
+    {
+        return $this->orders;
+    }
+
+    public function getSales(): WbTokenSalesDTO
+    {
+        return $this->sales;
     }
 }

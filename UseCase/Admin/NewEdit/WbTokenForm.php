@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,22 +25,17 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\UseCase\Admin\NewEdit;
 
-use BaksDev\Users\Profile\UserProfile\Repository\UserProfileChoice\UserProfileChoiceInterface;
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Active\WbTokenActiveForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Card\WbTokenCardForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Orders\WbTokenOrdersForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Percent\WbTokenPercentForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Profile\WbTokenProfileForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Sales\WbTokenSalesForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Stocks\WbTokenStockForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Token\WbTokenValueForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Warehouse\WbTokenWarehouseForm;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -49,12 +44,15 @@ final class WbTokenForm extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-
         $builder->add('active', WbTokenActiveForm::class, ['required' => false, 'label' => false]);
 
         $builder->add('card', WbTokenCardForm::class, ['required' => false, 'label' => false]);
 
+        $builder->add('orders', WbTokenOrdersForm::class, ['required' => false, 'label' => false]);
+
         $builder->add('stock', WbTokenStockForm::class, ['required' => false, 'label' => false]);
+
+        $builder->add('sales', WbTokenSalesForm::class, ['required' => false, 'label' => false]);
 
         $builder->add('profile', WbTokenProfileForm::class, ['required' => false, 'label' => false]);
 
@@ -71,7 +69,6 @@ final class WbTokenForm extends AbstractType
             ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-primary']],
         );
     }
-
 
     public function configureOptions(OptionsResolver $resolver): void
     {

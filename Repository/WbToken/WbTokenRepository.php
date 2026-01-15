@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,10 @@ use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\Status\UserProfileS
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
 use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
 use BaksDev\Wildberries\Entity\Event\Card\WbTokenCard;
+use BaksDev\Wildberries\Entity\Event\Orders\WbTokenOrders;
 use BaksDev\Wildberries\Entity\Event\Percent\WbTokenPercent;
 use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
+use BaksDev\Wildberries\Entity\Event\Sales\WbTokenSales;
 use BaksDev\Wildberries\Entity\Event\Stocks\WbTokenStocks;
 use BaksDev\Wildberries\Entity\Event\Token\WbTokenValue;
 use BaksDev\Wildberries\Entity\Event\Warehouse\WbTokenWarehouse;
@@ -158,6 +160,21 @@ final class WbTokenRepository implements WbTokenInterface
                 'wb_token_stocks.event = wb_token.event',
             );
 
+        $dbal
+            ->leftJoin(
+                'wb_token',
+                WbTokenOrders::class,
+                'wb_token_orders',
+                'wb_token_orders.event = wb_token.event',
+            );
+        $dbal
+            ->leftJoin(
+                'wb_token',
+                WbTokenSales::class,
+                'wb_token_sales',
+                'wb_token_sales.event = wb_token.event',
+            );
+
 
         $dbal
             ->select('wb_token_profile.value AS profile')
@@ -165,7 +182,9 @@ final class WbTokenRepository implements WbTokenInterface
             ->addSelect('wb_token_warehouse.value AS warehouse')
             ->addSelect('wb_token_percent.value AS percent')
             ->addSelect('wb_token_card.value AS card')
-            ->addSelect('wb_token_stocks.value AS stock');
+            ->addSelect('wb_token_stocks.value AS stock')
+            ->addSelect('wb_token_orders.value AS orders')
+            ->addSelect('wb_token_sales.value AS sales');
 
         return $dbal
             ->enableCache('wildberries')
