@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ use BaksDev\Users\Profile\UserProfile\Type\Event\UserProfileEventUid;
 use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use BaksDev\Wildberries\Type\id\WbTokenUid;
+use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see WbTokenPaginatorResult */
@@ -39,9 +40,14 @@ final readonly class WbTokenPaginatorResult
     public function __construct(
         private string $id, // " => "019aeb45-6f0c-7a52-afce-de57ac697431"
         private string $event, // " => "019aebbf-3308-7e02-9aba-dd08de19fa43"
-        private bool $active, // " => false
-        private bool $card, // " => true
-        private bool $stocks, // " => false
+        private string $modify, // " => "019aebbf-3308-7e02-9aba-dd08de19fa43"
+
+        private ?bool $active, // " => false
+        private ?bool $card, // " => true
+        private ?bool $stocks, // " => false
+        private ?bool $orders, // " => false
+        private ?bool $sales, // " => false
+
         private string $users_profile_event, // " => "019a7449-16d9-74c4-b24c-f22366a0780b"
         private ?string $users_profile_status, // " => null
         private ?string $users_profile_username, // " => "White Sign"
@@ -63,6 +69,11 @@ final readonly class WbTokenPaginatorResult
         return new WbTokenEventUid($this->event);
     }
 
+    public function getModify(): DateTimeImmutable
+    {
+        return new DateTimeImmutable($this->modify);
+    }
+
     public function isActive(): bool
     {
         return $this->active === true;
@@ -76,6 +87,16 @@ final readonly class WbTokenPaginatorResult
     public function isStocks(): bool
     {
         return $this->stocks === true;
+    }
+
+    public function isOrders(): bool
+    {
+        return $this->orders === true;
+    }
+
+    public function isSales(): bool
+    {
+        return $this->sales === true;
     }
 
     public function getUsersProfileEvent(): UserProfileEventUid
