@@ -95,6 +95,13 @@ abstract class Wildberries
 
         $this->profile = $profile;
 
+        if(false === ($this->wbAuthorizationToken instanceof WbAuthorizationToken))
+        {
+            $this->wbAuthorizationToken = $this->TokenByProfile
+                ->forProfile($this->profile)
+                ->getToken() ?: null;
+        }
+
         return $this;
     }
 

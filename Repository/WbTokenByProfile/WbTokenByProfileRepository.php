@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -37,8 +37,10 @@ use BaksDev\Users\User\Type\Id\UserUid;
 use BaksDev\Wildberries\Entity\Cookie\WbTokenCookie;
 use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
 use BaksDev\Wildberries\Entity\Event\Card\WbTokenCard;
+use BaksDev\Wildberries\Entity\Event\Orders\WbTokenOrders;
 use BaksDev\Wildberries\Entity\Event\Percent\WbTokenPercent;
 use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
+use BaksDev\Wildberries\Entity\Event\Sales\WbTokenSales;
 use BaksDev\Wildberries\Entity\Event\Stocks\WbTokenStocks;
 use BaksDev\Wildberries\Entity\Event\Token\WbTokenValue;
 use BaksDev\Wildberries\Entity\Event\Warehouse\WbTokenWarehouse;
@@ -67,7 +69,7 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
     }
 
     /**
-     * Токен авторизации Wildberries
+     * Возвращает токен авторизации Wildberries ID по профилю
      */
     public function getToken(): WbAuthorizationToken|false
     {
@@ -131,6 +133,20 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
 
         $dbal->join(
             'token',
+            WbTokenOrders::class,
+            'wb_token_orders',
+            'wb_token_orders.event = token.event',
+        );
+
+        $dbal->join(
+            'token',
+            WbTokenSales::class,
+            'wb_token_sales',
+            'wb_token_sales.event = token.event',
+        );
+
+        $dbal->join(
+            'token',
             WbTokenWarehouse::class,
             'wb_token_warehouse',
             'wb_token_warehouse.event = token.event',
@@ -158,11 +174,13 @@ final class WbTokenByProfileRepository implements WbTokenByProfileInterface
             ->addSelect('wb_token_card.value AS card')
             ->addSelect('wb_token_stocks.value AS stock')
             ->addSelect('wb_token_percent.value AS percent')
-            ->addSelect('wb_token_warehouse.value AS warehouse');
+            ->addSelect('wb_token_warehouse.value AS warehouse')
+            ->addSelect('wb_token_orders.value AS orders')
+            ->addSelect('wb_token_sales.value AS sales');
 
         /* Кешируем результат ORM */
         return $dbal
-            ->enableCache('users-profile-group', '1 day')
+            ->enableCache('wildberries', '1 day')
             ->fetchHydrate(WbAuthorizationToken::class);
 
     }
