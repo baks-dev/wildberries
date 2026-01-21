@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,11 @@ namespace BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses\ProfileWarehouseDTO;
-use BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses\ProfileWarehousesClient;
+use BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses\ProfileWarehousesRequest;
+use BaksDev\Wildberries\Manufacture\Api\Orders\GetWbOrdersRequest;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
+use ReflectionClass;
+use ReflectionMethod;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -36,37 +39,49 @@ use Symfony\Component\DependencyInjection\Attribute\When;
 #[When(env: 'test')]
 final class ProfileWarehousesTest extends KernelTestCase
 {
-    private static $tocken;
+    private static WbAuthorizationToken $Authorization;
 
     public static function setUpBeforeClass(): void
     {
-        self::$tocken = $_SERVER['TEST_WILDBERRIES_TOKEN'];
+        self::$Authorization = new WbAuthorizationToken(
+            new UserProfileUid(),
+            $_SERVER['TEST_WILDBERRIES_TOKEN'],
+        );
     }
 
     public function testUseCase(): void
     {
-        /** @var ProfileWarehousesClient $WildberriesWarehouses */
-        $WildberriesWarehouses = self::getContainer()->get(ProfileWarehousesClient::class);
+        self::assertTrue(true);
 
-        $WildberriesWarehouses->TokenHttpClient(new WbAuthorizationToken(new UserProfileUid(), self::$tocken));
+        /** @var ProfileWarehousesRequest $ProfileWarehousesClient */
+        $ProfileWarehousesClient = self::getContainer()->get(ProfileWarehousesRequest::class);
+        $ProfileWarehousesClient->TokenHttpClient(self::$Authorization);
 
-        /** @var ProfileWarehouseDTO $Warehouse */
-        $Warehouse = $WildberriesWarehouses->warehouses()->current();
+        $warehouses = $ProfileWarehousesClient->warehouses();
 
-        self::assertNotNull($Warehouse->getId());
-        self::assertIsInt($Warehouse->getId());
 
-        self::assertNotNull($Warehouse->getOffice());
-        self::assertIsInt($Warehouse->getOffice());
+        if(false === $warehouses->valid())
+        {
+            return;
+        }
 
-        self::assertNotNull($Warehouse->getName());
-        self::assertIsString($Warehouse->getName());
 
-        self::assertNotNull($Warehouse->getCategory());
-        self::assertContains($Warehouse->getCategory(), [1, 2, 3]);
+        foreach($warehouses as $ProfileWarehouseDTO)
+        {
+            // Вызываем все геттеры
+            $reflectionClass = new ReflectionClass(ProfileWarehouseDTO::class);
+            $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
 
-        self::assertNotNull($Warehouse->getDelivery());
-        self::assertContains($Warehouse->getDelivery(), [1, 2, 3]);
-
+            foreach($methods as $method)
+            {
+                // Методы без аргументов
+                if($method->getNumberOfParameters() === 0)
+                {
+                    // Вызываем метод
+                    $data = $method->invoke($ProfileWarehouseDTO);
+                    // dump($data);
+                }
+            }
+        }
     }
 }

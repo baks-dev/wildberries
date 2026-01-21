@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,51 +23,29 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Api\Token\Warehouse\WarehousesWildberries;
+namespace BaksDev\Wildberries\Api\Token\Warehouse\ProfileWarehouses;
 
-final class WildberriesWarehouseDTO
+final class ProfileWarehouseDTO
 {
 
-    /** ID*/
+    /** ID склада продавца */
     private int $id;
 
+    /** ID склада WB */
+    private int $office;
 
-    /** Адрес*/
-    private string $address;
-
-
-    /** Название*/
+    /** Название склада продавца */
     private string $name;
 
-
-    /** Город*/
-    private string $city;
-
-
-    /** Долгота*/
-    private float $longitude;
-
-
-    /*Широта*/
-    private float $latitude;
-
-
-    /**  Признак того, что склад уже выбран продавцом*/
-    private bool $selected;
-
-
-    /**
-     * Тип товара, который принимает склад:
+    /** Тип товара, который принимает склад:
      *
      * 1 - обычный
      * 2 - СГТ (Сверхгабаритный товар)
      * 3 - КГТ (Крупногабаритный товар). Не используется на данный момент.
      */
-    private int $cargo;
+    private int $category;
 
-    /**
-     *
-     * Тип доставки, который принимает склад:
+    /** Тип доставки, который принимает склад:
      *
      * 1 - доставка на склад Wildberries
      * 2 - доставка силами продавца
@@ -79,14 +57,12 @@ final class WildberriesWarehouseDTO
     public function __construct(array $content)
     {
         $this->id = $content['id'];
-        $this->address = $content['address'];
+        $this->office = $content['officeId'];
         $this->name = $content['name'];
-        $this->city = $content['city'];
-        $this->longitude = $content['longitude'];
-        $this->latitude = $content['latitude'];
-        $this->selected = $content['selected'];
-        $this->cargo = $content['cargoType'];
+
+        $this->category = $content['cargoType'];
         $this->delivery = $content['deliveryType'];
+
     }
 
     /**
@@ -98,11 +74,11 @@ final class WildberriesWarehouseDTO
     }
 
     /**
-     * Address
+     * Office
      */
-    public function getAddress(): string
+    public function getOffice(): int
     {
-        return $this->address;
+        return $this->office;
     }
 
     /**
@@ -114,43 +90,11 @@ final class WildberriesWarehouseDTO
     }
 
     /**
-     * City
+     * Category
      */
-    public function getCity(): string
+    public function getCategory(): int
     {
-        return $this->city;
-    }
-
-    /**
-     * Longitude
-     */
-    public function getLongitude(): float
-    {
-        return $this->longitude;
-    }
-
-    /**
-     * Latitude
-     */
-    public function getLatitude(): float
-    {
-        return $this->latitude;
-    }
-
-    /**
-     * Selected
-     */
-    public function isSelected(): bool
-    {
-        return $this->selected;
-    }
-
-    /**
-     * Cargo
-     */
-    public function getCargo(): int
-    {
-        return $this->cargo;
+        return $this->category;
     }
 
     /**

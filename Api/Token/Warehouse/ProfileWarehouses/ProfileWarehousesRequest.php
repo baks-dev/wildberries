@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,57 +30,52 @@ use DomainException;
 use Generator;
 use InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class ProfileWarehousesClient extends Wildberries
+#[Autoconfigure(public: true)]
+final class ProfileWarehousesRequest extends Wildberries
 {
 
     /**
      * Получить список складов продавца
      *
-     * @see https://openapi.wildberries.ru/marketplace/api/ru/#tag/Sklady/paths/~1api~1v3~1warehouses/get
+     * @see https://dev.wildberries.ru/openapi/work-with-products#tag/Sklady-prodavca/paths/~1api~1v3~1warehouses/get
+     *
+     * @return Generator<ProfileWarehouseDTO>|false
      *
      */
-    public function warehouses(): Generator
+    public function warehouses(): Generator|false
     {
         if(!$this->profile)
         {
             throw new InvalidArgumentException(
-                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)'
+                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)',
             );
         }
 
-        /** Кешируем результат запроса */
+        $response = $this->marketplace()->TokenHttpClient()->request(
+            'GET',
+            '/api/v3/warehouses',
+        );
 
-        $cache = new FilesystemAdapter('wildberries');
+        $content = $response->toArray(false);
 
-        $content = $cache->get('warehouses-'.$this->profile->getValue(), function(ItemInterface $item) {
-
-            $item->expiresAfter(60 * 60);
-
-            $response = $this->TokenHttpClient()->request(
-                'GET',
-                '/api/v3/warehouses',
+        if($response->getStatusCode() !== 200)
+        {
+            throw new DomainException(
+                message: $content['message'] ?? self::class, code: $response->getStatusCode(),
             );
+        }
 
-            if($response->getStatusCode() !== 200)
-            {
-                $content = $response->toArray(false);
-
-                throw new DomainException(
-                    message: $content['message'] ?? self::class, code: $response->getStatusCode()
-                );
-            }
-
-            return $response->toArray(false);
-
-        });
+        if(empty($content))
+        {
+            return false;
+        }
 
         foreach($content as $data)
         {
             yield new ProfileWarehouseDTO($data);
         }
     }
-
-
 }
