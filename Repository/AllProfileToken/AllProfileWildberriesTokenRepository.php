@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -105,6 +105,8 @@ final class AllProfileWildberriesTokenRepository implements AllProfileWildberrie
         /** Параметры конструктора объекта гидрации */
         $dbal->addSelect('wb_token_profile.value');
         $dbal->addSelect('personal.username AS attr');
+
+        $dbal->allGroupByExclude();
 
         return $dbal
             ->enableCache('wildberries', '1 minutes')
