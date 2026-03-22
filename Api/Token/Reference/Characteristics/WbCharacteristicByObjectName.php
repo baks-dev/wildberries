@@ -61,7 +61,7 @@ final class WbCharacteristicByObjectName extends Wildberries
         if(!$this->name)
         {
             throw new InvalidArgumentException(
-                'Не указано название родительской категории: ->name("Косухи")'
+                'Не указано название родительской категории: ->name("Косухи")',
             );
         }
 
@@ -102,7 +102,7 @@ final class WbCharacteristicByObjectName extends Wildberries
 
             throw new DomainException(
                 message: $response->getStatusCode().': '.$content['errorText'] ?? self::class,
-                code: $response->getStatusCode()
+                code: $response->getStatusCode(),
             );
         }
 

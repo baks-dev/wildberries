@@ -40,7 +40,7 @@ final class WbTokenDeleteForm extends AbstractType
         $builder->add(
             'wb_token_delete',
             SubmitType::class,
-            ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-danger']]
+            ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-danger']],
         );
     }
 

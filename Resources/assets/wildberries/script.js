@@ -20,7 +20,7 @@
  *  THE SOFTWARE.
  */
 
-$addButtonProfile = document.getElementById('add-collection-access');
+$addButtonProfile = document.getElementById("add-collection-access");
 
 if($addButtonProfile)
 {
@@ -29,7 +29,7 @@ if($addButtonProfile)
 
     //if ($blockCollectionCall) {
 
-    $addButtonProfile.addEventListener('click', function()
+    $addButtonProfile.addEventListener("click", function()
     {
 
         let $addButtonProfile = this;
@@ -46,7 +46,7 @@ if($addButtonProfile)
         newForm = newForm.replace(/__access__/g, index);
 
         /* Вставляем новую коллекцию */
-        let div = document.createElement('div');
+        let div = document.createElement("div");
         div.id = $addButtonProfile.dataset.item.replace(/__access__/g, index);
 
 
@@ -54,24 +54,24 @@ if($addButtonProfile)
         $blockCollection.append(div);
 
         /* Удаляем контактный номер телефона */
-        (div.querySelector('.del-item'))?.addEventListener('click', removeElement);
+        (div.querySelector(".del-item"))?.addEventListener("click", removeElement);
 
         /* применяем select2 */
-        new NiceSelect(div.querySelector('[data-select="select2"]'), {searchable: true});
+        new NiceSelect(div.querySelector("[data-select=\"select2\"]"), {searchable : true});
 
         /* Увеличиваем data-index на 1 после вставки новой коллекции */
         $addButtonProfile.dataset.index = (index + 1).toString();
 
         /* Плавная прокрутка к элементу */
-        div.scrollIntoView({block: "center", inline: "center", behavior: "smooth"});
+        div.scrollIntoView({block : "center", inline : "center", behavior : "smooth"});
 
     });
     //}
 }
 
-document.querySelectorAll('.del-item').forEach(function(item)
+document.querySelectorAll(".del-item").forEach(function(item)
 {
-    item.addEventListener('click', removeElement);
+    item.addEventListener("click", removeElement);
 });
 
 function removeElement()

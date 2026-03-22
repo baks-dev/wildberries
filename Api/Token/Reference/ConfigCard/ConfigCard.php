@@ -64,7 +64,7 @@ final class ConfigCard implements ConfigCardInterface
                 $response = $this->httpClient->request(
                     'GET',
                     '/api/v1/config/get/object/translated',
-                    ['query' => ['name' => $name],]
+                    ['query' => ['name' => $name],],
                 );
 
                 if($response->getStatusCode() !== 200)

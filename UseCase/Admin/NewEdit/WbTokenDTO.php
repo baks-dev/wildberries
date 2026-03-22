@@ -115,11 +115,6 @@ final class WbTokenDTO implements WbTokenEventInterface
         $this->sales = new WbTokenSalesDTO();
     }
 
-    public function setId(?WbTokenEventUid $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getEvent(): ?WbTokenEventUid
     {
         return $this->id;
@@ -128,6 +123,11 @@ final class WbTokenDTO implements WbTokenEventInterface
     public function getId(): ?WbTokenEventUid
     {
         return $this->id;
+    }
+
+    public function setId(?WbTokenEventUid $id): void
+    {
+        $this->id = $id;
     }
 
     public function getActive(): WbTokenActiveDTO

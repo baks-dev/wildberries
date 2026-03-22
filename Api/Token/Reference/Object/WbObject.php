@@ -60,7 +60,7 @@ final class WbObject extends Wildberries
                     '/content/v2/object/all',
                     ['query' => [
                         'limit' => 1000,
-                        'locale' => 'ru'
+                        'locale' => 'ru',
                     ]],
                 );
         });

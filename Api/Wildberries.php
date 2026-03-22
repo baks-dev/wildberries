@@ -44,12 +44,9 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 abstract class Wildberries
 {
-    private ?WbAuthorizationToken $wbAuthorizationToken = null;
-
-    private WbTokenUid|false $identifier = false;
-
     protected UserProfileUid|false $profile = false;
-
+    private ?WbAuthorizationToken $wbAuthorizationToken = null;
+    private WbTokenUid|false $identifier = false;
     private array $headers;
 
     private string|false $base = false;
@@ -111,14 +108,6 @@ abstract class Wildberries
     }
 
     /**
-     * Profile
-     */
-    public function getProfile(): UserProfileUid|false
-    {
-        return $this->wbAuthorizationToken ? $this->wbAuthorizationToken->getProfile() : false;
-    }
-
-    /**
      * Торговая наценка
      *
      * Положительное либо отрицательное число в рублях, либо с процентом, пример:
@@ -162,13 +151,64 @@ abstract class Wildberries
             && $this->wbAuthorizationToken->isSales() === true;
     }
 
-
     /**
      * Метод возвращает идентификатор склада
      */
     public function getWarehouse(): ?string
     {
         return $this->wbAuthorizationToken->getWarehouse();
+    }
+
+    public function TokenHttpClient(?WbAuthorizationToken $WbAuthorizationToken = null): RetryableHttpClient
+    {
+        if($WbAuthorizationToken !== null)
+        {
+            $this->wbAuthorizationToken = $WbAuthorizationToken;
+            $this->profile = $WbAuthorizationToken->getProfile();
+        }
+
+        if($this->wbAuthorizationToken === null)
+        {
+            if(false === $this->profile)
+            {
+                $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [self::class.':'.__LINE__]);
+
+                throw new InvalidArgumentException(
+                    'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)',
+                );
+            }
+
+            $this->wbAuthorizationToken = $this->TokenByProfile
+                ->forProfile($this->profile)
+                ->getToken() ?: null;
+
+            if(false === ($this->wbAuthorizationToken instanceof WbAuthorizationToken))
+            {
+                throw new DomainException(sprintf('Токен авторизации Wildberries не найден: %s', $this->profile));
+            }
+        }
+
+        $this->base ?: $this->base = 'suppliers-api.wildberries.ru';
+
+        $this->headers['Authorization'] = $this->wbAuthorizationToken->getToken()->getValue();
+        $this->headers['accept'] = 'application/json';
+        $this->headers['Content-Type'] = 'application/json';
+
+        return new RetryableHttpClient(
+            HttpClient::create(['headers' => $this->headers])
+                ->withOptions([
+                    'base_uri' => sprintf('https://%s', $this->base),
+                    'verify_host' => false,
+                ]),
+        );
+    }
+
+    /**
+     * Profile
+     */
+    public function getProfile(): UserProfileUid|false
+    {
+        return $this->wbAuthorizationToken ? $this->wbAuthorizationToken->getProfile() : false;
     }
 
     protected function content(): self
@@ -218,51 +258,6 @@ abstract class Wildberries
         $this->base = 'statistics-api.wildberries.ru';
 
         return $this;
-    }
-
-
-    public function TokenHttpClient(?WbAuthorizationToken $WbAuthorizationToken = null): RetryableHttpClient
-    {
-        if($WbAuthorizationToken !== null)
-        {
-            $this->wbAuthorizationToken = $WbAuthorizationToken;
-            $this->profile = $WbAuthorizationToken->getProfile();
-        }
-
-        if($this->wbAuthorizationToken === null)
-        {
-            if(false === $this->profile)
-            {
-                $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [self::class.':'.__LINE__]);
-
-                throw new InvalidArgumentException(
-                    'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)',
-                );
-            }
-
-            $this->wbAuthorizationToken = $this->TokenByProfile
-                ->forProfile($this->profile)
-                ->getToken() ?: null;
-
-            if(false === ($this->wbAuthorizationToken instanceof WbAuthorizationToken))
-            {
-                throw new DomainException(sprintf('Токен авторизации Wildberries не найден: %s', $this->profile));
-            }
-        }
-
-        $this->base ?: $this->base = 'suppliers-api.wildberries.ru';
-
-        $this->headers['Authorization'] = $this->wbAuthorizationToken->getToken()->getValue();
-        $this->headers['accept'] = 'application/json';
-        $this->headers['Content-Type'] = 'application/json';
-
-        return new RetryableHttpClient(
-            HttpClient::create(['headers' => $this->headers])
-                ->withOptions([
-                    'base_uri' => sprintf('https://%s', $this->base),
-                    'verify_host' => false,
-                ]),
-        );
     }
 
     protected function getCurlHeader(): string

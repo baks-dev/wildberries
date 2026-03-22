@@ -60,21 +60,19 @@ class WbToken
         return (string) $this->id;
     }
 
-    public function getId(): WbTokenUid
-    {
-        return $this->id;
-    }
-
-
     public function getEvent(): WbTokenEventUid
     {
         return $this->event;
     }
 
-
     public function setEvent(WbTokenEventUid|WbTokenEvent $event): void
     {
         $this->event = $event instanceof WbTokenEvent ? $event->getId() : $event;
+    }
+
+    public function getId(): WbTokenUid
+    {
+        return $this->id;
     }
 
 }

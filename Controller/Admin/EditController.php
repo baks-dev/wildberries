@@ -92,7 +92,7 @@ final class EditController extends AbstractController
                 'admin.breadcrumb.edit',
                 $handle instanceof WbToken ? 'admin.success.edit' : 'admin.danger.edit',
                 'admin.wb.token',
-                $handle
+                $handle,
             );
 
             return $this->redirectToReferer();

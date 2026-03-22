@@ -75,7 +75,7 @@ final class WbParentByReference extends Wildberries
             //$this->logger->critical('curl -X POST "' . $url . '" ' . $curlHeader . ' -d "' . $data . '"');
             throw new DomainException(
                 message: $response->getStatusCode().': '.$content['errorText'] ?? self::class,
-                code: $response->getStatusCode()
+                code: $response->getStatusCode(),
             );
         }
 
