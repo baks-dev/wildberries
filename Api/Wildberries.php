@@ -169,7 +169,7 @@ abstract class Wildberries
 
         if($this->wbAuthorizationToken === null)
         {
-            if(false === $this->profile)
+            if(false === ($this->profile instanceof UserProfileUid))
             {
                 $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [self::class.':'.__LINE__]);
 
@@ -282,6 +282,15 @@ abstract class Wildberries
      */
     protected function isExecuteEnvironment(): bool
     {
+        if(false === ($this->profile instanceof UserProfileUid))
+        {
+            $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [self::class.':'.__LINE__]);
+
+            throw new InvalidArgumentException(
+                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)',
+            );
+        }
+
         return $this->environment === 'prod';
     }
 
