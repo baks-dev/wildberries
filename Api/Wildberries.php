@@ -282,12 +282,12 @@ abstract class Wildberries
      */
     protected function isExecuteEnvironment(): bool
     {
-        if(false === ($this->profile instanceof UserProfileUid))
+        if(false === ($this->identifier instanceof WbTokenUid))
         {
-            $this->logger->critical('Не указан идентификатор профиля пользователя через вызов метода profile', [self::class.':'.__LINE__]);
+            $this->logger->critical('Не указан идентификатор токена через вызов метода forTokenIdentifier', [self::class.':'.__LINE__]);
 
             throw new InvalidArgumentException(
-                'Не указан идентификатор профиля пользователя через вызов метода profile: ->profile($UserProfileUid)',
+                'Не указан идентификатор токена через вызов метода forTokenIdentifier: ->forTokenIdentifier($WbTokenUid)',
             );
         }
 
