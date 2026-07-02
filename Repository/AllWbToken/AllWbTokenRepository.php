@@ -196,7 +196,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
                 'token',
                 UserProfileInfo::class,
                 'users_profile_info',
-                'users_profile_info.profile = token.id',
+                'users_profile_info.profile = profile.value',
             );
 
         // Event
