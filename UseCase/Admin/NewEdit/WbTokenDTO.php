@@ -19,17 +19,18 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
 
 namespace BaksDev\Wildberries\UseCase\Admin\NewEdit;
 
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\WbTokenEventInterface;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Active\WbTokenActiveDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Card\WbTokenCardDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Name\WbTokenNameDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Orders\WbTokenOrdersDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Percent\WbTokenPercentDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Profile\WbTokenProfileDTO;
@@ -101,6 +102,11 @@ final class WbTokenDTO implements WbTokenEventInterface
     #[Assert\Valid]
     private WbTokenSalesDTO $sales;
 
+    /**
+     * Название
+     */
+    #[Assert\Valid]
+    private WbTokenNameDTO $name;
 
     public function __construct()
     {
@@ -113,6 +119,7 @@ final class WbTokenDTO implements WbTokenEventInterface
         $this->orders = new WbTokenOrdersDTO();
         $this->warehouse = new WbTokenWarehouseDTO();
         $this->sales = new WbTokenSalesDTO();
+        $this->name = new WbTokenNameDTO();
     }
 
     public function getEvent(): ?WbTokenEventUid
@@ -173,5 +180,10 @@ final class WbTokenDTO implements WbTokenEventInterface
     public function getSales(): WbTokenSalesDTO
     {
         return $this->sales;
+    }
+
+    public function getName(): WbTokenNameDTO
+    {
+        return $this->name;
     }
 }

@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -27,6 +28,7 @@ namespace BaksDev\Wildberries\UseCase\Admin\NewEdit;
 
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Active\WbTokenActiveForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Card\WbTokenCardForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Name\WbTokenNameForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Orders\WbTokenOrdersForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Percent\WbTokenPercentForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Profile\WbTokenProfileForm;
@@ -54,14 +56,15 @@ final class WbTokenForm extends AbstractType
 
         $builder->add('sales', WbTokenSalesForm::class, ['required' => false, 'label' => false]);
 
-        $builder->add('profile', WbTokenProfileForm::class, ['required' => false, 'label' => false]);
+        $builder->add('profile', WbTokenProfileForm::class, ['required' => true, 'label' => false]);
 
-        $builder->add('percent', WbTokenPercentForm::class, ['required' => false, 'label' => false]);
+        $builder->add('percent', WbTokenPercentForm::class, ['required' => true, 'label' => false]);
 
-        $builder->add('token', WbTokenValueForm::class, ['required' => false, 'label' => false]);
+        $builder->add('token', WbTokenValueForm::class, ['required' => true, 'label' => false]);
 
-        $builder->add('warehouse', WbTokenWarehouseForm::class, ['required' => false, 'label' => false]);
+        $builder->add('warehouse', WbTokenWarehouseForm::class, ['required' => true, 'label' => false]);
 
+        $builder->add('name', WbTokenNameForm::class, ['required' => true, 'label' => false]);
 
         /* Сохранить ******************************************************/
         $builder->add(

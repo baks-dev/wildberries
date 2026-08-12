@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -38,13 +39,17 @@ final class WbTokenUid extends Uid
 
     private ?string $params;
 
+    private ?string $attr;
+
     public function __construct(
         AbstractUid|string|null $value = null,
         mixed $params = null,
+        ?string $attr = null,
     )
     {
         parent::__construct($value);
         $this->params = $params;
+        $this->attr = $attr;
     }
 
     public function getParams(): mixed
@@ -57,4 +62,8 @@ final class WbTokenUid extends Uid
         return json_decode($this->params, true, 512, JSON_THROW_ON_ERROR);
     }
 
+    public function getAttr(): ?string
+    {
+        return $this->attr;
+    }
 }

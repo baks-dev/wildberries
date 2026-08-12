@@ -22,24 +22,31 @@
  *
  */
 
-namespace BaksDev\Wildberries\Repository\AllWbToken;
+declare(strict_types=1);
 
-use BaksDev\Core\Form\Search\SearchDTO;
-use BaksDev\Core\Services\Paginator\PaginatorInterface;
-use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+namespace BaksDev\Wildberries\UseCase\Admin\NewEdit\Name;
 
-interface AllWbTokenInterface
+use BaksDev\Wildberries\Entity\Event\Name\WbTokenNameInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/** @see WbTokenName */
+final class WbTokenNameDTO implements WbTokenNameInterface
 {
-
-    public function search(SearchDTO $search): self;
-
-    public function profile(UserProfile|UserProfileUid|string $profile): self;
+    #[Assert\NotBlank]
+    private string $value;
 
     /**
-     * Метод возвращает пагинатор WbToken
-     * @see AllWbTokenResult
+     * Value
      */
-    public function findPaginator(): PaginatorInterface;
+    public function getValue(): string
+    {
+        return $this->value;
+    }
 
+    public function setValue(string $value): self
+    {
+        $this->value = $value;
+
+        return $this;
+    }
 }

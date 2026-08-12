@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -41,6 +42,7 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
 use BaksDev\Wildberries\Entity\Event\Card\WbTokenCard;
 use BaksDev\Wildberries\Entity\Event\Modify\WbTokenModify;
+use BaksDev\Wildberries\Entity\Event\Name\WbTokenName;
 use BaksDev\Wildberries\Entity\Event\Orders\WbTokenOrders;
 use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
 use BaksDev\Wildberries\Entity\Event\Sales\WbTokenSales;
@@ -90,6 +92,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
 
     /**
      * Метод возвращает пагинатор WbToken
+     * @see AllWbTokenResult
      */
     public function findPaginator(): PaginatorInterface
     {
@@ -139,6 +142,15 @@ final class AllWbTokenRepository implements AllWbTokenInterface
                 'active.event = token.event',
             );
 
+
+        $dbal
+            ->addSelect('name.value AS name')
+            ->leftJoin(
+                'token',
+                WbTokenName::class,
+                'name',
+                'name.event = token.event',
+            );
 
         $dbal
             ->addSelect('card.value AS card')
@@ -276,7 +288,7 @@ final class AllWbTokenRepository implements AllWbTokenInterface
                 ->addSearchLike('users_profile_personal.username');
         }
 
-        return $this->paginator->fetchAllHydrate($dbal, WbTokenPaginatorResult::class);
+        return $this->paginator->fetchAllHydrate($dbal, AllWbTokenResult::class);
 
     }
 }

@@ -3,6 +3,8 @@
     {# ОСНОВНЫЕ НАСТРОЙКИ #}
     <div class="tab-pane fade show active" id="tab_token" role="tabpanel">
 
+        {{ form_row(form.name.value, { label: 'Название' }) }}
+
         <div class="d-flex gap-3">
             {# Если администратор ресурса  #}
             {% if is_granted('ROLE_ADMIN') and form.profile.value is defined %}

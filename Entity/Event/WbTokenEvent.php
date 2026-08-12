@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 namespace BaksDev\Wildberries\Entity\Event;
@@ -31,6 +32,7 @@ use BaksDev\Wildberries\Entity\Cookie\WbTokenCookie;
 use BaksDev\Wildberries\Entity\Event\Active\WbTokenActive;
 use BaksDev\Wildberries\Entity\Event\Card\WbTokenCard;
 use BaksDev\Wildberries\Entity\Event\Modify\WbTokenModify;
+use BaksDev\Wildberries\Entity\Event\Name\WbTokenName;
 use BaksDev\Wildberries\Entity\Event\Orders\WbTokenOrders;
 use BaksDev\Wildberries\Entity\Event\Percent\WbTokenPercent;
 use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
@@ -110,6 +112,10 @@ class WbTokenEvent extends EntityEvent
     /** Модификатор */
     #[ORM\OneToOne(targetEntity: WbTokenModify::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private WbTokenModify $modify;
+
+    /** WbTokenWarehouse */
+    #[ORM\OneToOne(targetEntity: WbTokenName::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenName $name = null;
 
     public function __construct()
     {

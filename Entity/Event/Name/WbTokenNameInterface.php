@@ -22,24 +22,12 @@
  *
  */
 
-namespace BaksDev\Wildberries\Repository\AllWbToken;
+namespace BaksDev\Wildberries\Entity\Event\Name;
 
-use BaksDev\Core\Form\Search\SearchDTO;
-use BaksDev\Core\Services\Paginator\PaginatorInterface;
-use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-
-interface AllWbTokenInterface
+interface WbTokenNameInterface
 {
-
-    public function search(SearchDTO $search): self;
-
-    public function profile(UserProfile|UserProfileUid|string $profile): self;
-
     /**
-     * Метод возвращает пагинатор WbToken
-     * @see AllWbTokenResult
+     * Значение свойства
      */
-    public function findPaginator(): PaginatorInterface;
-
+    public function getValue(): string;
 }

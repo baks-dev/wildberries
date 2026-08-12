@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -26,7 +27,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Repository\AllWbToken\Tests;
 
 use BaksDev\Wildberries\Repository\AllWbToken\AllWbTokenInterface;
-use BaksDev\Wildberries\Repository\AllWbToken\WbTokenPaginatorResult;
+use BaksDev\Wildberries\Repository\AllWbToken\AllWbTokenResult;
 use PHPUnit\Framework\Attributes\DependsOnClass;
 use PHPUnit\Framework\Attributes\Group;
 use ReflectionClass;
@@ -56,7 +57,7 @@ class AllWbTokenRepositoryTest extends KernelTestCase
         foreach($result->getData() as $WbTokenPaginatorResult)
         {
             // Вызываем все геттеры
-            $reflectionClass = new ReflectionClass(WbTokenPaginatorResult::class);
+            $reflectionClass = new ReflectionClass(AllWbTokenResult::class);
             $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
 
             foreach($methods as $method)

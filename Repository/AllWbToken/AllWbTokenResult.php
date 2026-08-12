@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -32,31 +33,30 @@ use BaksDev\Users\Profile\UserProfile\Type\UserProfileStatus\UserProfileStatus;
 use BaksDev\Wildberries\Type\Event\WbTokenEventUid;
 use BaksDev\Wildberries\Type\id\WbTokenUid;
 use DateTimeImmutable;
-use Symfony\Component\Validator\Constraints as Assert;
 
-/** @see WbTokenPaginatorResult */
-final readonly class WbTokenPaginatorResult
+final readonly class AllWbTokenResult
 {
     public function __construct(
-        private string $id, // " => "019aeb45-6f0c-7a52-afce-de57ac697431"
-        private string $event, // " => "019aebbf-3308-7e02-9aba-dd08de19fa43"
-        private string $modify, // " => "019aebbf-3308-7e02-9aba-dd08de19fa43"
+        private string $id,
+        private string $event,
+        private string $modify,
 
-        private ?bool $active, // " => false
-        private ?bool $card, // " => true
-        private ?bool $stocks, // " => false
-        private ?bool $orders, // " => false
-        private ?bool $sales, // " => false
+        private ?bool $active,
+        private ?bool $card,
+        private ?bool $stocks,
+        private ?bool $orders,
+        private ?bool $sales,
 
-        private string $users_profile_event, // " => "019a7449-16d9-74c4-b24c-f22366a0780b"
-        private ?string $users_profile_status, // " => null
-        private ?string $users_profile_username, // " => "White Sign"
-        private ?string $users_profile_avatar, // " => null
-        private ?string $users_profile_avatar_ext, // " => null
-        private ?bool $users_profile_avatar_cdn, // " => null
-        private ?string $account_email, // " => null
-        private ?string $account_status, // " => null
+        private string $users_profile_event,
+        private ?string $users_profile_status,
+        private ?string $users_profile_username,
+        private ?string $users_profile_avatar,
+        private ?string $users_profile_avatar_ext,
+        private ?bool $users_profile_avatar_cdn,
+        private ?string $account_email,
+        private ?string $account_status,
 
+        private ?string $name = null,
     ) {}
 
     public function getId(): WbTokenUid
@@ -139,4 +139,8 @@ final readonly class WbTokenPaginatorResult
         return $this->account_status ? new EmailStatus($this->account_status) : null;
     }
 
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
 }
