@@ -1,7 +1,7 @@
 /.idea
-/memory
 /memory/
 /CLAUDE.md
+/MEMORY.md
 /vendor
 composer.lock
 composer.phar
