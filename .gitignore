@@ -1,4 +1,7 @@
 /.idea
+/memory
+/memory/
+/CLAUDE.md
 /vendor
 composer.lock
 composer.phar
