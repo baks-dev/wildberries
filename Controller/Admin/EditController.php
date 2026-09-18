@@ -1,17 +1,17 @@
 <?php
 /*
  *  Copyright 2025.  Baks.dev <admin@baks.dev>
- *  
+ *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *  
+ *
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,65 +40,96 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-#[RoleSecurity('ROLE_WB_TOKEN_EDIT')]
+#[RoleSecurity("ROLE_WB_TOKEN_EDIT")]
 final class EditController extends AbstractController
 {
-
-    #[Route('/admin/wb/token/edit/{id}', name: 'admin.newedit.edit', methods: ['GET', 'POST'])]
+    /**
+     * Обрабатывает редактирование токена Wildberries
+     *
+     * @see WbTokenHandler
+     */
+    #[
+        Route(
+            path: "/admin/wb/token/edit/{id}",
+            name: "admin.newedit.edit",
+            methods: ["GET", "POST"],
+        ),
+    ]
     public function edit(
         Request $request,
         #[MapEntity] WbTokenEvent $WbTokenEvent,
         WbTokenHandler $WbTokenHandler,
-    ): Response
-    {
-
+    ): Response {
         $WbTokenDTO = new WbTokenDTO();
 
         /** Запрещаем редактировать чужой токен */
-        if($this->isAdmin() === true || $this->getProfileUid()?->equals($WbTokenEvent->getProfile()->getValue()) === true)
-        {
+        if (
+            $this->isAdmin() === true ||
+            $this->getProfileUid()?->equals(
+                $WbTokenEvent->getProfile()->getValue(),
+            ) === true
+        ) {
             $WbTokenEvent->getDto($WbTokenDTO);
         }
 
-        if($request->getMethod() === 'GET')
-        {
+        if ($request->getMethod() === "GET") {
             $WbTokenDTO->getToken()->hiddenToken();
         }
 
         // Форма
-        $form = $this
-            ->createForm(WbTokenForm::class, $WbTokenDTO, [
-                'action' => $this->generateUrl(
-                    route: 'wildberries:admin.newedit.edit',
-                    parameters: ['id' => $WbTokenDTO->getEvent() ?: new WbTokenEventUid()]),
-            ])
-            ->handleRequest($request);
+        $form = $this->createForm(
+            type: WbTokenForm::class,
+            data: $WbTokenDTO,
+            options: [
+                "action" => $this->generateUrl(
+                    route: "wildberries:admin.newedit.edit",
+                    parameters: [
+                        "id" =>
+                            $WbTokenDTO->getEvent() ?: new WbTokenEventUid(),
+                    ],
+                ),
+            ],
+        )->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid() && $form->has('wb_token'))
-        {
+        if (
+            $form->isSubmitted() &&
+            $form->isValid() &&
+            $form->has("wb_token")
+        ) {
             $this->refreshTokenForm($form);
 
             /** Запрещаем редактировать чужой токен */
-            if($this->isAdmin() === false && $this->getProfileUid()?->equals($WbTokenDTO->getProfile()->getValue()) !== true)
-            {
-                $this->addFlash('admin.breadcrumb.edit', 'admin.danger.edit', 'admin.wb.token', '404');
+            if (
+                $this->isAdmin() === false &&
+                $this->getProfileUid()?->equals(
+                    $WbTokenDTO->getProfile()->getValue(),
+                ) !== true
+            ) {
+                $this->addFlash(
+                    type: "admin.breadcrumb.edit",
+                    message: "admin.danger.edit",
+                    subject: "admin.wb.token",
+                    context: "404",
+                );
                 return $this->redirectToReferer();
             }
 
             $handle = $WbTokenHandler->handle($WbTokenDTO);
 
-            $this->addFlash
-            (
-                'admin.breadcrumb.edit',
-                $handle instanceof WbToken ? 'admin.success.edit' : 'admin.danger.edit',
-                'admin.wb.token',
-                $handle,
+            $this->addFlash(
+                type: "admin.breadcrumb.edit",
+                message: $handle instanceof WbToken
+                    ? "admin.success.edit"
+                    : "admin.danger.edit",
+                subject: "admin.wb.token",
+                context: $handle,
             );
 
             return $this->redirectToReferer();
-
         }
 
-        return $this->render(['form' => $form->createView()]);
+        return $this->render(
+            view: ["form" => $form->createView()],
+        );
     }
 }

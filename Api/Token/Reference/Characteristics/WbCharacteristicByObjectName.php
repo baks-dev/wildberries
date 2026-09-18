@@ -50,7 +50,7 @@ final class WbCharacteristicByObjectName extends Wildberries
     /**
      * Характеристики для создания КТ по всем подкатегориям
      *
-     * @see https://openapi.wildberries.ru/#tag/Kontent-Konfigurator/paths/~1content~1v1~1object~1characteristics~1list~1filter/get
+     * @see https://dev.wildberries.ru/docs/openapi/item-management#tag/categoriesSubcategoriesAndCharacteristics/operation/getV1ObjectCharacteristics
      *
      * С помощью данного метода можно получить список характеристик, которые можно или нужно заполнить при создании КТ
      *     в подкатегории определенной родительской категории.

@@ -45,7 +45,7 @@ final class WbParentByReference extends Wildberries
      * Родительские категории товаров
      * С помощью данного метода можно получить список всех родительских категорий товаров.
      *
-     * @see https://openapi.wildberries.ru/#tag/Kontent-Konfigurator/paths/~1content~1v1~1object~1parent~1all/get
+     * @see https://dev.wildberries.ru/docs/openapi/item-management#tag/ParentCategories/operation/getV2ObjectParentAll
      */
     public function findParent(): self
     {

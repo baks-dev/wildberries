@@ -39,53 +39,76 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-#[RoleSecurity('ROLE_WB_TOKEN_DELETE')]
+#[RoleSecurity("ROLE_WB_TOKEN_DELETE")]
 final class DeleteController extends AbstractController
 {
-
-    #[Route('/admin/wb/token/delete/{id}', name: 'admin.delete', methods: ['GET', 'POST'])]
+    /**
+     * Обрабатывает удаление токена Wildberries
+     *
+     * @see WbTokenDeleteHandler
+     */
+    #[
+        Route(
+            path: "/admin/wb/token/delete/{id}",
+            name: "admin.delete",
+            methods: ["GET", "POST"],
+        ),
+    ]
     public function delete(
         Request $request,
         #[MapEntity] WbTokenEvent $WbTokenEvent,
         WbTokenDeleteHandler $WbTokenDeleteHandler,
-    ): Response
-    {
+    ): Response {
         $WbTokenDeleteDTO = new WbTokenDeleteDTO();
         $WbTokenEvent->getDto($WbTokenDeleteDTO);
 
-        $form = $this
-            ->createForm(
-                type: WbTokenDeleteForm::class,
-                data: $WbTokenDeleteDTO,
-                options: ['action' => $this->generateUrl('wildberries:admin.delete', ['id' => $WbTokenDeleteDTO->getEvent()]),
-                ])
-            ->handleRequest($request);
+        $form = $this->createForm(
+            type: WbTokenDeleteForm::class,
+            data: $WbTokenDeleteDTO,
+            options: [
+                "action" => $this->generateUrl(
+                    route: "wildberries:admin.delete",
+                    parameters: ["id" => $WbTokenDeleteDTO->getEvent()],
+                ),
+            ],
+        )->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid() && $form->has('wb_token_delete'))
-        {
+        if (
+            $form->isSubmitted() &&
+            $form->isValid() &&
+            $form->has("wb_token_delete")
+        ) {
             $this->refreshTokenForm($form);
 
             $WbToken = $WbTokenDeleteHandler->handle($WbTokenDeleteDTO);
 
-            if($WbToken instanceof WbToken)
-            {
-                $this->addFlash('admin.breadcrumb.delete', 'admin.success.delete', 'admin.wb.token');
+            if ($WbToken instanceof WbToken) {
+                $this->addFlash(
+                    type: "admin.breadcrumb.delete",
+                    message: "admin.success.delete",
+                    subject: "admin.wb.token",
+                );
 
-                return $this->redirectToRoute('wildberries:admin.index');
+                return $this->redirectToRoute(route: "wildberries:admin.index");
             }
 
             $this->addFlash(
-                'admin.breadcrumb.delete',
-                'admin.danger.delete',
-                'admin.wb.token',
-                $WbToken,
+                type: "admin.breadcrumb.delete",
+                message: "admin.danger.delete",
+                subject: "admin.wb.token",
+                context: $WbToken,
             );
 
-            return $this->redirectToRoute('wildberries:admin.index', status: 400);
+            return $this->redirectToRoute(
+                route: "wildberries:admin.index",
+                status: 400,
+            );
         }
 
-        return $this->render([
-            'form' => $form->createView(),
-        ]);
+        return $this->render(
+            view: [
+                "form" => $form->createView(),
+            ],
+        );
     }
 }
