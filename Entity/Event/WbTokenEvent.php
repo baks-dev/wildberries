@@ -35,6 +35,7 @@ use BaksDev\Wildberries\Entity\Event\Orders\WbTokenOrders;
 use BaksDev\Wildberries\Entity\Event\Percent\WbTokenPercent;
 use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
 use BaksDev\Wildberries\Entity\Event\Sales\WbTokenSales;
+use BaksDev\Wildberries\Entity\Event\Shipping\WbTokenShipping;
 use BaksDev\Wildberries\Entity\Event\Stocks\WbTokenStocks;
 use BaksDev\Wildberries\Entity\Event\Token\WbTokenValue;
 use BaksDev\Wildberries\Entity\Event\Warehouse\WbTokenWarehouse;
@@ -110,6 +111,10 @@ class WbTokenEvent extends EntityEvent
     /** Модификатор */
     #[ORM\OneToOne(targetEntity: WbTokenModify::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private WbTokenModify $modify;
+
+    /** WbTokenShipping */
+    #[ORM\OneToOne(targetEntity: WbTokenShipping::class, mappedBy: 'event', cascade: ['all'])]
+    private ?WbTokenShipping $shipping = null;
 
     public function __construct()
     {

@@ -87,7 +87,7 @@ final class NewController extends AbstractController
                 $this->addFlash(
                     type: "admin.breadcrumb.new",
                     message: "admin.success.new",
-                    subject: "admin.wb.token",
+                    domain: "admin.wb.token",
                 );
 
                 return $this->redirectToRoute(route: "wildberries:admin.index");
@@ -96,15 +96,15 @@ final class NewController extends AbstractController
             $this->addFlash(
                 type: "admin.breadcrumb.new",
                 message: "admin.danger.new",
-                subject: "admin.wb.token",
-                context: $WbToken,
+                domain: "admin.wb.token",
+                arguments: $WbToken,
             );
 
             return $this->redirectToReferer();
         }
 
         return $this->render(
-            view: ["form" => $form->createView()],
+            parameters: ["form" => $form->createView()],
         );
     }
 }

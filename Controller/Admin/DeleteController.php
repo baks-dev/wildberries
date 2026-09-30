@@ -86,7 +86,7 @@ final class DeleteController extends AbstractController
                 $this->addFlash(
                     type: "admin.breadcrumb.delete",
                     message: "admin.success.delete",
-                    subject: "admin.wb.token",
+                    domain: "admin.wb.token",
                 );
 
                 return $this->redirectToRoute(route: "wildberries:admin.index");
@@ -95,8 +95,8 @@ final class DeleteController extends AbstractController
             $this->addFlash(
                 type: "admin.breadcrumb.delete",
                 message: "admin.danger.delete",
-                subject: "admin.wb.token",
-                context: $WbToken,
+                domain: "admin.wb.token",
+                arguments: $WbToken,
             );
 
             return $this->redirectToRoute(
@@ -106,7 +106,7 @@ final class DeleteController extends AbstractController
         }
 
         return $this->render(
-            view: [
+            parameters: [
                 "form" => $form->createView(),
             ],
         );

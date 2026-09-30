@@ -31,6 +31,7 @@ use BaksDev\Wildberries\UseCase\Admin\NewEdit\Orders\WbTokenOrdersForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Percent\WbTokenPercentForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Profile\WbTokenProfileForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Sales\WbTokenSalesForm;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Shipping\WbTokenShippingForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Stocks\WbTokenStockForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Token\WbTokenValueForm;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Warehouse\WbTokenWarehouseForm;
@@ -61,6 +62,8 @@ final class WbTokenForm extends AbstractType
         $builder->add('token', WbTokenValueForm::class, ['required' => false, 'label' => false]);
 
         $builder->add('warehouse', WbTokenWarehouseForm::class, ['required' => false, 'label' => false]);
+
+        $builder->add('shipping', WbTokenShippingForm::class, ['required' => false, 'label' => false]);
 
 
         /* Сохранить ******************************************************/

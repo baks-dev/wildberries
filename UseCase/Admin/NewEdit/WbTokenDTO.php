@@ -34,12 +34,13 @@ use BaksDev\Wildberries\UseCase\Admin\NewEdit\Orders\WbTokenOrdersDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Percent\WbTokenPercentDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Profile\WbTokenProfileDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Sales\WbTokenSalesDTO;
+use BaksDev\Wildberries\UseCase\Admin\NewEdit\Shipping\WbTokenShippingDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Stocks\WbTokenStockDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Token\WbTokenValueDTO;
 use BaksDev\Wildberries\UseCase\Admin\NewEdit\Warehouse\WbTokenWarehouseDTO;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/** @see MegamarketTokenEvent */
+/** @see WbTokenEvent */
 final class WbTokenDTO implements WbTokenEventInterface
 {
 
@@ -101,6 +102,10 @@ final class WbTokenDTO implements WbTokenEventInterface
     #[Assert\Valid]
     private WbTokenSalesDTO $sales;
 
+    /** Идентификатор пункта отгрузки  */
+    #[Assert\Valid]
+    private WbTokenShippingDTO $shipping;
+
 
     public function __construct()
     {
@@ -113,6 +118,7 @@ final class WbTokenDTO implements WbTokenEventInterface
         $this->orders = new WbTokenOrdersDTO();
         $this->warehouse = new WbTokenWarehouseDTO();
         $this->sales = new WbTokenSalesDTO();
+        $this->shipping = new WbTokenShippingDTO();
     }
 
     public function getEvent(): ?WbTokenEventUid
@@ -173,5 +179,10 @@ final class WbTokenDTO implements WbTokenEventInterface
     public function getSales(): WbTokenSalesDTO
     {
         return $this->sales;
+    }
+
+    public function getShipping(): WbTokenShippingDTO
+    {
+        return $this->shipping;
     }
 }

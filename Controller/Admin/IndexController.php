@@ -77,7 +77,7 @@ final class IndexController extends AbstractController
             ->findPaginator();
 
         return $this->render(
-            view: [
+            parameters: [
                 "query" => $WbToken,
                 "search" => $searchForm->createView(),
             ],

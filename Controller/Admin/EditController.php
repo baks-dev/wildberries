@@ -108,8 +108,8 @@ final class EditController extends AbstractController
                 $this->addFlash(
                     type: "admin.breadcrumb.edit",
                     message: "admin.danger.edit",
-                    subject: "admin.wb.token",
-                    context: "404",
+                    domain: "admin.wb.token",
+                    arguments: "404",
                 );
                 return $this->redirectToReferer();
             }
@@ -121,15 +121,15 @@ final class EditController extends AbstractController
                 message: $handle instanceof WbToken
                     ? "admin.success.edit"
                     : "admin.danger.edit",
-                subject: "admin.wb.token",
-                context: $handle,
+                domain: "admin.wb.token",
+                arguments: $handle,
             );
 
             return $this->redirectToReferer();
         }
 
         return $this->render(
-            view: ["form" => $form->createView()],
+            parameters: ["form" => $form->createView()],
         );
     }
 }

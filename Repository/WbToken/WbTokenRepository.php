@@ -35,6 +35,7 @@ use BaksDev\Wildberries\Entity\Event\Orders\WbTokenOrders;
 use BaksDev\Wildberries\Entity\Event\Percent\WbTokenPercent;
 use BaksDev\Wildberries\Entity\Event\Profile\WbTokenProfile;
 use BaksDev\Wildberries\Entity\Event\Sales\WbTokenSales;
+use BaksDev\Wildberries\Entity\Event\Shipping\WbTokenShipping;
 use BaksDev\Wildberries\Entity\Event\Stocks\WbTokenStocks;
 use BaksDev\Wildberries\Entity\Event\Token\WbTokenValue;
 use BaksDev\Wildberries\Entity\Event\Warehouse\WbTokenWarehouse;
@@ -177,6 +178,14 @@ final class WbTokenRepository implements WbTokenInterface
 
 
         $dbal
+            ->leftJoin(
+                'wb_token',
+                WbTokenShipping::class,
+                'wb_token_shipping',
+                'wb_token_shipping.event = wb_token.event',
+            );
+
+        $dbal
             ->select('wb_token_profile.value AS profile')
             ->addSelect('wb_token_value.value AS token')
             ->addSelect('wb_token_warehouse.value AS warehouse')
@@ -184,7 +193,8 @@ final class WbTokenRepository implements WbTokenInterface
             ->addSelect('wb_token_card.value AS card')
             ->addSelect('wb_token_stocks.value AS stock')
             ->addSelect('wb_token_orders.value AS orders')
-            ->addSelect('wb_token_sales.value AS sales');
+            ->addSelect('wb_token_sales.value AS sales')
+            ->addSelect('wb_token_shipping.value AS shipping');
 
         return $dbal
             ->enableCache('wildberries')

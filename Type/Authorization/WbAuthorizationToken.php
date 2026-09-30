@@ -46,7 +46,8 @@ final class WbAuthorizationToken
         private ?bool $card = false, // карточки
         private ?bool $stock = false, // остатки
         private ?bool $orders = false, // заказы
-        private ?bool $sales = false // продажи
+        private ?bool $sales = false, // продажи
+        private ?int $shipping = 0, // склад отгрузки
     )
     {
         $this->profile = (string) $profile;
@@ -73,9 +74,9 @@ final class WbAuthorizationToken
      * строковое число (пример: 100|-100)
      * строковое число с процентом - процент (пример: 10%|-10%)
      */
-    public function getPercent(): ?string
+    public function getPercent(): string|false
     {
-        return $this->percent;
+        return empty($this->percent) ? false : $this->percent;
     }
 
     public function isCard(): bool
@@ -83,18 +84,23 @@ final class WbAuthorizationToken
         return $this->card === true;
     }
 
-    public function isStock(): ?bool
+    public function isStock(): bool
     {
         return $this->stock === true;
     }
 
-    public function isOrders(): ?bool
+    public function isOrders(): bool
     {
         return $this->orders === true;
     }
 
-    public function isSales(): ?bool
+    public function isSales(): bool
     {
         return $this->sales === true;
+    }
+
+    public function getShipping(): int|false
+    {
+        return empty($this->shipping) ? false : $this->shipping;
     }
 }

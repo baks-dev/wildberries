@@ -120,7 +120,7 @@ abstract class Wildberries
      */
     public function getPercent(): string
     {
-        return $this->wbAuthorizationToken?->getPercent() ?: '0';
+        return $this->wbAuthorizationToken?->getPercent();
     }
 
     public function isCard(): bool
