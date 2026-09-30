@@ -123,6 +123,11 @@ abstract class Wildberries
         return $this->wbAuthorizationToken?->getPercent();
     }
 
+    public function getShipping(): int|false
+    {
+        return $this->wbAuthorizationToken->getShipping();
+    }
+
     public function isCard(): bool
     {
         return
